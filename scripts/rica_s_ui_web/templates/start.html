@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>RICA-S</title>
+</head>
+
+<body>
+    <h1>rica_s</h1>
+    <form id="run_params" action="/submitted" method="post">
+        <ul>
+            <input type="text" id="tb_readpath"  name="tb_readpath" value="/path/to/reads/"/>
+
+            {% for stg in stages %}
+            <h2>{{ stg[0] }}</h2>
+            {% for s in stg[1] %}
+
+                <input type="checkbox" id="cb_{{ s }}" name="cb_{{ s }}" value="{{ s }}"/>
+                {{ s }} </br>
+                {% endfor %}
+
+            {% endfor %}
+        </ul>
+
+
+        <input type="submit" name="submit" id="submit"  value="Submit" />
+    </form>
+
+</body>
+
+</html>

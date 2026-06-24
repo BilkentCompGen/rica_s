@@ -1,0 +1,64 @@
+services:
+  rica_s_tl_tksm:
+    container_name: rica_s_tl_tksm
+
+    hostname: rica_s_tl_tksm
+
+    ipc: private
+
+    image: alkanlab/rica_s_tl_tksm:0.6.1
+
+
+    logging:
+      driver: json-file
+      options: {}
+
+    networks:
+      - rica_s_net
+
+    stdin_open: true
+
+    tty: true
+
+    volumes:
+      - /home/ricardo/projects/rica_s:/rica_s
+
+    # command:
+    #   - /bin/bash
+
+    # environment:
+      # - PATH=/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      # - LANG=C.UTF-8
+      # - LC_ALL=C.UTF-8
+      # - ENV_NAME=base
+      # - MAMBA_ROOT_PREFIX=/opt/conda
+      # - MAMBA_EXE=/bin/micromamba
+      # - MAMBA_USER=mambauser
+      # - MAMBA_USER_ID=57439
+      # - MAMBA_USER_GID=57439
+      # - TKSM_MODELS=/opt/conda/bin/tksm_models/badread
+      # - PYTHON_VERSION=3.14.0
+      # - PYTHON_SHA256=2299dae542d395ce3883aca00d3c910307cd68e0b2f7336098c8e7b7eee9f3e9
+
+    # build:
+    #   context: .
+    #   dockerfile_inline: |
+#         FROM python:latest
+#         WORKDIR /rica_s/tools/rica_s_tl_tksm
+#         COPY . .
+
+# COPY /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt # buildkit
+
+# COPY /tmp/bin/micromamba /bin/micromamba # buildkit
+# RUN /bin/sh -c { grep -q '^ID=alpine$' /etc/os-release && apk add --no-cache bash; } || true # buildkit
+# ARG MAMBA_USER=mambauser
+# ARG MAMBA_USER_ID=57439
+# ARG MAMBA_USER_GID=57439
+
+
+# COPY _dockerfile_initialize_user_accounts.sh /usr/local/bin/_dockerfile_initialize_user_accounts.sh # buildkit
+
+
+
+#         RUN python -m pip install flask docker pyaml
+#         ENTRYPOINT [ "/bin/bash", "/rica_s/tools/rica_s_tl_tksm/run.sh" ]

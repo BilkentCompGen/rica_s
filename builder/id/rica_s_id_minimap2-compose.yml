@@ -1,0 +1,28 @@
+services:
+  rica_s_id_minimap2:
+    container_name: rica_s_id_minimap2
+
+    entrypoint:
+      - /bin/bash
+
+    hostname: rica_s_id_minimap2
+
+    image: staphb/minimap2
+
+    ipc: private
+
+    logging:
+      driver: json-file
+      options: {}
+
+    mac_address: 56:df:80:6e:a8:ef
+
+    networks:
+      - rica_s_net
+
+    stdin_open: true
+
+    tty: true
+
+    volumes:
+      - /home/ricardo/projects/rica_s:/rica_s

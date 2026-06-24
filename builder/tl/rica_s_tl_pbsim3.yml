@@ -1,0 +1,27 @@
+services:
+  rica_s_tl_tksm:
+    container_name: rica_s_tl_pbsim3
+
+    entrypoint:
+      - /bin/bash
+      
+    hostname: rica_s_tl_pbsim3
+
+    ipc: private
+
+    image: thomasrauter/pbsim3:1.0
+
+
+    logging:
+      driver: json-file
+      options: {}
+
+    networks:
+      - rica_s_net
+
+    stdin_open: true
+
+    tty: true
+
+    volumes:
+      - /home/ricardo/projects/rica_s:/rica_s

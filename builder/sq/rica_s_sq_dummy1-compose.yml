@@ -1,0 +1,31 @@
+networks: {}
+
+services:
+  rica_s_sq_dummy1:
+
+    command:
+      - /bin/sh
+
+    container_name: rica_s_sq_dummy1
+
+    environment:
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+    hostname: rica_s_sq_dummy1
+
+    networks:
+      - rica_s_net
+
+    image: alpine:latest
+
+    ipc: private
+
+    logging:
+      driver: json-file
+      options: {}
+
+    stdin_open: true
+
+    tty: true
+
+    working_dir: /

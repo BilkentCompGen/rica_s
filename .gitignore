@@ -1,0 +1,11 @@
+# Ignore heavy directories completely
+16s/
+amr/
+datasets/
+output/
+reads/
+reference_genomes/
+tools/
+
+# compiled python files
+*.pyc

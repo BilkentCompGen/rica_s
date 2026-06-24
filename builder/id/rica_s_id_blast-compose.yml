@@ -1,0 +1,26 @@
+services:
+  rica_s_id_blast:
+    container_name: rica_s_id_blast
+
+    entrypoint:
+      - /bin/bash
+
+    hostname: rica_s_id_blast
+
+    image: ncbi/blast:latest
+
+    ipc: private
+
+    logging:
+      driver: json-file
+      options: {}
+
+    networks:
+      - rica_s_net
+
+    stdin_open: true
+
+    tty: true
+
+    volumes:
+      - /home/ricardo/projects/rica_s:/rica_s

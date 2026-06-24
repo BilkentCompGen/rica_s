@@ -1,0 +1,28 @@
+services:
+  rica_s_id_ngmlr:
+    container_name: rica_s_id_ngmlr
+
+    entrypoint:
+      - /bin/bash
+
+    hostname: rica_s_id_ngmlr
+
+    image: alkanlab/ngmlr:1
+
+    ipc: private
+
+    logging:
+      driver: json-file
+      options: {}
+
+    mac_address: fe:da:fc:08:a3:3f
+
+    networks:
+      - rica_s_net
+
+    stdin_open: true
+
+    tty: true
+
+    volumes:
+      - /home/ricardo/projects/rica_s:/rica_s

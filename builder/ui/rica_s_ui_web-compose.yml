@@ -1,0 +1,43 @@
+services:
+  rica_s_ui_web:
+    container_name: rica_s_ui_web
+
+    hostname: rica_s_ui_web
+
+    ipc: private
+
+    logging:
+      driver: json-file
+      options: {}
+
+    networks:
+      rica_s_net:
+        ipv4_address: 172.20.0.10 # Assign a static IP address within the subnet
+
+    # mac_address: 0e:4a:e1:c2:3a:81
+
+    ports:
+      - 5000:5000/tcp
+
+    stdin_open: true
+
+    tty: true
+
+    volumes:
+      - /home/ricardo/projects/rica_s:/rica_s
+
+    command:
+      - /bin/bash
+    environment:
+      - PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - PYTHON_VERSION=3.14.0
+      - PYTHON_SHA256=2299dae542d395ce3883aca00d3c910307cd68e0b2f7336098c8e7b7eee9f3e9
+
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:latest
+        WORKDIR /rica_s/tools/rica_s_ui_web
+        COPY . .
+        RUN python -m pip install flask docker pyaml
+        ENTRYPOINT [ "/bin/bash", "/rica_s/tools/rica_s_ui_web/run.sh" ]

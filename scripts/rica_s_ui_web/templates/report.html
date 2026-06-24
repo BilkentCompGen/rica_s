@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>RICA-S</title>
+    
+</head>
+
+<body>
+    <h1>Report</h1>
+    <p> Run ID: {{ run_params.id }}</p>
+    <hr>
+    {{ run_params.report | safe }}
+    <hr>
+</body>
+
+</html>
