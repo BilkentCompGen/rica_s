@@ -1,8 +1,5 @@
 #! /bin/bash
 
-# this script sends a fasta file containing hopefully 1 read, and it for the samfile
-# to be able to retrieve it for later classification
-
 # 1. Quote your variables to handle spaces
 inputfile="$1"
 outputfile="$2"
@@ -15,4 +12,6 @@ filename=$(basename "$inputfile")
 clean_id="${filename%.*}"
 
 # 4. Use double quotes around everything and add the SM tag
-minimap2 -a -R "@RG\tID:$filename\tSM:$clean_id" "$indexfile" "$inputfile" > "$outputfile"
+minimap2 -a -R "@RG\tID:$filename\tSM:$clean_id" "$indexfile" "$inputfile" > "$filename".filter.sam
+samtools view -F 4 "$filename".filter.sam |awk '{print $1}' | sort -u > human_mapped_sequence_names.txt
+samtools view -f 4 "$filename".filter.sam |awk '{print $1}' | sort -u > nonhuman_unmapped_sequence_names.txt

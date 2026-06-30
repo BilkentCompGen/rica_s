@@ -1,19 +1,18 @@
 #! /bin/bash
 
+echo "[i]> === kraken2"
 date
-echo 'starting rica_s_id_kraken'
-echo '-----------------------------------'
 
-run_id=$1
-read_file=$2
-k2 classify --db /rica_s/tools/rica_s_id_kraken2/pathogen.k2db /
-	--output /rica_s/output/$1/$1.outk2 /
-	--threads 16 /
-	--unclassified-out $1.unclassifiedk2 /
-	--classified-out $1.classifiedk2 /
-	--report $1.reportk2 /
-	read_file
 
-echo '-----------------------------------'
-echo 'finishing rica_s_id_kraken'
+# run_id=$1
+inputfile="$1"
+outputfile=$(basename $inputfile)
+outdir="$2"
+
+k2db=/rica_s/tools/rica_s_id_kraken2/pathogen.k2db/
+
+/usr/bin/time -v k2 classify --db $k2db --threads `nproc` --report $outdir/$outputfile.kraken2.report --output $outputfile.kraken2.output --unclassified-out $outdir/$outputfile.kraken2.unclassified --classified-out $outdir/$outputfile.kraken2.classified $inputfile
+
+
 date
+echo "[i]> kraken2 ==="

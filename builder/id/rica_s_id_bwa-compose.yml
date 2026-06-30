@@ -1,19 +1,21 @@
 services:
-  rica_s_id_ngmlr:
-    container_name: rica_s_id_ngmlr
+  rica_s_id_bwa:
+    container_name: rica_s_id_bwa
 
     entrypoint:
       - /bin/bash
 
-    hostname: rica_s_id_ngmlr
+    hostname: rica_s_id_bwa
 
-    image: ubuntu:stonking-20260612
+    image: staphb/bwa
 
     ipc: private
 
     logging:
       driver: json-file
       options: {}
+
+    # mac_address: fe:da:fc:08:a3:3f
 
     networks:
       - rica_s_net

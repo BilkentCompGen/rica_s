@@ -2,9 +2,9 @@
 #!/bin/bash
 
 # Define your input and output files right here at the top
-MAP_FILE=$1
-INPUT_FASTA=$2
-OUTPUT_FASTA=$2_withtaxid.fasta
+MAP_FILE=/home/ricardo/projects/rica_s/tools/rica_s_id_kraken2/pathogen.k2db/taxonomy/nucl_wgs.accession2taxid #NCBI Accession-to-TaxID mapping file.
+INPUT_FASTA=/home/ricardo/projects/rica_s/reference_genomes/coosa.fasta
+OUTPUT_FASTA="$INPUT_FASTA"_withtaxid.fasta
 
 echo -e "\e[1;33m[+] Firing up the FASTA tagger, ese...\e[0m"
 echo -e "\e[1;34m[+] Reading the NCBI accession map into memory (give it a minute)...\e[0m"

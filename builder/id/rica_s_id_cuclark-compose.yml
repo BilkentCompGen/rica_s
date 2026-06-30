@@ -1,28 +1,36 @@
 services:
-  rica_s_id_ganon:
-    container_name: rica_s_id_ganon
+  rica_s_id_cuclark:
+    container_name: rica_s_id_cuclark
 
     entrypoint:
       - /bin/bash
 
-    hostname: rica_s_id_ganon
+    hostname: rica_s_id_cuclark
 
-    image: quay.io/biocontainers/ganon:2.1.1--py39h69c296c_0
-
+    image: alkanlab/rica_s_id_cuclark:latest
+    
     ipc: private
-
+    
     logging:
       driver: json-file
       options: {}
-
-    mac_address: a6:fb:54:78:61:77
-
+    
     networks:
       - rica_s_net
 
     stdin_open: true
 
     tty: true
-
+    
     volumes:
       - /home/ricardo/projects/rica_s:/rica_s
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+# docker run --gpus all -it -v $(pwd):/data alkanlab/cuclark:latest

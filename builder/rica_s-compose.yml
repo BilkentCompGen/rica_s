@@ -13,18 +13,18 @@ networks:
 
 include:
 #  - path: "tl/rica_s_tl_tksm.yml"
-  - path: "tl/rica_s_tl_pbsim3.yml"
+#   - path: "tl/rica_s_tl_pbsim3.yml"
 
 
   - path: "ui/rica_s_ui_web-compose.yml"
 
 
-  - path: "sq/rica_s_sq_dummy1-compose.yml"
+#   - path: "sq/rica_s_sq_dummy1-compose.yml"
   
   
-  - path: "bc/rica_s_bc_dummy1-compose.yml"
+#   - path: "bc/rica_s_bc_dummy1-compose.yml"
   
-  
+
   - path: "id/rica_s_id_ngmlr-compose.yml"
   - path: "id/rica_s_id_minimap2-compose.yml"
   - path: "id/rica_s_id_kraken2-compose.yml"
@@ -33,10 +33,10 @@ include:
   - path: "id/rica_s_id_blast-compose.yml"
   - path: "id/rica_s_id_clark-compose.yml"
   - path: "id/rica_s_id_cuclark-compose.yml"
-#  - path: "id/rica_s_id_bwa-compose.yml"
+  - path: "id/rica_s_id_bwa-compose.yml"
 
 
-#  - path: "pr/rica_s_pr_card-compose.yml"
+# #  - path: "pr/rica_s_pr_card-compose.yml"
   - path: "pr/rica_s_pr_abricate-compose.yml"
   
   

@@ -17,12 +17,13 @@
 
 
 # $1 is the read file
+inputfile="$1"
+outputfile=$(basename $inputfile).abricate.csv
 
+outdir="$2"
 
 # 2. Run the loop to hit every database and append the raw data (without extra headers)
 for db in resfinder victors vfdb upec_expec_vf ecoli_vf argannot megares plasmidfinder card ncbi bacmet2 ecoh; do
-    echo "=== $db ===" >> out.tsv
-    abricate --db $db $1 >> out.tsv
+    # echo "=== $db ===" >> out.tsv
+    abricate --db $db $inputfile >> $outdir/$outputfile
 done
-
-echo "[+] Jale finished, carnal. Master file is ready."

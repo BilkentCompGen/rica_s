@@ -1,21 +1,18 @@
 #! /bin/bash
 
-echo "start run" $1
-echo $(date)
+echo '[i]> === minimap2'
+date
 
+inputfile="$1"
+outputfile=$(basename $inputfile)
 
-queries=$(find $2 -type f -name "*."$3)
-refs=$(find /rica_s/data/pathogen_reference/ -type f -name "*.fasta")
+outdir="$2"
+referencefile="/rica_s/reference_genomes/joint/all_pathogens.mmi"
 
+# queries=$(find $2 -type f -name "*."$3)
+# refs=$(find /rica_s/data/pathogen_reference/ -type f -name "*.fasta")
 
-for r in $refs; do
-        for q in $queries; do
-                echo $r
-                echo $q
+/usr/bin/time -v minimap2 -t `nproc` -c -x map-ont $referencefile $inputfile > $outdir/$outputfile.minimap2.paf
 
-                minimap2 -t 14 -c -x map-ont $r $q > /rica_s/output/runs/$1/id/$(basename $q)_vs_$(basename $r).paf
-        done
-done
-
-
-echo $(date)
+date
+echo '[i]> minimap2 ==='
