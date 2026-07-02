@@ -3,43 +3,99 @@
 
 
 networks:
-  rica_s_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 111.20.0.0/24 # Define the subnet for your network
-#        - subnet: 172.20.0.0/24 # Define the subnet for your network
+    rica_s_net:
+        driver: bridge
+        ipam:
+            config:
+            #   - subnet: 111.20.0.0/24 # Define the subnet for your network
+                - subnet: 172.20.0.0/24 # Define the subnet for your network
+
+services:
+    rica_s_id_clark:
+        extends:
+            file: id/rica_s_id_clark-compose.yml
+            service: rica_s_id_clark
+
+    rica_s_id_blast:
+            extends:
+                file: id/rica_s_id_blast-compose.yml
+                service: rica_s_id_blast
+
+    rica_s_id_bwa:
+            extends:
+                file: id/rica_s_id_bwa-compose.yml
+                service: rica_s_id_bwa
+
+    rica_s_id_cuclark:
+            extends:
+                file: id/rica_s_id_cuclark-compose.yml
+                service: rica_s_id_cuclark
+
+    rica_s_id_ganon:
+            extends:
+                file: id/rica_s_id_ganon-compose.yml
+                service: rica_s_id_ganon
+
+    rica_s_id_kraken2:
+            extends:
+                file: id/rica_s_id_kraken2-compose.yml
+                service: rica_s_id_kraken2
+
+    rica_s_id_krakenuniq:
+            extends:
+                file: id/rica_s_id_krakenuniq-compose.yml
+                service: rica_s_id_krakenuniq
+
+    rica_s_id_minimap2:
+            extends:
+                file: id/rica_s_id_minimap2-compose.yml
+                service: rica_s_id_minimap2
+
+    rica_s_id_ngmlr:
+            extends:
+                file: id/rica_s_id_ngmlr-compose.yml
+                service: rica_s_id_ngmlr
+
+    rica_s_pr_abricate:
+            extends:
+                file: pr/rica_s_pr_abricate-compose.yml
+                service: rica_s_pr_abricate
+
+    rica_s_ui_web:
+            extends:
+                file: ui/rica_s_ui_web-compose.yml
+                service: rica_s_ui_web
 
 
-include:
-#  - path: "tl/rica_s_tl_tksm.yml"
+# include:
+# #  - path: "tl/rica_s_tl_tksm.yml"
 #   - path: "tl/rica_s_tl_pbsim3.yml"
 
 
-  - path: "ui/rica_s_ui_web-compose.yml"
+#   - path: "ui/rica_s_ui_web-compose.yml"
 
 
-#   - path: "sq/rica_s_sq_dummy1-compose.yml"
+# #   - path: "sq/rica_s_sq_dummy1-compose.yml"
   
   
-#   - path: "bc/rica_s_bc_dummy1-compose.yml"
+# #   - path: "bc/rica_s_bc_dummy1-compose.yml"
   
 
-  - path: "id/rica_s_id_ngmlr-compose.yml"
-  - path: "id/rica_s_id_minimap2-compose.yml"
-  - path: "id/rica_s_id_kraken2-compose.yml"
-  - path: "id/rica_s_id_krakenuniq-compose.yml"
-  - path: "id/rica_s_id_ganon-compose.yml"
-  - path: "id/rica_s_id_blast-compose.yml"
-  - path: "id/rica_s_id_clark-compose.yml"
-  - path: "id/rica_s_id_cuclark-compose.yml"
-  - path: "id/rica_s_id_bwa-compose.yml"
+#   - path: "id/rica_s_id_ngmlr-compose.yml"
+#   - path: "id/rica_s_id_minimap2-compose.yml"
+#   - path: "id/rica_s_id_kraken2-compose.yml"
+#   - path: "id/rica_s_id_krakenuniq-compose.yml"
+#   - path: "id/rica_s_id_ganon-compose.yml"
+#   - path: "id/rica_s_id_blast-compose.yml"
+#   - path: "id/rica_s_id_clark-compose.yml"
+#   - path: "id/rica_s_id_cuclark-compose.yml"
+#   - path: "id/rica_s_id_bwa-compose.yml"
 
 
-# #  - path: "pr/rica_s_pr_card-compose.yml"
-  - path: "pr/rica_s_pr_abricate-compose.yml"
+# # #  - path: "pr/rica_s_pr_card-compose.yml"
+#   - path: "pr/rica_s_pr_abricate-compose.yml"
   
   
-  # - path: "rp/*.yml"
+#   # - path: "rp/*.yml"
   
 

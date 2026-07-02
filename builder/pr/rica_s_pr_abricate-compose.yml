@@ -7,15 +7,13 @@ services:
 
     hostname: rica_s_pr_abricate
 
-    image: python:3.11-slim
+    image: alkanlab/rica_s_pr_abricate:v1.1
 
     ipc: private
 
     logging:
       driver: json-file
       options: {}
-
-    mac_address: 5e:31:3d:ea:cb:f1
 
     networks:
       - rica_s_net
@@ -25,4 +23,4 @@ services:
     tty: true
 
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s

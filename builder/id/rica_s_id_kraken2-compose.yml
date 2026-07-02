@@ -7,15 +7,13 @@ services:
 
     hostname: rica_s_id_kraken2
 
-    image: staphb/kraken2
+    image: alkanlab/rica_s_id_kraken2:v1.1
 
     ipc: private
 
     logging:
       driver: json-file
       options: {}
-
-    mac_address: a6:fb:54:78:61:77
 
     networks:
       - rica_s_net
@@ -25,4 +23,5 @@ services:
     tty: true
 
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s
+

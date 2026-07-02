@@ -7,7 +7,10 @@ services:
 
     hostname: rica_s_id_clark
 
-    image: ubuntu:stonking-20260612
+    image: alkanlab/rica_s_id_clark:v1.1
+
+    environment:
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/CLARK/exe:/root/CLARK/scripts
 
     ipc: private
 
@@ -23,5 +26,5 @@ services:
     tty: true
 
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s
 

@@ -4,6 +4,8 @@ services:
 
     hostname: rica_s_ui_web
 
+    image: alkanlab/rica_s_ui_web:v1.1
+
     ipc: private
 
     logging:
@@ -14,8 +16,6 @@ services:
       rica_s_net:
         ipv4_address: 172.20.0.10 # Assign a static IP address within the subnet
 
-    # mac_address: 0e:4a:e1:c2:3a:81
-
     ports:
       - 5000:5000/tcp
 
@@ -24,10 +24,8 @@ services:
     tty: true
 
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s
 
-    command:
-      - /bin/bash
     environment:
       - PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       - PYTHON_VERSION=3.14.0
@@ -37,7 +35,8 @@ services:
       context: .
       dockerfile_inline: |
         FROM python:latest
-        WORKDIR /rica_s/tools/rica_s_ui_web
+        WORKDIR /opt/rica_s/tools/rica_s_ui_web
         COPY . .
         RUN python -m pip install flask docker pyaml
-        ENTRYPOINT [ "/bin/bash", "/rica_s/tools/rica_s_ui_web/run.sh" ]
+
+# ENTRYPOINT [ "/bin/bash", "/rica_s/tools/rica_s_ui_web/run.sh" ]

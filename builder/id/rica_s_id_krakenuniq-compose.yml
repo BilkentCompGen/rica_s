@@ -7,7 +7,7 @@ services:
 
     hostname: rica_s_id_krakenuniq
 
-    image: staphb/krakenuniq
+    image: alkanlab/rica_s_id_krakenuniq:v1.1
 
     ipc: private
 
@@ -23,4 +23,4 @@ services:
     tty: true
 
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s

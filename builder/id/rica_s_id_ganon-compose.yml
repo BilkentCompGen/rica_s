@@ -1,21 +1,19 @@
 services:
   rica_s_id_ganon:
-    container_name: rica_s_id_ganon
+    container_name: rica_s_id_ganon2
 
     entrypoint:
       - /bin/bash
 
-    hostname: rica_s_id_ganon
+    hostname: rica_s_id_ganon2
 
-    image: quay.io/biocontainers/ganon:2.1.1--py39h69c296c_0
+    image: alkanlab/rica_s_id_ganon2:v1.1
 
     ipc: private
 
     logging:
       driver: json-file
       options: {}
-
-    mac_address: a6:fb:54:78:61:77
 
     networks:
       - rica_s_net
@@ -25,4 +23,4 @@ services:
     tty: true
 
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s

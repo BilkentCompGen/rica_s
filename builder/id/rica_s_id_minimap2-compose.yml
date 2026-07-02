@@ -7,15 +7,13 @@ services:
 
     hostname: rica_s_id_minimap2
 
-    image: staphb/minimap2
+    image: alkanlab/rica_s_id_minimap2:v1.1
 
     ipc: private
 
     logging:
       driver: json-file
       options: {}
-
-    mac_address: 56:df:80:6e:a8:ef
 
     networks:
       - rica_s_net
@@ -25,4 +23,4 @@ services:
     tty: true
 
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s

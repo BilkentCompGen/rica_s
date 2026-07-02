@@ -9,8 +9,7 @@ services:
 
     ipc: private
 
-    image: thomasrauter/pbsim3:1.0
-
+    image: alkanlab/pbsim3:v1.1
 
     logging:
       driver: json-file
@@ -24,4 +23,4 @@ services:
     tty: true
 
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s

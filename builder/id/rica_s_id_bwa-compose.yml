@@ -7,15 +7,13 @@ services:
 
     hostname: rica_s_id_bwa
 
-    image: staphb/bwa
+    image: alkanlab/rica_s_id_bwa:v1.1
 
     ipc: private
 
     logging:
       driver: json-file
       options: {}
-
-    # mac_address: fe:da:fc:08:a3:3f
 
     networks:
       - rica_s_net
@@ -25,4 +23,4 @@ services:
     tty: true
 
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s

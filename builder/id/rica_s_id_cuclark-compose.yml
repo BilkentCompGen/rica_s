@@ -7,23 +7,23 @@ services:
 
     hostname: rica_s_id_cuclark
 
-    image: alkanlab/rica_s_id_cuclark:latest
-    
+    image: alkanlab/rica_s_id_cuclark:v1.1
+
     ipc: private
-    
+
     logging:
       driver: json-file
       options: {}
-    
+
     networks:
       - rica_s_net
 
     stdin_open: true
 
     tty: true
-    
+
     volumes:
-      - /home/ricardo/projects/rica_s:/rica_s
+      - /opt/rica_s:/opt/rica_s
 
     deploy:
       resources:
