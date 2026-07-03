@@ -1,5 +1,9 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
+
+echo '[i]> === ABRicate'
+date
+echo ""
 # (abricate_env) root@rica_s_pr_abricate:~# abricate --list
 # DATABASE	SEQUENCES	DBTYPE	DATE
 # resfinder	3206	nucl	2026-Apr-3
@@ -22,8 +26,22 @@ outputfile=$(basename $inputfile).abricate.csv
 
 outdir="$2"
 
+source /root/.bashrc
+micromamba activate
+
+echo -e "#FILE\tSEQUENCE\tSTART\tEND\tSTRAND\tGENE\tCOVERAGE\tCOVERAGE_MAP\tGAPS\t%COVERAGE\t%IDENTITY\tDATABASE\tACCESSION\tPRODUCT\tRESISTANCE" > $outdir/$outputfile
+
 # 2. Run the loop to hit every database and append the raw data (without extra headers)
 for db in resfinder victors vfdb upec_expec_vf ecoli_vf argannot megares plasmidfinder card ncbi bacmet2 ecoh; do
     # echo "=== $db ===" >> out.tsv
-    abricate --db $db $inputfile >> $outdir/$outputfile
+    abricate --db $db $inputfile | tail -n +2 >> $outdir/$outputfile
 done
+
+# grep  -v "#FILE" $outdir/$outputfile > "$outdir/tmp"
+# mv $outdir/tmp $outdir/$outputfile
+# rm $outdir/tmp
+
+
+echo ""
+date
+echo '[i]> ABRicate ==='

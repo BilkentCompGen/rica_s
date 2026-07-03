@@ -33,4 +33,8 @@ services:
               count: all
               capabilities: [gpu]
 
+    build:
+      context: .
+      dockerfile_inline: |
+        RUN apt update && apt install -y nano tail less git wget samtools seqtk seqkit
 # docker run --gpus all -it -v $(pwd):/data alkanlab/cuclark:latest

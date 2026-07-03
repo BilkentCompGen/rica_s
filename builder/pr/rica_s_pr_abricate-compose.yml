@@ -7,7 +7,7 @@ services:
 
     hostname: rica_s_pr_abricate
 
-    image: alkanlab/rica_s_pr_abricate:v1.1
+    image: alkanlab/rica_s_pr_abricate:v1.2
 
     ipc: private
 
@@ -24,3 +24,13 @@ services:
 
     volumes:
       - /opt/rica_s:/opt/rica_s
+
+    build:
+      context: .
+      dockerfile_inline: |
+        RUN apt update && apt install -y nano tail less git wget samtools seqtk seqkit curl
+        "${SHELL}" <(curl -L micro.mamba.pm)
+        source ~/.bashrc
+        micromamba activate
+        conda install -c conda-forge -c bioconda abricate
+

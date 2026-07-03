@@ -11,17 +11,16 @@ outputfile=$(basename $inputfile)
 
 outdir="$2"
 
-kudb=/rica_s/tools/rica_s_id_krakenuniq/pathogen.kudb
+kudb=/opt/rica_s/tools/rica_s_id_krakenuniq/pathogen.kudb
 
 # inputfile=/rica_s/datasets/_1/dataset_5120reads.fasta
 
 
 
-krakenuniq --db $kudb \
-           --threads `nproc` \
-           --report-file $outdir/$outputfile.tsv \
-           "$inputfile" > $outdir/$outputfile.kraken 2> $outdir/$outputfile.log
-
-
-echo "[i]> krakenuniq ==="
+# krakenuniq --db $kudb \
+#            --threads `nproc` \
+#            --report-file $outdir/$outputfile.tsv \
+#            "$inputfile" > $outdir/$outputfile.kraken 2> $outdir/$outputfile.log
+echo "N/A"
 date
+echo "[i]> krakenuniq ==="
