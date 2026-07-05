@@ -1,73 +1,70 @@
+#!/usr/bin/env python3
+# Save this as: plot_top10.py
+
+import argparse
+import os
 import pandas as pd
 import plotly.express as px
-import os
-import sys
-import re
 
+def main():
+    parser = argparse.ArgumentParser(description="Generate horizontal bar charts (HTML & PDF) for the top 10 mapped references.")
+    parser.add_argument("input_tsv", help="Input 2-column TSV file (Reference, Count)")
+    args = parser.parse_args()
 
+    print(f"[*] Reading data from {args.input_tsv}...")
+    
+    try:
+        df = pd.read_csv(args.input_tsv, sep='\t', header=None, names=['Reference', 'Count'])
+    except Exception as e:
+        print(f"¡Chale! Error reading the file: {e}")
+        return
 
-# 1. Load up the BLAST output
-file_path = sys.argv[1]
-df = pd.read_csv(file_path, sep='\t', comment='#', header=None)
+    # Grab the top 10 highest counts.
+    top10_df = df.nlargest(10, 'Count').sort_values(by='Count', ascending=True)
 
-# 2. Count ALL hits and sort them
-hit_counts = df[1].value_counts().reset_index()
-hit_counts.columns = ['Subject', 'Hit_Count']
+    # THE STREET MAGIC: Merge the Reference and Count into a single formatted string
+    top10_df['Label'] = "<i>"+top10_df['Reference'] + "</i> <b>(" + top10_df['Count'].astype(str) + ")</b>  "
 
-# remove taxid
-# hit_counts.replace(r"\(taxid \d+\)" , "", inplace=True, regex=True)
-
-
-hit_counts = hit_counts.sort_values(by='Hit_Count', ascending=False)
-hit_counts = hit_counts[0:21] # keep top 20
-hit_counts = hit_counts.sort_values(by='Hit_Count', ascending=True)
-
-# 3. Build that horizontal Plotly bar chart
-fig = px.bar(hit_counts,
-             x='Hit_Count',
-             y='Subject',
-             orientation='h',
-             title="Hits Distribution (Horizontal)",
-             labels={'Subject': 'Species', 'Hit_Count': 'Reads'},
-             color='Hit_Count',
-             color_continuous_scale='sunsetdark')
-
-
-# ---> THE TRICK FOR TOP & BOTTOM LABELS <---
-# We build a secondary X-axis (xaxis2) that mirrors the bottom one
-fig.update_layout(
-    xaxis2=dict(
-        title='Number of Reads',   # Give it the exact same title
-        overlaying='x',            # Lay it directly over the original x-axis
-        side='top',                # Push it to the roof
-        matches='x'                # Force it to perfectly sync with the bottom scale
+    print("[*] Building the visualization...")
+    
+    fig = px.bar(
+        top10_df, 
+        x='Count', 
+        y='Label',  # Use our new merged column here
+        orientation='h',
+        # title='Top 10 Mapped References',
+        color='Count',
+        color_continuous_scale='Turbo' 
+        # Notice we dropped the text='Count' argument here so it doesn't double-print
     )
-)
 
-# Plotly only draws an axis if there is data attached to it.
-# We drop a single, invisible scatter point attached to 'x2' to trick it into rendering.
-fig.add_scatter(x=[0],
-                y=[hit_counts['Subject'].iloc[0]],
-                xaxis='x2',
-                opacity=0,          # Make it completely invisible
-                # hoverinfo='skip',   # Don't let the mouse interact with it
-                showlegend=False)   # Keep it off the legend
+    fig.update_layout(
+        # template='plotly_dark',
+        xaxis_title="Number of Reads Mapped",
+        yaxis_title="",  # Leave this blank so we don't crowd your new labels
+        # font=dict(family="Courier New, monospace", size=14),
+        margin=dict(l=10, r=10, t=0, b=60),
+        coloraxis_showscale=False 
+    )
+    
+    # Kept the bars nice and lean at 60% thickness
+    fig.update_traces(width=0.5)
 
-# 4. Make it massive and clean
-fig.update_layout(
-    # template="plotly_dark",
-    yaxis=dict(
-        tickfont=dict(size=20),
-        automargin=True,
-        tickmode='linear'
-    ),
-    # width=900,
-    height=50*len(hit_counts)+300
-)
+    base_name, _ = os.path.splitext(args.input_tsv)
+    out_html = f"{base_name}.html"
+    out_pdf = f"{base_name}.pdf"
 
-# 5. Save it as a massive SVG
-output_file = sys.argv[1]+"_hits_horizontal.svg"
-fig.write_image(output_file)
-fig.write_html(output_file+".html")
+    fig.write_html(out_html)
+    print(f"[*] Saved interactive HTML: {out_html}")
+    
+    try:
+        fig.write_image(out_pdf, width=600)
+        print(f"[*] Saved static PDF: {out_pdf}")
+    except ValueError as e:
+        print(f"¡Chale! Failed to save PDF. Run: pip install -U kaleido")
+        print(f"System error: {e}")
 
-print(f"¡Listo, ese! Horizontal chart saved successfully as {output_file}")
+    print("[*] ¡Ya estuvo! Both files are locked and loaded, carnal.")
+
+if __name__ == "__main__":
+    main()

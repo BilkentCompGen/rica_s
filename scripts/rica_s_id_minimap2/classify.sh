@@ -14,7 +14,7 @@ referencefile="/opt/rica_s/reference_genomes/joint/all_pathogens.mmi"
 # refs=$(find /rica_s/data/pathogen_reference/ -type f -name "*.fasta")
 
 /usr/bin/time -v minimap2 -t `nproc` -c -x map-ont $referencefile $inputfile > $outdir/$outputfile.minimap2.paf
-sort -k1,1 -k12,12nr $outdir/$outputfile.minimap2.paf | awk '!seen[$1]++ {print $6}' | sort | uniq -c | awk -v OFS='\t' '{print $1, $2}' | sort -nr > $outdir/$outputfile.minimap2.paf.tsv
+sort -k1,1 -k12,12nr $outdir/$outputfile.minimap2.paf | awk '!seen[$1]++ {print $6}' | sort | uniq -c | awk -v OFS='\t' '{print $2, $1}' | sort -nr > $outdir/$outputfile.minimap2.paf.tsv
 
 echo
 date

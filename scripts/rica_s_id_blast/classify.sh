@@ -17,15 +17,30 @@ blastdbfile="/opt/rica_s/tools/rica_s_id_blast/pathogen_references.fasta.blastdb
 
 
 # blastn -query "$1" -db "$blastdbfile" -num_threads `nproc` -outfmt 0 > "$outdir/$outputfile"
-/usr/bin/time -v blastn -num_threads `nproc` \
+/usr/bin/time -v \
+blastn -num_threads `nproc` \
     -query $inputfile \
     -db $blastdbfile \
     -outfmt 6 \
-    > $outdir/$outputfile.6
+    > $outdir/$outputfile.6 | \
+awk -F': ' '
+/Elapsed/ { time = $2 }
+/Maximum resident/ { mem = $2 / 1024 }
+END {
+    print "--------------------------------"
+    printf "Time\t%s\n", time
+    printf "RAM(MB)\t%.2f\n", mem
+    print "--------------------------------"
+}'
 
 
 # fixing output
-    sort -k1,1 -k3,3nr $outdir/$outputfile.6 | awk -v OFS='\t' '!seen[$1]++ {print $2, $3}' >$outdir/$outputfile.6.tsv
+# Assuming your BLAST output is already sitting at $outdir/$outputfile.6
+awk -F'\t' '!seen[$1]++ {print $2}' "$outdir/$outputfile.6" | \
+sort | uniq -c | \
+awk -v OFS='\t' '{print $2, $1}' > "$outdir/${outputfile}.tsv"
+
+
 
 echo ""
 echo -n "[i]> " && date

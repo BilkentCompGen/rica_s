@@ -15,7 +15,7 @@ referencefile=/opt/rica_s/reference_genomes/joint/all_pathogens.fasta
 
 
 /usr/bin/time -v bwa mem -t `nproc` -x ont2d $referencefile $inputfile > $outdir/$outputfile.bwa.sam
-samtools view -F 2308 $outdir/$outputfile.bwa.sam | awk '{print $3}' | sort | uniq -c | awk -v OFS='\t' '{print $1, $2}' | sort -nr > $outdir/$outputfile.bwa.sam.tsv
+samtools view -F 2308 $outdir/$outputfile.bwa.sam | awk '{print $3}' | sort | uniq -c | awk -v OFS='\t' '{print $2, $1}' | sort -nr > $outdir/$outputfile.bwa.sam.tsv
 
 
 echo ""

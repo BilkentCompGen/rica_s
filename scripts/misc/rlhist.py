@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 import numpy as np
 import plotly.express as px
 
@@ -5128,23 +5130,49 @@ rl = [544684,
 # 1. Manually calculate the exact step size for your 50 bins
 data_min = np.min(rl)
 data_max = np.max(rl)
-exact_bins = 11
+exact_bins = 20
 step_size = (data_max - data_min) / exact_bins
 
 
 fig = px.histogram(
-    rl, 
+    rl,
     # title="<b>Read Length Distribution</b>"
+).update_xaxes(showgrid=True,
+    gridcolor='LightGray',  # Line color
+    gridwidth=0.2,           # Line width in pixels
+    # Line style (e.g., 'solid', 'dash', 'dot')
+    griddash='solid',
+    linecolor='black', 
+    mirror=True, 
+    minor=dict(
+        showgrid=True,         # Turn on minor grid lines
+        gridcolor='whitesmoke',# Light color for minor lines
+        dtick=25000             # Minor grid line every 0.25 units
+    )
+).update_yaxes(
+    showgrid=True,
+    gridcolor='LightGray',  # Line color
+    gridwidth=0.2,           # Line width in pixels
+    griddash='solid',        # Line style (e.g., 'solid', 'dash', 'dot')
+    linecolor='black', 
+    mirror=True, 
+    minor=dict(
+        showgrid=True,         # Turn on minor grid lines
+        gridcolor='whitesmoke',# Light color for minor lines
+        dtick=100             # Minor grid line every 0.25 units
+    )
 ).update_traces(
     xbins=dict(start=data_min, end=data_max, size=step_size),
-    marker_line_width=0.5, 
-    marker_line_color="#000", 
+    marker_line_width=0.5,
+    marker_line_color="#000",
     opacity=.85
 ).update_layout(
-    showlegend=False, 
-    xaxis_title="<b>Length</b>", 
-    yaxis_title="<b>Frequency</b>", 
+    showlegend=False,
+    xaxis_title="<b>Length</b>",
+    yaxis_title="<b>Frequency</b>",
+    margin={'t': 0, 'l': 0, 'b': 60, 'r': 0},
+
     bargap=0.2
 )
 
-fig.write_image("output_histogram.pdf")  # , width=400, height=200)
+fig.write_image("output_haistogram.pdf", width=400, height=200)

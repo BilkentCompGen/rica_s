@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# set -x #debug flag
 echo "[i]> Begin of profiling stage"
 
 

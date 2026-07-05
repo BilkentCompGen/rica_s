@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+# set -x #debug flag
 echo "[i]> Begin of Filtering stage"
 
 
