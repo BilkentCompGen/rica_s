@@ -15,7 +15,7 @@ END {
     for (ref in total) {
         print ref, total[ref]
     }
-}' $projecthome/output/$runid/*.tsv | sort -k2,2nr > $projecthome/output/$runid/$runid_counts.tsv
+}' $projecthome/output/$runid/*.tsv | sort -k2,2nr > $projecthome/output/$runid/$runid.tsv
 
 echo "[i]> done."
 echo "[i]> generating plots..."
