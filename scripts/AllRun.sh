@@ -1,24 +1,58 @@
 #!/usr/bin/env bash
 # set -x #debug flag
-echo "[i]> Begin of sepsis detection"
-echo
+
+# Inject this tracking logic at the absolute top of your script
+# export PS4='+ ${BASH_SOURCE}:${LINENO}:${FUNCNAME[0]} -> '
+# exec 3>&2 2>/tmp/script_execution.log
+# set -x
+
+
 
 projecthome=/opt/rica_s/
-runid=$1
-inputfile="$2"
-
-$projecthome/scripts/_1AllFilter.sh $runid $inputfile
-nohuman_inputfile=$projecthome/output/$runid/rica_s_fl_minimap2/nonhuman_unmapped_sequence_names.fasta
-read -n 1 -p Continue?;
-echo
-$projecthome/scripts/_2AllClassify.sh $runid $nohuman_inputfile
-read -n 1 -p Continue?;
-echo
-$projecthome/scripts/_3AllProfile.sh $runid $nohuman_inputfile
-read -n 1 -p Continue?;
-echo
-$projecthome/scripts/_4AllPlot.sh $runid
+. $projecthome/scripts/_1AllFilter.sh
+. $projecthome/scripts/_2AllClassify.sh
+. $projecthome/scripts/_3AllProfile.sh
+. $projecthome/scripts/_4AllPlot.sh
 
 
-echo
-echo "[i]> End of sepsis detection"
+
+AllRun() {
+
+	echo "[i]> Begin of sepsis detection"
+	date
+	echo
+
+
+	runid=$1
+	inputfile="$2"
+	echo $runid
+	echo $inputfile
+
+	# $projecthome/scripts/_1AllFilter.sh $runid $inputfile
+    AllFilter $runid $inputfile
+	nohuman_inputfile=$projecthome/output/$runid/rica_s_fl_minimap2/nonhuman_unmapped_sequence_names.fasta
+	# read -n 1 -p Continue?;
+	echo
+	# $projecthome/scripts/_2AllClassify.sh $runid $nohuman_inputfile
+    AllClassify $runid $nohuman_inputfile
+	# read -n 1 -p Continue?;
+	echo
+	# $projecthome/scripts/_3AllProfile.sh $runid $nohuman_inputfile
+    AllProfile $runid $nohuman_inputfile
+	# read -n 1 -p Continue?;
+	echo
+	# $projecthome/scripts/_4AllPlot.sh $runid
+    AllPlot $runid
+    # read -n 1 -p Continue?;
+
+
+
+	echo
+	date
+	echo "[i]> End of sepsis detection"
+}
+
+
+
+
+AllRun $1 $2

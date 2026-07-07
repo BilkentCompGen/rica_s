@@ -1,7 +1,6 @@
 #!/bin/bash
-# Save this as: replace_taxid_for_spp_batch.sh
-# Run it like: bash replace_taxid_for_spp_batch.sh 2 file1.tsv file2.tsv
-# Or hit the whole block: bash replace_taxid_for_spp_batch.sh 2 *.tsv
+# Run: bash replace_taxid_for_spp_batch.sh 2 file1.tsv file2.tsv
+# Or wildcards: bash replace_taxid_for_spp_batch.sh 2 *.tsv
 
 # Grab the column number from the first argument
 COL=$1
@@ -10,32 +9,31 @@ COL=$1
 shift
 
 if [ -z "$COL" ] || [ -z "$1" ]; then
-    echo "Hold up, ese. Usage: $0 <column_number> <file1.tsv> [file2.tsv ...]"
+    echo "Usage: $0 <column_number> <file1.tsv> [file2.tsv ...]"
     exit 1
 fi
 
-echo "[*] Extracting unique TaxIDs from all files (Column $COL)..."
+
 # Grab only numbers so we ignore headers or empty lines
 awk -v col="$COL" -F'\t' '{print $col}' "$@" | grep -E '^[0-9]+$' | sort -u > tmp_taxids.txt
 
 if [ ! -s tmp_taxids.txt ]; then
-    echo "¡Chale! No valid TaxIDs found in column $COL across any of those files, vato."
+    echo "No TaxIDs found in column $COL across any of those files."
     rm -f tmp_taxids.txt
     exit 1
 fi
 
-echo "[*] Hitting NCBI Taxonomy database to pull Species Names..."
+
 epost -db taxonomy -input tmp_taxids.txt | \
 esummary | \
 xtract -pattern DocumentSummary -element TaxId,ScientificName > tmp_tax_map.txt
 
 if [ ! -s tmp_tax_map.txt ]; then
-    echo "¡Chale! Could not pull taxonomy data. Check your connection or IDs, carnal."
+    echo "Check your connection or IDs."
     rm -f tmp_taxids.txt tmp_tax_map.txt
     exit 1
 fi
 
-echo "[*] Overwriting files with fresh species names..."
 
 # Loop through every file provided on the command line
 for TARGET_TSV in "$@"; do
@@ -64,7 +62,6 @@ for TARGET_TSV in "$@"; do
     mv -f tmp_new_target.tsv "$TARGET_TSV"
 done
 
-echo "[*] Cleaning up the block..."
 rm -f tmp_taxids.txt tmp_tax_map.txt
 
-echo "[*] ¡Ya estuvo! All your files are locked, loaded, and updated, ese."
+echo "[*] Done."

@@ -1,40 +1,39 @@
 #!/bin/bash
-# Save this as: replace_acc_for_spp_batch.sh
-# Run it like: bash replace_acc_for_spp_batch.sh 2 file1.tsv file2.tsv file3.tsv
+
+# Run: bash replace_acc_for_spp_batch.sh 2 file1.tsv file2.tsv file3.tsv
 # Or use wildcards: bash replace_acc_for_spp_batch.sh 2 *.tsv
 
 # Grab the column number from the first argument
 COL=$1
 
-# The 'shift' command is pure street magic. It bumps the first argument out of the way,
-# so the '$@' variable now only contains your list of files.
+
 shift
 
 if [ -z "$COL" ] || [ -z "$1" ]; then
-    echo "Hold up, ese. Usage: $0 <column_number> <file1.tsv> [file2.tsv ...]"
+    echo "Usage: $0 <column_number> <file1.tsv> [file2.tsv ...]"
     exit 1
 fi
 
-echo "[*] Extracting unique Accessions from all files (Column $COL)..."
+
 # Awk seamlessly reads through every file passed in $@
 awk -v col="$COL" -F'\t' '{print $col}' "$@" | grep -E '^[A-Za-z]+_?[A-Za-z0-9]+\.?[0-9]*$' | sort -u > tmp_accs.txt
 
 if [ ! -s tmp_accs.txt ]; then
-    echo "¡Chale! No valid Accessions found in column $COL across any of those files, vato."
+    echo "No accessions found in column $COL."
     rm -f tmp_accs.txt
     exit 1
 fi
 
-echo "[*] 1/2 Hitting NCBI Nuccore database to translate to TaxIDs..."
+
 epost -db nuccore -input tmp_accs.txt | \
 esummary | \
 xtract -pattern DocumentSummary -element AccessionVersion,TaxId > tmp_acc_taxid.txt
 
-echo "[*] Extracting unique TaxIDs for the next hop..."
+
 awk '{print $2}' tmp_acc_taxid.txt | grep -E '^[0-9]+$' | sort -u > tmp_taxids.txt
 
 if [ ! -s tmp_taxids.txt ]; then
-    echo "¡Chale! Could not map those Accessions, carnal. They might be dead links."
+    echo "No taxids!"
     rm -f tmp_accs.txt tmp_acc_taxid.txt tmp_taxids.txt
     exit 1
 fi
@@ -65,7 +64,7 @@ echo "[*] Overwriting files with fresh species names..."
 
 # Loop through every file provided in the command
 for TARGET_TSV in "$@"; do
-    echo "    -> Slicing up: $TARGET_TSV"
+    echo "    -> $TARGET_TSV"
     
     # Do the in-place swap using the master map
     awk -v col="$COL" -F'\t' '
@@ -100,7 +99,6 @@ for TARGET_TSV in "$@"; do
     mv -f tmp_new_target.tsv "$TARGET_TSV"
 done
 
-echo "[*] Cleaning up the block..."
 rm -f tmp_accs.txt tmp_acc_taxid.txt tmp_taxids.txt tmp_taxid_spp.txt tmp_acc_spp_map.txt
 
-echo "[*] ¡Ya estuvo! All your files are locked, loaded, and overwritten."
+echo "[*] Done."

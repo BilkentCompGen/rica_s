@@ -16,7 +16,7 @@ def main():
     try:
         df = pd.read_csv(args.input_tsv, sep='\t', header=None, names=['Reference', 'Count'])
     except Exception as e:
-        print(f"¡Chale! Error reading the file: {e}")
+        print(f"{e}")
         return
 
     # Grab the top 10 highest counts.
@@ -25,8 +25,6 @@ def main():
     # THE STREET MAGIC: Merge the Reference and Count into a single formatted string
     top10_df['Label'] = "<i>"+top10_df['Reference'] + "</i> <b>(" + top10_df['Count'].astype(str) + ")</b>  "
 
-    print("[*] Building the visualization...")
-    
     fig = px.bar(
         top10_df, 
         x='Count', 
@@ -54,17 +52,13 @@ def main():
     out_html = f"{base_name}.html"
     out_pdf = f"{base_name}.pdf"
 
-    fig.write_html(out_html)
-    print(f"[*] Saved interactive HTML: {out_html}")
-    
     try:
+        fig.write_html(out_html)
         fig.write_image(out_pdf, width=600)
-        print(f"[*] Saved static PDF: {out_pdf}")
+        print(f"[*] Files saved: {out_pdf} {out_html}")
     except ValueError as e:
-        print(f"¡Chale! Failed to save PDF. Run: pip install -U kaleido")
         print(f"System error: {e}")
 
-    print("[*] ¡Ya estuvo! Both files are locked and loaded, carnal.")
 
 if __name__ == "__main__":
     main()
