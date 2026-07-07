@@ -1,8 +1,8 @@
-# RICA-S
+# RICA_S
 
-**A containerized, modular pipeline for rapid pathogen identification and antimicrobial‑resistance (AMR) profiling from long‑read sequencing data, geared toward sepsis diagnostics.**
+**A container-base, modular workflow for rapid pathogen identification and antimicrobial‑resistance (AMR) profiling from long‑read sequencing data, geared toward sepsis diagnostics.**
 
-`RICA-S` takes raw sequencing reads (e.g. Oxford Nanopore FASTA/FASTQ), filters out human DNA, classifies the remaining reads against a curated pathogen database using several independent classifiers in parallel, profiles the sample for antimicrobial‑resistance and virulence genes, and (optionally) surfaces results through a small web UI. Every stage runs inside its own Docker container so tools with conflicting dependencies coexist cleanly and the pipeline is reproducible across machines.
+`RICA_S` takes raw sequencing reads (e.g. Oxford Nanopore FASTA/FASTQ), filters out human DNA, classifies the remaining reads against a curated pathogen database using several independent classifiers in ensemble, profiles the sample for antimicrobial‑resistance and virulence genes, and (optionally) surfaces results through a small web UI. Every stage runs inside its own Docker container so tools with conflicting dependencies coexist cleanly and the pipeline is reproducible across machines.
 
 ---
 
@@ -26,7 +26,7 @@
 
 ## Overview
 
-Diagnosing bloodstream infections and sepsis quickly matters - every hour of delay in effective therapy worsens outcomes. `RICA-S` is built to move a sample from raw reads to an actionable identification + resistance profile with minimal manual intervention, using a metagenomic, alignment‑and‑classification approach.
+Diagnosing bloodstream infections and sepsis quickly matters - every hour of delay in effective therapy worsens outcomes. `RICA_S` is built to move a sample from raw reads to an actionable identification + resistance profile with minimal manual intervention, using a metagenomic, alignment‑and‑classification approach.
 
 The design philosophy is **one tool, one container**. Each bioinformatics tool (minimap2, kraken2, BLAST, ABRicate, ...) lives in its own image, and the host orchestrates them by executing scripts inside the running containers. This keeps dependency graphs isolated, makes it trivial to add or swap a classifier, and lets the same read set be evaluated against many methods at once for comparison.
 
