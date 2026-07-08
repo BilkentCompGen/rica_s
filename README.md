@@ -88,7 +88,7 @@ Each stage appends its stdout/stderr to a per‑run log at `output/<runid>/<runi
 - **Docker** and the **Docker Compose** plugin (`docker compose`, v2 syntax).
 - A Linux host (the pipeline uses Linux containers and `docker exec`). Sufficient CPU cores and RAM for the classifiers; alignment against the human genome and pathogen references is the heaviest step.
 - **Disk space** for reference genomes and prebuilt databases (BLAST, kraken2, krakenuniq, minimap2, ABRicate). These can be large (tens of GB), and are **not** stored in git (they live under git‑ignored directories such as `tools/`, `reference_genomes/`, `datasets/`, `reads/`).
-- Network access to the data host (`donut.cs.bilkent.edu.tr` over FTP) to download reference data and databases.
+- Network access to the data host (`donut.cs.bilkent.edu.tr` over HTTP) to download reference data and databases.
 - The prebuilt images are published under the Docker Hub org **`alkanlab/`** (e.g. `alkanlab/rica_s_id_kraken2:v1.1`). Docker will pull them automatically on first `up`.
 
 ## Installation
@@ -130,23 +130,14 @@ Each stage appends its stdout/stderr to a per‑run log at `output/<runid>/<runi
 
 ## Downloading data and databases
 
-Reference data and prebuilt databases are fetched from the lab FTP server with `scripts/DownloadDataFromDonut.sh`.
-
-> **Edit the destination first.** The script downloads into the `DL_DIR` variable defined at the top (default `/home/ricardo/projects/rica_s/`). Change it to your install path — e.g. `/opt/rica_s/` — before running:
->
-> ```bash
-> # in scripts/DownloadDataFromDonut.sh
-> DL_DIR="/opt/rica_s/"
-> ```
-
-Then run it:
+Reference data and prebuilt databases are fetched from the lab HTTP server with `scripts/DownloadData.sh`.
 
 ```bash
 cd /opt/rica_s
-bash scripts/DownloadDataFromDonut.sh
+bash scripts/DownloadData.sh
 ```
 
-It fetches, via `wget` over FTP:
+It fetches, via `wget` over HTTP:
 
 - `16s/` — 16S rRNA reference sequences
 - `amr/` — antimicrobial‑resistance references
@@ -295,7 +286,7 @@ And under the minimap2 script directory:
 ## Troubleshooting
 
 - **`docker exec` fails / container not found** — confirm the stack is up (`docker ps | grep rica_s`) and that the container name matches the script directory name under `scripts/`.
-- **A classifier can't find its database** — you likely skipped or misconfigured the download step; verify the expected DB exists under `tools/<tool>/` (and `reference_genomes/joint/` for alignment‑based tools). Remember to set `DL_DIR` in `DownloadDataFromDonut.sh`.
+- **A classifier can't find its database** — you likely skipped or misconfigured the download step; verify the expected DB exists under `tools/<tool>/` (and `reference_genomes/joint/` for alignment‑based tools). Remember to set `DL_DIR` in `DownloadData.sh`.
 - **Nothing happens for a stage** — the drivers only act on containers that are actually running; bring up the relevant services first.
 - **Permission errors writing `output/`** — ensure the host `/opt/rica_s` is writable by your user, since it's bind‑mounted read‑write into the containers.
 - **Web UI can't reach Docker** — `orch.py`/`start.py` connect to the Docker daemon over TCP; adjust the socket/URL and the orchestrator's hardcoded paths to match your environment.
