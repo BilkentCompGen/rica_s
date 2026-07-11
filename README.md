@@ -34,11 +34,7 @@ A processing run is identified by a **run id** (`runid`) and all of its artifact
 
 ## Pipeline architecture
 
-Work is organized into named **stages**, and every service follows the naming convention:
-
-```
-rica_s_<stage>_<tool>
-```
+Work is organized into named **stages**, and every service follows the naming convention: `rica_s_<stage>_<tool>`
 
 | Stage code | Stage | Purpose |
 |-----------|-------|---------|
@@ -71,7 +67,7 @@ Each stage appends its stdout/stderr to a per‑run log at `output/<runid>/<runi
         └────────┬─────────┘
                  │  non‑human reads
         ┌────────▼──────────┐
-        │  _2AllClassify.sh │  minimap2 / kraken2 / blast / bwa / ngmlr / clark / … (parallel classifiers)
+        │  _2AllClassify.sh │  minimap2 / kraken2 / blast / bwa / ngmlr / clark / … (classifiers)
         └────────┬──────────┘
                  │  per‑tool species hits (.tsv)
         ┌────────▼─────────┐
