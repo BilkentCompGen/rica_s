@@ -9,7 +9,7 @@ echo $2
 # 1. Quote your variables to handle spaces
 inputfile="$1"
 outdir="$2"
-indexfile="/opt/rica_s/tools/rica_s_id_minimap2/human_dna_db/human_v38.mmi"
+indexfile="/opt/rica_s/tools/rica_s_id_minimap2/human_v38.mmi"
 
 # 2. Extract just the filename without the path
 filename=$(basename "$inputfile")

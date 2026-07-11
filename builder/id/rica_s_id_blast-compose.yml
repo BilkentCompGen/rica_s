@@ -25,7 +25,8 @@ services:
     volumes:
       - /opt/rica_s:/opt/rica_s
 
-    build:
-      context: .
-      dockerfile_inline: |
-        RUN apt update && apt install -y nano tail less git wget samtools seqtk seqkit
+    # build:
+    #   context: .
+    #   dockerfile_inline: |
+    #     FROM alkanlab/rica_s_id_blast:v1.1
+    #     RUN apt update && apt install -y nano less git wget samtools seqtk seqkit

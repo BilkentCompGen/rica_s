@@ -8,7 +8,8 @@ inputfile="$1"
 outputfile=$(basename $inputfile)
 
 outdir="$2"
-referencefile="/opt/rica_s/reference_genomes/joint/all_pathogens.mmi"
+referencefile="/opt/rica_s/tools/rica_s_id_minimap2/all_pathogens.mmi"
+
 
 # queries=$(find $2 -type f -name "*."$3)
 # refs=$(find /rica_s/data/pathogen_reference/ -type f -name "*.fasta")

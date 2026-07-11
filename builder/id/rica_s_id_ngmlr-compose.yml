@@ -1,31 +1,22 @@
 services:
   rica_s_id_ngmlr:
     container_name: rica_s_id_ngmlr
-
     entrypoint:
       - /bin/bash
-
     hostname: rica_s_id_ngmlr
-
     image: alkanlab/rica_s_id_ngmlr:v1.1
-
     ipc: private
-
     logging:
       driver: json-file
       options: {}
-
     networks:
       - rica_s_net
-
     stdin_open: true
-
     tty: true
-
     volumes:
       - /opt/rica_s:/opt/rica_s
-
-    build:
-      context: .
-      dockerfile_inline: |
-        RUN apt update && apt install -y nano tail less git wget samtools seqtk seqkit
+    # build:
+    #   context: .
+    #   dockerfile_inline: |
+    #     FROM alkanlab/rica_s_id_ngmlr:v1.1 
+    #     RUN apt update && apt install -y nano less git wget samtools seqtk seqkit

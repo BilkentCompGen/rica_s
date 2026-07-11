@@ -31,19 +31,19 @@ AllRun() {
 	# $projecthome/scripts/_1AllFilter.sh $runid $inputfile
     AllFilter $runid $inputfile
 	nohuman_inputfile=$projecthome/output/$runid/rica_s_fl_minimap2/nonhuman_unmapped_sequence_names.fasta
-	# read -n 1 -p Continue?;
+	read -n 1 -p Continue?;
 	echo
 	# $projecthome/scripts/_2AllClassify.sh $runid $nohuman_inputfile
     AllClassify $runid $nohuman_inputfile
-	# read -n 1 -p Continue?;
+	read -n 1 -p Continue?;
 	echo
 	# $projecthome/scripts/_3AllProfile.sh $runid $nohuman_inputfile
     AllProfile $runid $nohuman_inputfile
-	# read -n 1 -p Continue?;
+	read -n 1 -p Continue?;
 	echo
 	# $projecthome/scripts/_4AllPlot.sh $runid
     AllPlot $runid
-    # read -n 1 -p Continue?;
+    read -n 1 -p Continue?;
 
 
 

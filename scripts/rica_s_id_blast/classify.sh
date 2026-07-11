@@ -17,21 +17,7 @@ blastdbfile="/opt/rica_s/tools/rica_s_id_blast/pathogen_references.fasta.blastdb
 
 
 # blastn -query "$1" -db "$blastdbfile" -num_threads `nproc` -outfmt 0 > "$outdir/$outputfile"
-/usr/bin/time -v \
-blastn -num_threads `nproc` \
-    -query $inputfile \
-    -db $blastdbfile \
-    -outfmt 6 \
-    > $outdir/$outputfile.6 | \
-awk -F': ' '
-/Elapsed/ { time = $2 }
-/Maximum resident/ { mem = $2 / 1024 }
-END {
-    print "--------------------------------"
-    printf "Time\t%s\n", time
-    printf "RAM(MB)\t%.2f\n", mem
-    print "--------------------------------"
-}'
+/usr/bin/time -v blastn -num_threads `nproc` -query $inputfile -db $blastdbfile -outfmt 6 > $outdir/$outputfile.6 
 
 
 # fixing output
