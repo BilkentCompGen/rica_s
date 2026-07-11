@@ -6,6 +6,8 @@ output/
 reads/
 reference_genomes/
 tools/
+input/
+tmp/
 
 # compiled python files
 *.pyc
