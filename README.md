@@ -81,6 +81,15 @@ Each stage appends its stdout/stderr to a per‑run log at `output/<runid>/<runi
 
 ## Requirements
 
+- Ubuntu 24.04
+- 32+ GB memory
+- 1+ TB SSD/HDD
+- NVIDIA GeForce RTX 4060 Max-Q / Mobile or better
+- Docker
+        - Docker-compose v2
+        - NVIDIA Container Toolkit (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+    
+<!--
 - A Linux host (the pipeline uses Linux containers and `docker exec`). Sufficient CPU cores and RAM for the classifiers; alignment against the human genome and pathogen references is the heaviest step.
 - **Disk space** for reference genomes and prebuilt databases (BLAST, kraken2, krakenuniq, minimap2, ABRicate). These can be large (tens of GB), and are **not** stored in git (they live under git‑ignored directories such as `tools/`, `reference_genomes/`, `datasets/`, `reads/`).
 - A modern CUDA-enable device, if the GPU-enable classifiers are to be used (i.e. cuCLARK).
@@ -88,7 +97,7 @@ Each stage appends its stdout/stderr to a per‑run log at `output/<runid>/<runi
 - **Docker** and the **Docker Compose** plugin (`docker compose`, v2 syntax).
 - NVIDIA Container Toolkit.
 - The prebuilt images are published under the Docker Hub org **`alkanlab/`** (e.g. `alkanlab/rica_s_id_kraken2:v1.1`). Docker will pull them automatically on first `up`.
-
+-->
 ## Installation
 
 1. **Clone the repository to `/opt/rica_s`.** The containers mount the project at `/opt/rica_s`, so cloning there keeps host and container paths identical.
