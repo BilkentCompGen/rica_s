@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# LEGACY / alternative: recursive FTP mirror of the data host. The canonical
+# downloader is scripts/DownloadData.sh (one tar per item, over HTTP). Kept for
+# reference; prefer DownloadData.sh.
 
 DL_DIR="/opt/rica_s/"
 echo "=== downloading data ==="

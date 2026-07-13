@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# LEGACY / alternative: recursive HTTP mirror of the data host (directory tree,
+# not tars). The canonical downloader is scripts/DownloadData.sh (one tar per
+# item). Kept for reference; prefer DownloadData.sh.
 
 DL_DIR="/opt/rica_s/"
 echo "=== downloading data ==="

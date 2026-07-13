@@ -10,12 +10,12 @@ def processRun(run_id, run_params):
 	# setup config
 	# check directories
 
-	os.mkdir("/rica_s/output/runs/"+run_id)
-	os.mkdir("/rica_s/output/runs/"+run_id+"/sq")
-	os.mkdir("/rica_s/output/runs/"+run_id+"/bc")
-	os.mkdir("/rica_s/output/runs/"+run_id+"/id")
-	os.mkdir("/rica_s/output/runs/"+run_id+"/pr")
-	os.mkdir("/rica_s/output/runs/"+run_id+"/rp")
+	os.makedirs("/opt/rica_s/output/runs/"+run_id)
+	os.makedirs("/opt/rica_s/output/runs/"+run_id+"/sq")
+	os.makedirs("/opt/rica_s/output/runs/"+run_id+"/bc")
+	os.makedirs("/opt/rica_s/output/runs/"+run_id+"/id")
+	os.makedirs("/opt/rica_s/output/runs/"+run_id+"/pr")
+	os.makedirs("/opt/rica_s/output/runs/"+run_id+"/rp")
 
 
 

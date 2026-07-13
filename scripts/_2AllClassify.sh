@@ -33,7 +33,7 @@ AllClassify()
 	# echo $inputfile
 	# echo "========================="
 	# for dir in ` ls -d /rica_s/scripts/rica_s_id_*/`
-	for container in `ls $projecthome/scripts/ | grep rica_s_id*`
+	for container in `ls $projecthome/scripts/ | grep '^rica_s_id_'`
 	do
 		
 		RunClassify $container $projecthome/scripts/$container/classify.sh $inputfile /opt/rica_s/output/$runid/ $outdir/$runid.log 

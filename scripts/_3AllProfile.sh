@@ -25,7 +25,7 @@ AllProfile() {
 	mkdir -p $outdir
 
 	# for dir in ` ls -d /rica_s/scripts/rica_s_id_*/`
-	for container in $(ls $projecthome/scripts/ | grep rica_s_pr*); do
+	for container in $(ls $projecthome/scripts/ | grep '^rica_s_pr_'); do
 
 		RunProfile $container $projecthome/scripts/$container/profile.sh $inputfile /opt/rica_s/output/$runid/ $outdir/$runid.log
 		# docker exec -it $container $projecthome/scripts/$container/profile.sh $inputfile /opt/rica_s/output/$runid/ 2>&1 | tee -a $outdir/$runid.log

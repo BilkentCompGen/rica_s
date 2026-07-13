@@ -22,9 +22,9 @@ AllRun() {
 	date
 	echo
 
-	mkdir -p $projecthome/output/$runid/
 	runid=$1
 	inputfile="$2"
+	mkdir -p $projecthome/output/$runid/
 	echo $runid
 	echo $inputfile
 
