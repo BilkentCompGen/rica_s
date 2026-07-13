@@ -16,11 +16,13 @@ AllFilter() {
 	inputfile="$2"
 	outdir=$projecthome/output/$runid/
 
-	mkdir -p $projecthome/output/$runid/
+	mkdir -p $outdir
+
+	echo "docker exec -it rica_s_id_minimap2 $projecthome/scripts/rica_s_id_minimap2/filterHumanDna.sh $inputfile $outdir 2>&1 | tee -a $outdir/$runid.log"
 
 	docker exec -it rica_s_id_minimap2 \
-		$projecthome/scripts/rica_s_id_minimap2/filterHumanDna.sh $inputfile \
-		/opt/rica_s/output/$runid/ 2>&1 | tee -a $outdir/$runid.log
+		$projecthome/scripts/rica_s_id_minimap2/filterHumanDna.sh $inputfile $outdir \
+		2>&1 | tee -a $outdir/$runid.log
 
 	echo
 	date
