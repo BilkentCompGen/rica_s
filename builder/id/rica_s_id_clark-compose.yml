@@ -7,7 +7,7 @@ services:
 
     hostname: rica_s_id_clark
 
-    image: alkanlab/rica_s_id_clark:v1.2
+    image: alkanlab/rica_s_id_clark:v1.1
 
     environment:
       - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/CLARK/exe:/root/CLARK/scripts
