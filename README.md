@@ -85,9 +85,10 @@ Each stage appends its stdout/stderr to a per‑run log at `output/<runid>/<runi
 - 32+ GB memory
 - 1+ TB SSD/HDD
 - NVIDIA GeForce RTX 4060 Max-Q / Mobile or better
+  - NVIDIA CUDA Toolkit (https://developer.nvidia.com/cuda/toolkit)
 - Docker
-        - Docker-compose v2
-        - NVIDIA Container Toolkit (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+  - Docker-compose v2
+  - NVIDIA Container Toolkit (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
     
 <!--
 - A Linux host (the pipeline uses Linux containers and `docker exec`). Sufficient CPU cores and RAM for the classifiers; alignment against the human genome and pathogen references is the heaviest step.
