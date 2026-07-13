@@ -38,5 +38,5 @@ services:
         WORKDIR /opt/rica_s/tools/rica_s_ui_web
         COPY . .
         RUN python -m pip install flask docker pyaml
-        RUN apt update && apt install -y nano tail less git wget samtools seqtk seqkit
+        RUN apt update && apt install -y nano less git wget samtools seqtk seqkit
 # ENTRYPOINT [ "/bin/bash", "/rica_s/tools/rica_s_ui_web/run.sh" ]

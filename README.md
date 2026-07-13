@@ -145,16 +145,26 @@ cd /opt/rica_s
 bash scripts/DownloadData.sh
 ```
 
-It fetches, via `wget` over HTTP:
+The downloader uses a **one‑tar‑per‑item** model: each item is a single `.tar` served over HTTP from `http://donut.cs.bilkent.edu.tr/rica_s/`, downloaded once (`wget -nc`) and extracted into place, then the tar is deleted. Test data extracts at the project root; each tool's database extracts into its own directory under `tools/`.
 
-- `16s/` — 16S rRNA reference sequences
-- `amr/` — antimicrobial‑resistance references
-- `datasets/` — test datasets
-- `reads/` — simulated reads
-- `reference_genomes/` — pathogen reference genomes (including the joint `all_pathogens.fasta` / `all_pathogens.mmi`)
-- Prebuilt tool databases under `tools/`: `rica_s_id_blast/`, `rica_s_id_kraken2/`, `rica_s_id_krakenuniq/`, `rica_s_id_minimap2/`, and `rica_s_pr_abricate/`.
+Test data (extracted at the project root):
 
-The CLARK / CU‑CLARK / Metabuli database downloads are present but commented out; uncomment them if you plan to run those classifiers.
+- `datasets.tar` → `datasets/` — test datasets
+- `reads.tar` → `reads/` — simulated reads
+
+Per‑tool databases / indexes (extracted into `tools/rica_s_id_<tool>/`), one tar each:
+
+- `tools/rica_s_id_minimap2.tar` → `tools/rica_s_id_minimap2/` — `human_v38.mmi` (human filter index) **and** `all_pathogens.mmi` (pathogen classification index)
+- `tools/rica_s_id_kraken2.tar` → `tools/rica_s_id_kraken2/pathogen.k2db/`
+- `tools/rica_s_id_blast.tar` → `tools/rica_s_id_blast/`
+- `tools/rica_s_id_bwa.tar` → `tools/rica_s_id_bwa/all_pathogens.fasta` (+ BWA index files)
+- `tools/rica_s_id_ngmlr.tar` → `tools/rica_s_id_ngmlr/all_pathogens.fasta`
+- `tools/rica_s_id_clark.tar` → `tools/rica_s_id_clark/`
+- `tools/rica_s_id_cuclark.tar` → `tools/rica_s_id_cuclark/`
+
+Every classifier reads its reference/DB from `tools/rica_s_id_<tool>/` — there is no shared `reference_genomes/` on the run path. The optional `reference_genomes.tar` (shared `joint/all_pathogens.*`) and the scaffolded `krakenuniq` DB are present in `DownloadData.sh` but commented out; uncomment them only if you need those. The ABRicate profiling databases ship **inside** the `rica_s_pr_abricate` image, so there is no separate ABRicate download.
+
+> **Note.** `scripts/misc/download_data.sh` (recursive HTTP) and `scripts/misc/download_data_from_donut.sh` (recursive FTP) are legacy alternatives kept for reference only. Use `scripts/DownloadData.sh`.
 
 ## Running the pipeline
 
@@ -191,7 +201,7 @@ All three tee their output to `output/<runid>/<runid>.log`.
 ## Stage and tool reference
 
 ### Filtering — `rica_s_id_minimap2/filterHumanDna.sh`
-Aligns reads to the human reference index `tools/rica_s_id_minimap2/human_dna_db/human_v38.mmi` with `minimap2 -a`, then uses `samtools` to split mapped (human) vs. unmapped (non‑human) read names and `seqtk subseq` to extract the non‑human reads. Produces, in `output/<runid>/rica_s_fl_minimap2/`:
+Aligns reads to the human reference index `tools/rica_s_id_minimap2/human_v38.mmi` with `minimap2 -a`, then uses `samtools` to split mapped (human) vs. unmapped (non‑human) read names and `seqtk subseq` to extract the non‑human reads. Produces, in `output/<runid>/rica_s_fl_minimap2/`:
 - `human_mapped_sequence_names.txt`
 - `nonhuman_unmapped_sequence_names.txt`
 - `nonhuman_unmapped_sequence_names.fasta` ← the input for classification.
@@ -201,11 +211,11 @@ All classify against the curated pathogen database and emit a normalized two‑c
 
 | Tool | Container | Method | Reference / DB | Key outputs |
 |------|-----------|--------|----------------|-------------|
-| **minimap2** | `rica_s_id_minimap2` | Long‑read mapping (`map-ont`) | `reference_genomes/joint/all_pathogens.mmi` | `*.minimap2.paf`, `*.minimap2.paf.tsv` |
+| **minimap2** | `rica_s_id_minimap2` | Long‑read mapping (`map-ont`) | `tools/rica_s_id_minimap2/all_pathogens.mmi` | `*.minimap2.paf`, `*.minimap2.paf.tsv` |
 | **kraken2** | `rica_s_id_kraken2` | k‑mer classification | `tools/rica_s_id_kraken2/pathogen.k2db/` | `*.kraken2.report(.tsv)`, classified/unclassified reads |
 | **BLAST** | `rica_s_id_blast` | `blastn` alignment | `tools/rica_s_id_blast/pathogen_references.fasta.blastdb` | `*.blastout.tab.6`, `*.blastout.tab.6.tsv` |
-| **BWA** | `rica_s_id_bwa` | `bwa mem -x ont2d` | `reference_genomes/joint/all_pathogens.fasta` | `*.bwa.sam`, `*.bwa.sam.tsv` |
-| **NGMLR** | `rica_s_id_ngmlr` | Long‑read mapping | `reference_genomes/joint/all_pathogens.fasta` | `*.ngmlr.sam`, `*.ngmlr.sam.tsv` |
+| **BWA** | `rica_s_id_bwa` | `bwa mem -x ont2d` | `tools/rica_s_id_bwa/all_pathogens.fasta` | `*.bwa.sam`, `*.bwa.sam.tsv` |
+| **NGMLR** | `rica_s_id_ngmlr` | Long‑read mapping | `tools/rica_s_id_ngmlr/all_pathogens.fasta` | `*.ngmlr.sam`, `*.ngmlr.sam.tsv` |
 | **CLARK** | `rica_s_id_clark` | k‑mer classification | `tools/rica_s_id_clark/` (build with `set_targets.sh`) | `*.clark.csv`, `*.clark.csv.tsv` |
 | **CU‑CLARK** | `rica_s_id_cuclark` | GPU CLARK | `tools/rica_s_id_cuclark/` | `*.cuclark.csv`, `*.cuclark.csv.tsv` |
 | **krakenuniq** | `rica_s_id_krakenuniq` | k‑mer + unique‑k‑mer counts | `tools/rica_s_id_krakenuniq/pathogen.kudb` | *(scaffolded; classify body currently disabled)* |
@@ -294,7 +304,7 @@ And under the minimap2 script directory:
 ## Troubleshooting
 
 - **`docker exec` fails / container not found** — confirm the stack is up (`docker ps | grep rica_s`) and that the container name matches the script directory name under `scripts/`.
-- **A classifier can't find its database** — you likely skipped or misconfigured the download step; verify the expected DB exists under `tools/<tool>/` (and `reference_genomes/joint/` for alignment‑based tools). Remember to set `DL_DIR` in `DownloadData.sh`.
+- **A classifier can't find its database** — you likely skipped the download step; verify the expected DB exists under `tools/rica_s_id_<tool>/` (every classifier, including the alignment‑based minimap2/bwa/ngmlr, reads from its own `tools/` directory). `DownloadData.sh` extracts each tool's tar there automatically.
 - **Nothing happens for a stage** — the drivers only act on containers that are actually running; bring up the relevant services first.
 - **Permission errors writing `output/`** — ensure the host `/opt/rica_s` is writable by your user, since it's bind‑mounted read‑write into the containers.
 - **Web UI can't reach Docker** — `orch.py`/`start.py` connect to the Docker daemon over TCP; adjust the socket/URL and the orchestrator's hardcoded paths to match your environment.

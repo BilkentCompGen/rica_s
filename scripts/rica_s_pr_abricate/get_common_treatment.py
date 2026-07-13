@@ -7,7 +7,8 @@ import pandas as pd
 import re
 
 
-conn = sqlite3.connect('rica_s.db')
+_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rica_s.db')
+conn = sqlite3.connect(_DB_PATH)
 
 p1=sys.argv[1]
 print(p1)

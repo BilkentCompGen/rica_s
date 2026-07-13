@@ -20,17 +20,12 @@ clean_id="${filename%.*}"
 
 
 minimap2 -a -R "@RG\tID:$filename\tSM:$clean_id" "$indexfile" "$inputfile" > $outdir/$filename.filterHumanDna.sam
-	read -n 1 -p Continue?;
 
 mkdir -p $outdir/rica_s_fl_minimap2/
-	read -n 1 -p Continue?;
 
 samtools view -F 4 "$outdir/$filename".filterHumanDna.sam |awk '{print $1}' | sort -u > $outdir/rica_s_fl_minimap2/human_mapped_sequence_names.txt
-	read -n 1 -p Continue?;
 samtools view -f 4 "$outdir/$filename".filterHumanDna.sam |awk '{print $1}' | sort -u > $outdir/rica_s_fl_minimap2/nonhuman_unmapped_sequence_names.txt
-	read -n 1 -p Continue?;
 seqtk subseq $inputfile $outdir/rica_s_fl_minimap2/nonhuman_unmapped_sequence_names.txt > $outdir/rica_s_fl_minimap2/nonhuman_unmapped_sequence_names.fasta
-	read -n 1 -p Continue?;
 
 echo ""
 date
