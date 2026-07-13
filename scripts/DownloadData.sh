@@ -33,11 +33,11 @@ fetch_tar() {
 }
 
 # --- test data (extracted at the project root -> /opt/rica_s/datasets, /opt/rica_s/reads) ---
-echo "=== datasets ==="
-fetch_tar "datasets.tar" "$DL_DIR/"
+# echo "=== datasets ==="
+# fetch_tar "datasets.tar" "$DL_DIR/"
 
-echo "=== reads ==="
-fetch_tar "reads.tar" "$DL_DIR/"
+# echo "=== reads ==="
+# fetch_tar "reads.tar" "$DL_DIR/"
 
 # Optional shared reference genomes. Superseded by the per-tool DBs below
 # (minimap2/bwa/ngmlr each carry their own copy under tools/). Uncomment only
