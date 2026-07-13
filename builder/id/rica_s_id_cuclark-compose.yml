@@ -7,7 +7,7 @@ services:
 
     hostname: rica_s_id_cuclark
 
-    image: alkanlab/rica_s_id_cuclark:v1.2
+    image: alkanlab/rica_s_id_cuclark:v1.1
 
     ipc: private
 
