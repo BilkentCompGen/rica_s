@@ -7,7 +7,7 @@ services:
 
     hostname: rica_s_id_bwa
 
-    image: alkanlab/rica_s_id_bwa:v1.1
+    image: alkanlab/rica_s_id_bwa:v1.2
 
     ipc: private
 

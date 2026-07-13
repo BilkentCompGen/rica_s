@@ -4,7 +4,7 @@ services:
     entrypoint:
       - /bin/bash
     hostname: rica_s_id_ngmlr
-    image: alkanlab/rica_s_id_ngmlr:v1.1
+    image: alkanlab/rica_s_id_ngmlr:v1.2
     ipc: private
     logging:
       driver: json-file

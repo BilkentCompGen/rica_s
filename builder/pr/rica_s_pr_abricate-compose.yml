@@ -7,7 +7,7 @@ services:
 
     hostname: rica_s_pr_abricate
 
-    image: alkanlab/rica_s_pr_abricate:v1.2
+    image: alkanlab/rica_s_pr_abricate:v1.3
 
     ipc: private
 
