@@ -5,6 +5,8 @@ services:
       - /bin/bash
     hostname: rica_s_id_ngmlr
     image: alkanlab/rica_s_id_ngmlr:v1.2
+    working_dir: /
+
     ipc: private
     logging:
       driver: json-file

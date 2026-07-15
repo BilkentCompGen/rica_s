@@ -6,11 +6,11 @@ services:
       - /bin/bash
 
     hostname: rica_s_id_clark
+    working_dir: /
 
-    image: alkanlab/rica_s_id_clark:v1.1
-
+    image: alkanlab/rica_s_id_clark:v1.5
     environment:
-      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/CLARK/exe:/root/CLARK/scripts
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/CLARK/exe:/opt/CLARK/scripts
 
     ipc: private
 

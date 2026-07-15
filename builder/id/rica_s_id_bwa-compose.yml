@@ -6,6 +6,7 @@ services:
       - /bin/bash
 
     hostname: rica_s_id_bwa
+    working_dir: /
 
     image: alkanlab/rica_s_id_bwa:v1.2
 

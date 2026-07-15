@@ -1,4 +1,6 @@
 #! /bin/bash
+# set -x
+
 
 echo '[i]> === clark'
 date
@@ -8,12 +10,17 @@ inputfile="$1"
 outputfile=$(basename $inputfile)
 outdir="$2"
 
-clarkdb=/opt/rica_s/tools/rica_s_id_clark/
+clarkdb=/opt/rica_s/tools/rica_s_id_clark
+
+
 
 
 set_targets.sh $clarkdb custom 
+classify_metagenome.sh -O $inputfile -R $outdir/$outputfile.clark -n 8 -m 0 --long
+#/opt/CLARK/exe/CLARK -T /opt/rica_s/tools/rica_s_id_clark/targets.txt -D /opt/rica_s/tools/rica_s_id_clark/custom_0/ -O /opt/rica_s/input/pathogens_25.fasta -R ./caca -m 0 --long
 
-/usr/bin/time -v classify_metagenome.sh --long -O $inputfile -R $outdir/$outputfile.clark.csv -m 0 -n `nproc`
+
+
 # tail -n +2 $outdir/$outputfile.clark.csv.csv | cut -d',' -f1,4 | tr ',' '\t' > $outdir/$outputfile.clark.csv.tsv
 
 awk -F',' '

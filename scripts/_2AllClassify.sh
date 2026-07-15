@@ -6,8 +6,9 @@
 
 RunClassify()
 {
-	docker exec -it $1 $2 $3 $4 2>&1 | tee -a $5 
-	# docker exec -it $container $projecthome/scripts/$container/classify.sh $inputfile /opt/rica_s/output/$runid/ 2>&1 | tee -a $outdir/$runid.log 
+	# echo $1
+	docker exec -e TERM=xterm -e COLUMNS=80 -e LINES=24 -e MALLOC_ARENA_MAX=2 -it $1 $2 $3 $4 2>&1 | tee -a $5
+
 
 }
 
@@ -20,13 +21,13 @@ AllClassify()
 	echo
 
 	#projecthome is a dir in the local fs
-	projecthome=/opt/rica_s/
+	projecthome=/opt/rica_s
 	runid=$1
 
 	#inputfile is a fasta/q in the docker filesystem
 	#and must be ABSOLUTE PATH
 	inputfile="$2"
-	outdir=$projecthome/output/$runid/
+	outdir=$projecthome/output/$runid
 
 	mkdir -p $outdir
 	# echo "========================="

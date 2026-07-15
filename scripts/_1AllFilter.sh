@@ -18,7 +18,7 @@ AllFilter() {
 
 	mkdir -p $outdir
 
-	echo "docker exec -it rica_s_id_minimap2 $projecthome/scripts/rica_s_id_minimap2/filterHumanDna.sh $inputfile $outdir 2>&1 | tee -a $outdir/$runid.log"
+	# echo "docker exec -it rica_s_id_minimap2 $projecthome/scripts/rica_s_id_minimap2/filterHumanDna.sh $inputfile $outdir 2>&1 | tee -a $outdir/$runid.log"
 
 	docker exec -it rica_s_id_minimap2 \
 		$projecthome/scripts/rica_s_id_minimap2/filterHumanDna.sh $inputfile $outdir \

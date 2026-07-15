@@ -8,6 +8,7 @@ services:
     hostname: rica_s_id_minimap2
 
     image: alkanlab/rica_s_id_minimap2:v1.2
+    working_dir: /
 
     ipc: private
 

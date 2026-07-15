@@ -7,7 +7,7 @@ echo ""
 inputfile="$1"
 outdir="$2"
 outputfile=$(basename $inputfile)
-referencefile="/opt/rica_s/tools/rica_s_id_ngmlr/all_pathogens.fasta"
+referencefile="/opt/rica_s/tools/rica_s_id_ngmlr/all_pathogen.fasta"
 
 # queries=$(find $2 -type f -name "*."$3)
 # refs=$(find /rica_s/data/pathogen_reference/ -type f -name "*.fasta")
