@@ -8,7 +8,7 @@ services:
     hostname: rica_s_id_cuclark
     working_dir: /
 
-    image: alkanlab/rica_s_id_cuclark:v1.1
+    image: alkanlab/rica_s_id_cuclark:v1.2
 
     ipc: private
 

@@ -1,2 +1,2 @@
 #! /bin/bash
-docker compose -f ./rica_s-compose.yml up --build -d
+docker compose -f  /opt/rica_s/builder/rica_s-compose.yml up --build -d

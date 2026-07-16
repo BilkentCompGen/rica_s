@@ -23,7 +23,7 @@ AllRun() {
 	echo
 
 	runid=$1
-	inputfile="$2"
+	inputfile=$(realpath "$2")
 	mkdir -p $projecthome/output/$runid
 	echo run ID: $runid
 	echo input file: $inputfile

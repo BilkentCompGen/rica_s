@@ -16,7 +16,7 @@ clarkdb=/opt/rica_s/tools/rica_s_id_clark
 
 
 set_targets.sh $clarkdb custom 
-classify_metagenome.sh -O $inputfile -R $outdir/$outputfile.clark -n 8 -m 0 --long
+classify_metagenome.sh -O $inputfile -R $outdir/$outputfile.clark.csv -n 8 -m 0 --long
 #/opt/CLARK/exe/CLARK -T /opt/rica_s/tools/rica_s_id_clark/targets.txt -D /opt/rica_s/tools/rica_s_id_clark/custom_0/ -O /opt/rica_s/input/pathogens_25.fasta -R ./caca -m 0 --long
 
 
