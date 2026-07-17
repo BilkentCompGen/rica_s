@@ -1,5 +1,5 @@
-#!/bin/bash
-set -e
+#! /bin/bash
+set -x #debug flag
 
 # Canonical downloader for RICA_S reference data and prebuilt databases.
 #
@@ -10,68 +10,67 @@ set -e
 # (Legacy alternatives scripts/misc/download_data.sh and
 #  scripts/misc/download_data_from_donut.sh are kept for reference only.)
 
-python3 - << 'EOF'
-import os
-import sys 
-import subprocess
+DL_DIR="/opt/rica_s"
+BASE_URL="http://donut.cs.bilkent.edu.tr/rica_s"
 
-tools = [
-    "kraken2", 
-    # "krakenuniq"
-    "blast", 
-    "bwa", 
-    "ngmlr", 
-    "clark", 
-    "cuclark",
-]
+echo "=== downloading data ==="
 
-data = [
-    "reference_genomes",
-    "datasets",
-    # "reads",
-]
+mkdir -p "$DL_DIR/tmp/"
+mkdir -p "$DL_DIR/tools/"
 
+# fetch_tar <url-path-relative-to-BASE_URL> <extract-dir>
+#   downloads BASE_URL/<url-path> once (-nc) into tmp/, extracts into
+#   <extract-dir>, then removes the downloaded tar.
+fetch_tar() {
+    urlpath="$1"
+    dest="$2"
+    tarname="$(basename "$urlpath")"
 
-project_home = "/opt/rica_s"
-base_url = "http://donut.cs.bilkent.edu.tr/rica_s"
+    mkdir -p "$dest"
+    wget -nc -P "$DL_DIR/tmp/" "$BASE_URL/$urlpath"
+    tar xf "$DL_DIR/tmp/$tarname" -C "$dest"
+    rm -f "$DL_DIR/tmp/$tarname"
+}
 
+# --- test data (extracted at the project root -> /opt/rica_s/datasets, /opt/rica_s/reads) ---
+echo "=== datasets ==="
+fetch_tar "datasets.tar" "$DL_DIR/"
 
+# echo "=== reads ==="
+# fetch_tar "reads.tar" "$DL_DIR/"
 
-def fetch_tar(urlpath, dest):
-    
-    tarname = os.path.basename(urlpath)
-    os.makedirs(dest, exist_ok=True)
-    tmp_tar = os.path.join(project_home, "tmp", tarname)
-    
+# Optional shared reference genomes. Superseded by the per-tool DBs below
+# (minimap2/bwa/ngmlr each carry their own copy under tools/). Uncomment only
+# if you specifically need reference_genomes/joint/.
+echo "=== reference_genomes ==="
+fetch_tar "reference_genomes.tar" "$DL_DIR/"
 
-    # wget -nc
-    subprocess.run(["wget", "-nc", "-P", os.path.join(project_home, "tmp"), f"{BASE_URL}/{urlpath}"], check=True)
-    
-    # tar xf
-    subprocess.run(["tar", "xf", tmp_tar, "-C", dest], check=True)
-    
-    # rm -f
-    try: 
-        os.remove(tmp_tar) 
-    except FileNotFoundError: 
-        pass
+# --- per-tool databases / indexes (extracted into /opt/rica_s/tools/<tool>/) ---
+echo "=== db/index ==="
 
+echo "=== minimap2 (human_v38.mmi for filtering + all_pathogens.mmi for classification) ==="
+fetch_tar "tools/rica_s_id_minimap2.tar" "$DL_DIR/tools/"
 
+echo "=== kraken2 ==="
+fetch_tar "tools/rica_s_id_kraken2.tar" "$DL_DIR/tools/"
 
+echo "=== blast ==="
+fetch_tar "tools/rica_s_id_blast.tar" "$DL_DIR/tools/"
 
-os.makedirs(os.path.join(project_home, "tmp"), exist_ok=True)
-os.makedirs(os.path.join(project_home, "tools"), exist_ok=True)
-os.makedirs(os.path.join(project_home, "reference_genomes"), exist_ok=True)
-os.makedirs(os.path.join(project_home, "datasets"), exist_ok=True)
+echo "=== bwa ==="
+fetch_tar "tools/rica_s_id_bwa.tar" "$DL_DIR/tools/"
 
-print("=== downloading data ===")
+echo "=== ngmlr ==="
+fetch_tar "tools/rica_s_id_ngmlr.tar" "$DL_DIR/tools/"
 
-for d in data:
-    fetch_tar(base_url+"/"+d/".tar")
+echo "=== clark ==="
+fetch_tar "tools/rica_s_id_clark.tar" "$DL_DIR/tools/"
 
-for t in tools:
-    fetch_tar(base_url+"/"+t/".tar")
+echo "=== cuclark ==="
+fetch_tar "tools/rica_s_id_cuclark.tar" "$DL_DIR/tools/"
 
+# Optional / scaffolded classifiers (disabled by default).
+# echo "=== krakenuniq ==="
+# fetch_tar "tools/rica_s_id_krakenuniq.tar" "$DL_DIR/tools/"
 
-print("=== finished ===")
-EOF
+echo "=== finished ==="

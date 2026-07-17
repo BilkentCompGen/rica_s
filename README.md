@@ -216,49 +216,52 @@ Each stage driver takes a **run id** and an **absolute path to the input reads**
 ```bash
 $ cd /opt/rica_s
 $ scripts/AllRun.sh 1234_uniqueidentifier /path/to/input/data.fasta
+```
 
-# ## Stage and tool reference
+<!--
+## Stage and tool reference
 
-# ### Filtering — `rica_s_id_minimap2/filterHumanDna.sh`
-# Aligns reads to the human reference index `tools/rica_s_id_minimap2/human_v38.mmi` with `minimap2 -a`, then uses `samtools` to split mapped (human) vs. unmapped (non‑human) read names and `seqtk subseq` to extract the non‑human reads. Produces, in `output/<runid>/rica_s_fl_minimap2/`:
-# - `human_mapped_sequence_names.txt`
-# - `nonhuman_unmapped_sequence_names.txt`
-# - `nonhuman_unmapped_sequence_names.fasta` ← the input for classification.
+### Filtering — `rica_s_id_minimap2/filterHumanDna.sh`
+Aligns reads to the human reference index `tools/rica_s_id_minimap2/human_v38.mmi` with `minimap2 -a`, then uses `samtools` to split mapped (human) vs. unmapped (non‑human) read names and `seqtk subseq` to extract the non‑human reads. Produces, in `output/<runid>/rica_s_fl_minimap2/`:
+- `human_mapped_sequence_names.txt`
+- `nonhuman_unmapped_sequence_names.txt`
+- `nonhuman_unmapped_sequence_names.fasta` ← the input for classification.
 
-# ### Identification (`id`) classifiers
-# All classify against the curated pathogen database and emit a normalized two‑column `.tsv` (species vs. read count / identity) that downstream tooling can plot.
+### Identification (`id`) classifiers
+All classify against the curated pathogen database and emit a normalized two‑column `.tsv` (species vs. read count / identity) that downstream tooling can plot.
 
-# | Tool | Container | Method | Reference / DB | Key outputs |
-# |------|-----------|--------|----------------|-------------|
-# | **minimap2** | `rica_s_id_minimap2` | Long‑read mapping (`map-ont`) | `tools/rica_s_id_minimap2/all_pathogens.mmi` | `*.minimap2.paf`, `*.minimap2.paf.tsv` |
-# | **kraken2** | `rica_s_id_kraken2` | k‑mer classification | `tools/rica_s_id_kraken2/pathogen.k2db/` | `*.kraken2.report(.tsv)`, classified/unclassified reads |
-# | **BLAST** | `rica_s_id_blast` | `blastn` alignment | `tools/rica_s_id_blast/pathogen_references.fasta.blastdb` | `*.blastout.tab.6`, `*.blastout.tab.6.tsv` |
-# | **BWA** | `rica_s_id_bwa` | `bwa mem -x ont2d` | `tools/rica_s_id_bwa/all_pathogens.fasta` | `*.bwa.sam`, `*.bwa.sam.tsv` |
-# | **NGMLR** | `rica_s_id_ngmlr` | Long‑read mapping | `tools/rica_s_id_ngmlr/all_pathogens.fasta` | `*.ngmlr.sam`, `*.ngmlr.sam.tsv` |
-# | **CLARK** | `rica_s_id_clark` | k‑mer classification | `tools/rica_s_id_clark/` (build with `set_targets.sh`) | `*.clark.csv`, `*.clark.csv.tsv` |
-# | **CU‑CLARK** | `rica_s_id_cuclark` | GPU CLARK | `tools/rica_s_id_cuclark/` | `*.cuclark.csv`, `*.cuclark.csv.tsv` |
-# | **krakenuniq** | `rica_s_id_krakenuniq` | k‑mer + unique‑k‑mer counts | `tools/rica_s_id_krakenuniq/pathogen.kudb` | *(scaffolded; classify body currently disabled)* |
-# | **ganon2** | `rica_s_id_ganon2` | k‑mer classification | — | *(scaffolded / placeholder)* |
+| Tool | Container | Method | Reference / DB | Key outputs |
+|------|-----------|--------|----------------|-------------|
+| **minimap2** | `rica_s_id_minimap2` | Long‑read mapping (`map-ont`) | `tools/rica_s_id_minimap2/all_pathogens.mmi` | `*.minimap2.paf`, `*.minimap2.paf.tsv` |
+| **kraken2** | `rica_s_id_kraken2` | k‑mer classification | `tools/rica_s_id_kraken2/pathogen.k2db/` | `*.kraken2.report(.tsv)`, classified/unclassified reads |
+| **BLAST** | `rica_s_id_blast` | `blastn` alignment | `tools/rica_s_id_blast/pathogen_references.fasta.blastdb` | `*.blastout.tab.6`, `*.blastout.tab.6.tsv` |
+| **BWA** | `rica_s_id_bwa` | `bwa mem -x ont2d` | `tools/rica_s_id_bwa/all_pathogens.fasta` | `*.bwa.sam`, `*.bwa.sam.tsv` |
+| **NGMLR** | `rica_s_id_ngmlr` | Long‑read mapping | `tools/rica_s_id_ngmlr/all_pathogens.fasta` | `*.ngmlr.sam`, `*.ngmlr.sam.tsv` |
+| **CLARK** | `rica_s_id_clark` | k‑mer classification | `tools/rica_s_id_clark/` (build with `set_targets.sh`) | `*.clark.csv`, `*.clark.csv.tsv` |
+| **CU‑CLARK** | `rica_s_id_cuclark` | GPU CLARK | `tools/rica_s_id_cuclark/` | `*.cuclark.csv`, `*.cuclark.csv.tsv` |
+| **krakenuniq** | `rica_s_id_krakenuniq` | k‑mer + unique‑k‑mer counts | `tools/rica_s_id_krakenuniq/pathogen.kudb` | *(scaffolded; classify body currently disabled)* |
+| **ganon2** | `rica_s_id_ganon2` | k‑mer classification | — | *(scaffolded / placeholder)* |
 
-# > **Status note.** `krakenuniq/classify.sh` and `ganon2/classify.sh` are scaffolded — their commands are present but commented out and they currently print `N/A`. minimap2, kraken2, BLAST, BWA, NGMLR, CLARK, and CU‑CLARK are the working classifiers. CLARK/CU‑CLARK require their databases (see the download step) and run `set_targets.sh` before classifying.
+> **Status note.** `krakenuniq/classify.sh` and `ganon2/classify.sh` are scaffolded — their commands are present but commented out and they currently print `N/A`. minimap2, kraken2, BLAST, BWA, NGMLR, CLARK, and CU‑CLARK are the working classifiers. CLARK/CU‑CLARK require their databases (see the download step) and run `set_targets.sh` before classifying.
 
-# ### Profiling (`pr`) — `rica_s_pr_abricate/profile.sh`
-# Runs **ABRicate** over the read file against a broad set of resistance and virulence databases and concatenates the hits into one TSV with a full header. Databases queried: `resfinder`, `victors`, `vfdb`, `upec_expec_vf`, `ecoli_vf`, `argannot`, `megares`, `plasmidfinder`, `card`, `ncbi`, `bacmet2`, `ecoh`. Output: `output/<runid>/<reads>.abricate.csv` (tab‑separated).
+### Profiling (`pr`) — `rica_s_pr_abricate/profile.sh`
+Runs **ABRicate** over the read file against a broad set of resistance and virulence databases and concatenates the hits into one TSV with a full header. Databases queried: `resfinder`, `victors`, `vfdb`, `upec_expec_vf`, `ecoli_vf`, `argannot`, `megares`, `plasmidfinder`, `card`, `ncbi`, `bacmet2`, `ecoh`. Output: `output/<runid>/<reads>.abricate.csv` (tab‑separated).
 
-# The companion `get_common_treatment.py` queries the bundled SQLite database `rica_s.db` to map an identified organism name to a suggested/common treatment:
+The companion `get_common_treatment.py` queries the bundled SQLite database `rica_s.db` to map an identified organism name to a suggested/common treatment:
 
-# ```bash
-# python scripts/rica_s_pr_abricate/get_common_treatment.py "Escherichia coli"
-# ```
+```bash
+python scripts/rica_s_pr_abricate/get_common_treatment.py "Escherichia coli"
+```
 
-# > This maps organisms to treatments recorded in the local reference database and is **not** clinical guidance; treatment decisions must be made by a qualified clinician.
+> This maps organisms to treatments recorded in the local reference database and is **not** clinical guidance; treatment decisions must be made by a qualified clinician.
 
-# ### Tooling (`tl`) — read simulators
-# `builder/tl/rica_s_tl_pbsim3.yml` (PBSIM3) and `rica_s_tl_tksm.yml` (TKSM) define containers for generating synthetic long reads used to build the test `datasets/` and `reads/`.
+### Tooling (`tl`) — read simulators
+`builder/tl/rica_s_tl_pbsim3.yml` (PBSIM3) and `rica_s_tl_tksm.yml` (TKSM) define containers for generating synthetic long reads used to build the test `datasets/` and `reads/`.
+-->
 
 ## Output files
 
-For a given run, everything lands under `output/<runid>/`:
+For a given run, all the output files are collected at `/opt/rica/output/<runid>/`:
 
 ```
 output/<runid>/
@@ -267,22 +270,22 @@ output/<runid>/
 │   ├── human_mapped_sequence_names.txt
 │   ├── nonhuman_unmapped_sequence_names.txt
 │   └── nonhuman_unmapped_sequence_names.fasta
-├── <reads>.minimap2.paf(.tsv)                   # per‑classifier raw + normalized
-├── <reads>.kraken2.report(.tsv) + classified/unclassified
-├── <reads>.blastout.tab.6(.tsv)
-├── <reads>.bwa.sam(.tsv)
-├── <reads>.ngmlr.sam(.tsv)
-├── <reads>.clark.csv(.tsv) / .cuclark.csv(.tsv)
-└── <reads>.abricate.csv                         # profiling stage
+├── <inputfile>.minimap2.[ paf|tsv|pdf|eps ]
+├── <inputfile>.kraken2.[ report|tsv|pdf|eps ]
+├── <inputfile>.blastout.tab.[ 6|tsv|pdf|eps ]
+├── <inputfile>.bwa.[ sam|tsv|pdf|eps ]
+├── <inputfile>.ngmlr.[ sam|tsv|pdf|eps ]
+├── <inputfile>.[ clark|cuclark ].csv.[ csv|tsv|pdf|eps ]
+└── <inputfile>.abricate.csv                         # profiling stage
 ```
-
+<!-- 
 The `.tsv` files are the normalized, comparable summaries (species vs. read count / identity). Use `scripts/histogram.py` to visualize the top hits:
 
 ```bash
 python scripts/histogram.py output/<runid>/<reads>.kraken2.report.tsv
 ```
 
-It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders a horizontal Plotly bar chart. (Requires `pandas` and `plotly`.)
+It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders a horizontal Plotly bar chart. (Requires `pandas` and `plotly`.) -->
 
 
 
@@ -305,8 +308,9 @@ It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders
 - **Nothing happens for a stage** — the drivers only act on containers that are actually running; bring up the relevant services first.
 - **Permission errors writing `output/`** — ensure the host `/opt/rica_s` is writable by your user, since it's bind‑mounted read‑write into the containers.
 - **Web UI can't reach Docker** — `orch.py`/`start.py` connect to the Docker daemon over TCP; adjust the socket/URL and the orchestrator's hardcoded paths to match your environment.
+-->
+## Authors and acknowledgements 
 
-## Authors and acknowledgements -->
 
 Developed by **Ricardo Roman‑Brenes** (Bilkent University, Alkan Lab).
 
