@@ -3,7 +3,7 @@
 **A container-base, modular workflow for rapid pathogen identification and antimicrobial‑resistance (AMR) profiling from long‑read sequencing data, geared toward sepsis diagnostics.**
 
 `RICA_S` takes raw sequencing reads (e.g. Oxford Nanopore FASTA/FASTQ), filters out human DNA, classifies the remaining reads against a curated pathogen database using several independent classifiers in ensemble, profiles the sample for antimicrobial‑resistance and virulence genes, and (optionally) surfaces results through a small web UI. Every stage runs inside its own Docker container so tools with conflicting dependencies coexist cleanly and the pipeline is reproducible across machines.
-
+<!--
 ---
 
 ## Table of contents
@@ -21,7 +21,7 @@
 - [Notes and conventions](#notes-and-conventions)
 - [Troubleshooting](#troubleshooting)
 - [Authors and acknowledgements](#authors-and-acknowledgements)
-
+-->
 ---
 
 ## Overview
@@ -215,7 +215,7 @@ Each stage driver takes a **run id** and an **absolute path to the input reads**
 
 ```bash
 $ cd /opt/rica_s
-$ scripts/AllRun.sh 1234_uniqueidentifier /path/to/input/data.fasta
+$ scripts/AllRun.sh <runid> </path/to/input/data.fasta>
 ```
 
 <!--
