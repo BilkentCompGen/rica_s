@@ -16,6 +16,11 @@ services:
     #             file: ui/rica_s_ui_web-compose.yml
     #             service: rica_s_ui_web
 
+    rica_s_bc_dorado:
+        extends:
+            file: bc/rica_s_bc_dorado-compose.yml
+            service: rica_s_bc_dorado
+            
     rica_s_id_clark:
         extends:
             file: id/rica_s_id_clark-compose.yml

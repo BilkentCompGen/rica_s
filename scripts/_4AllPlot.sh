@@ -7,7 +7,7 @@ AllPlot()
 	date
 	echo
 
-	projecthome=/opt/rica_s/
+	project_home=/opt/rica_s/
 	runid=$1
 
 	echo "[i]> merging TSVs..."
@@ -19,14 +19,14 @@ AllPlot()
 		for (ref in total) {
 			print ref, total[ref]
 		}
-	}' $projecthome/output/$runid/*.tsv | sort -k2,2nr > $projecthome/output/$runid/$runid.tsv
+	}' $project_home/output/$runid/*.tsv | sort -k2,2nr > $project_home/output/$runid/$runid.tsv
 
 	echo "[i]> done."
 	echo "[i]> generating plots..."
 
-	for file in $projecthome/output/$runid/*.tsv; do 
+	for file in $project_home/output/$runid/*.tsv; do 
 		# echo $file
-		# echo $$projecthome/output/$runid/$file;
+		# echo $$project_home/output/$runid/$file;
 		python3 /opt/rica_s/scripts/misc/histogram.py $file; 
 		echo
 		# read -n 1 -p Continue?;
@@ -34,7 +34,7 @@ AllPlot()
 
 	echo "[i]> done."
 	echo "[i]> generating EPS..."
-		for file in $projecthome/output/$runid/*.pdf; do
+		for file in $project_home/output/$runid/*.pdf; do
 			pdftops "$file" "$file".eps; 
 		done
 	echo "[i]> done."

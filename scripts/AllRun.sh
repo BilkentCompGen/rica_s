@@ -6,13 +6,13 @@
 # exec 3>&2 2>/tmp/script_execution.log
 # set -x
 
+source ./config.sh
+echo `pwd`
 
-
-projecthome=/opt/rica_s
-. $projecthome/scripts/_1AllFilter.sh
-. $projecthome/scripts/_2AllClassify.sh
-. $projecthome/scripts/_3AllProfile.sh
-. $projecthome/scripts/_4AllPlot.sh
+. $project_home/scripts/_1AllFilter.sh
+. $project_home/scripts/_2AllClassify.sh
+. $project_home/scripts/_3AllProfile.sh
+. $project_home/scripts/_4AllPlot.sh
 
 
 
@@ -24,36 +24,36 @@ AllRun() {
 
 	runid=$1
 	inputfile=$(realpath "$2")
-	mkdir -p $projecthome/output/$runid
+	mkdir -p $project_home/output/$runid
+	echo "------------------------------"
 	echo run ID: $runid
 	echo input file: $inputfile
-	echo output dir: $projecthome/output/$runid
+	echo output dir: $project_home/output/$runid
+	echo "------------------------------"
 	echo
 
 
 
 
     AllFilter $runid $inputfile
-	nohuman_inputfile=$projecthome/output/$runid/rica_s_fl_minimap2/nonhuman_unmapped_sequence_names.fasta
-	# read -n 1 -p Continue?;
+	inputfile_cleaned=$project_home/output/$runid/rica_s_fl_minimap2/$(basename $inputfile).cleaned.fasta
+	read -n 1 -p Continue?;
 	echo
 
 
-    AllClassify $runid $nohuman_inputfile
-	# read -n 1 -p Continue?;
+    AllClassify $runid $inputfile_cleaned
+	read -n 1 -p Continue?;
 	echo
 
 
-    AllProfile $runid $nohuman_inputfile
-	# read -n 1 -p Continue?;
+    AllProfile $runid $inputfile_cleaned
+	read -n 1 -p Continue?;
 	echo
 	
 	
-
-
     AllPlot $runid
-    # read -n 1 -p Continue?;
-
+    read -n 1 -p Continue?;
+	echo
 
 
 	echo

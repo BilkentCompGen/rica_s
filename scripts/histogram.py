@@ -70,4 +70,4 @@ output_file = sys.argv[1]+"_hits_horizontal.svg"
 fig.write_image(output_file)
 fig.write_html(output_file+".html")
 
-print(f"¡Listo, ese! Horizontal chart saved successfully as {output_file}")
+print(f"Saved as {output_file}")

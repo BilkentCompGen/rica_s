@@ -1,0 +1,41 @@
+services:
+  rica_s_bc_dorado:
+    container_name: rica_s_bc_dorado
+
+    entrypoint:
+      - /bin/bash
+
+    hostname: rica_s_bc_dorado
+    working_dir: /
+
+    image: staphb/dorado:0.9.0-cuda12.2.0
+
+    ipc: private
+
+    logging:
+      driver: json-file
+      options: {}
+
+    networks:
+      - rica_s_net
+
+    stdin_open: true
+
+    tty: true
+
+    volumes:
+      - /opt/rica_s:/opt/rica_s
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    # build:
+    #   context: .
+    #   dockerfile_inline: |
+    #     FROM alkanlab/rica_s_bc_dorado:v1.1
+    #     RUN apt update && apt install -y nano less git wget samtools seqtk seqkit
