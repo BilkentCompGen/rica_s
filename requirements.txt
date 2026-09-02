@@ -1,0 +1,5 @@
+pod5
+biopython
+pandas
+scipy
+numpy

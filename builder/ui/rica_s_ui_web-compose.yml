@@ -4,7 +4,7 @@ services:
 
     hostname: rica_s_ui_web
 
-    image: alkanlab/rica_s_ui_web:v1.1
+    image: ubuntu:stonking
 
     ipc: private
 
@@ -34,9 +34,9 @@ services:
     build:
       context: .
       dockerfile_inline: |
-        FROM alkanlab/rica_s_ui_web:v1.1
+        FROM ubuntu:stonking
         WORKDIR /opt/rica_s/tools/rica_s_ui_web
         COPY . .
-        RUN python -m pip install flask docker pyaml
-        RUN apt update && apt install -y nano less git wget samtools seqtk seqkit
-# ENTRYPOINT [ "/bin/bash", "/rica_s/tools/rica_s_ui_web/run.sh" ]
+        RUN apt update && apt install -y nano less git wget samtools seqtk seqkit python3 python3-pip
+        RUN python3 -m pip install flask docker pyaml pandas --break-system-packages
+        

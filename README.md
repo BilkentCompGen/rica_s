@@ -298,7 +298,7 @@ It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders
 - **Paths.** Inside containers the project is always `/opt/rica_s`; input read paths passed to the drivers must be absolute and container‑visible.
 - **Compose structure.** `builder/rica_s-compose.yml` doesn't define services inline — it `extends` each per‑service file under `builder/<stage>/`. Images are pulled from `alkanlab/*` on Docker Hub; the `build.dockerfile_inline` blocks add common CLI tools (`samtools`, `seqtk`, `seqkit`, …) on top.
 - **Git‑ignored data.** `16s/`, `amr/`, `datasets/`, `output/`, `reads/`, `reference_genomes/`, and `tools/` are excluded from version control (see `.gitignore`). They're populated by the download step and by pipeline runs.
-- **Reproducibility.** Every classifier wraps its main command in `/usr/bin/time -v`, so per‑run resource usage (wall time, peak memory) is captured in the log for benchmarking.
+- **Reproducibility.** Every classifier wraps its main command in `/usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB"`, so per‑run resource usage (wall time, peak memory) is captured in the log for benchmarking.
 - **Not for clinical use.** This is a research pipeline. Identifications and treatment mappings are for investigation and benchmarking, not diagnosis.
 <!-- 
 ## Troubleshooting

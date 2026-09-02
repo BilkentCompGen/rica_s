@@ -1,17 +1,262 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <title>RICA-S</title>
+    <meta charset="UTF-8">
+    <title>Analysis Report: {{ runid }}</title>
+
+    <!-- jQuery and DataTables Libraries -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     
+    <style>
+        /* Base & Layout */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 90%;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        h1 { margin-top: 0; flex-shrink: 0; }
+
+        /* Tabs Navigation */
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-radius: 6px 6px 0 0;
+            flex-shrink: 0;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 24px;
+            transition: 0.3s;
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .tab button:hover { background-color: #ddd; }
+        .tab button.active {
+            background-color: #234eb9;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            color: #ffffff;
+        }
+
+        /* Tab Content Area */
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ffffff;
+            border-top: none;
+            background: #fff;
+            border-radius: 0 0 6px 6px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        /* General Sections */
+        .section { margin-bottom: 30px; }
+        .section h3 { color: #333; }
+        .text-center { text-align: center; }
+
+        /* Log Formatting */
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* DataTables */
+        .dataTables_wrapper { margin-top: 15px; }
+
+        /* Summary Tables */
+        .summary-header {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 10px 15px;
+            border-radius: 6px 6px 0 0;
+            margin: 0;
+            font-size: 16px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .summary-table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-top: none;
+            font-size: 14px;
+        }
+
+        .summary-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .summary-table td:first-child {
+            font-weight: bold;
+            width: 40%;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .summary-table tr:nth-child(even) { background-color: #f8fafc; }
+
+        /* iFrame Formatting */
+        iframe {
+            width: 90%;
+            height: 90%;
+            border: none;
+            background: transparent;
+            overflow: hidden;
+        }
+        
+        hr.divider {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 40px 0;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Report</h1>
-    <p> Run ID: {{ run_params.id }}</p>
-    <hr>
-    {{ run_params.report | safe }}
-    <hr>
-</body>
+    <div class="container">
+        <h1>Analysis Dashboard: [{{ runid }}]</h1>
 
+        <!-- Tab Links -->
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'SummaryTab')" id="defaultOpen">Data Summary</button>
+            <button class="tablinks" onclick="openTab(event, 'PathogenTab')">Pathogen Presence</button>
+            <button class="tablinks" onclick="openTab(event, 'CSVTab')">CSV Data</button>
+            <button class="tablinks" onclick="openTab(event, 'LogTab')">System Log</button>
+        </div>
+
+        <!-- Tab Content: Data Summary -->
+        <div id="SummaryTab" class="tabcontent">
+            {% if not summary_data %}
+                <p>No summary data found for this run.</p>
+            {% else %}
+                {% for section in summary_data %}
+                    <div class="section">
+                        <h3 class="summary-header">{{ section.header }}</h3>
+                        <table class="summary-table">
+                            {% for key, value in section.rows.items() %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Tab Content: Logs -->
+        <div id="LogTab" class="tabcontent">
+            {% if log_text %}
+                <pre>{{ log_text }}</pre>
+            {% else %}
+                <p>Log file not found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Tab Content: CSV / AMR Data -->
+        <div id="CSVTab" class="tabcontent">
+            {% if not csv_data %}
+                <p>No CSV files found matching the pattern.</p>
+            {% else %}
+                {% for csv in csv_data %}
+                    <div class="section">
+                        <h3>Source: {{ csv.filename }}</h3>
+                        {% if csv.error %}
+                            <p>Error loading file: {{ csv.error }}</p>
+                        {% else %}
+                            {{ csv.table_html | safe }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Tab Content: Pathogen HTMLs -->
+        <div id="PathogenTab" class="tabcontent">
+            {% if not pathogen_data %}
+                <p>No HTML files found in the specified directory.</p>
+            {% else %}
+                {% for item in pathogen_data %}
+                    <div class="section text-center">
+                        <h3>Source: {{ item.filename }}</h3>
+                        <iframe scrolling="no" srcdoc="{{ item.raw_html }}"></iframe>
+                    </div>
+                    <hr class="divider">
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function openTab(evt, tabName) {
+            let tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            let tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+
+            if (tabName === 'CSVTab') {
+                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+            }
+        }
+
+        $(document).ready(function () {
+            $('.data-table').DataTable({
+                "pageLength": 25,
+                "order": [],
+                "scrollX": true,
+                "destroy": true,
+                "fixedHeader": true,
+            });
+        });
+
+        // Automatically open the first tab on page load
+        document.getElementById("defaultOpen").click();
+    </script>
+</body>
 </html>

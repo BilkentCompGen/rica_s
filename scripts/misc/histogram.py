@@ -87,10 +87,15 @@ def main():
     base_name, _ = os.path.splitext(args.input_tsv)
     out_html = f"{base_name}.html"
     out_pdf = f"{base_name}.pdf"
+    out_svg = f"{base_name}.svg"
+    out_png = f"{base_name}.png"
+
 
     try:
         fig.write_html(out_html)
         fig.write_image(out_pdf, width=600)
+        fig.write_image(out_png, width=600)
+        fig.write_image(out_svg, width=600)
         print(f"[*] Files saved: {out_pdf} {out_html}")
     except ValueError as e:
         print(f"System error: {e}")
