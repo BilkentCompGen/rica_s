@@ -1,10 +1,4 @@
 #! /bin/bash
-# set -x
-
-
-echo '[i]> === clark'
-date
-echo ""
 
 inputfile="$1"
 outputfile=$(basename $inputfile)
@@ -40,8 +34,3 @@ END {
         printf "%s\t%d\n", r, count[r]
     }
 }' $outdir/$outputfile.clark.csv.csv > $outdir/$outputfile.clark.csv.csv.tsv
-
-
-echo ""
-date
-echo '[i]> clark ==='

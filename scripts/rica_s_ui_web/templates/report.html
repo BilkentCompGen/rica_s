@@ -6,9 +6,9 @@
     <title>Analysis Report: {{ runid }}</title>
 
     <!-- jQuery and DataTables Libraries -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.dataTables.min.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
     
     <style>
         /* Base & Layout */
@@ -216,7 +216,7 @@
                 {% for item in pathogen_data %}
                     <div class="section text-center">
                         <h3>Source: {{ item.filename }}</h3>
-                        <iframe scrolling="no" srcdoc="{{ item.raw_html }}"></iframe>
+                        <iframe scrolling="no" src="{{ item.url }}" loading="lazy"></iframe>
                     </div>
                     <hr class="divider">
                 {% endfor %}
@@ -225,7 +225,7 @@
     </div>
 
     <!-- Scripts -->
-    <script>
+    <!-- <script>
         function openTab(evt, tabName) {
             let tabcontent = document.getElementsByClassName("tabcontent");
             for (let i = 0; i < tabcontent.length; i++) {
@@ -257,6 +257,87 @@
 
         // Automatically open the first tab on page load
         document.getElementById("defaultOpen").click();
+    </script> -->
+
+
+    <!-- Scripts -->
+    <script>
+        function openTab(evt, tabName) {
+            let tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            let tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+
+            if (tabName === 'CSVTab') {
+                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+            }
+        }
+
+        function initDataTables() {
+            $('.data-table').DataTable({
+                "pageLength": 25,
+                "order": [],
+                "scrollX": true,
+                "destroy": true,
+                "fixedHeader": true,
+            });
+        }
+
+        $(document).ready(function () {
+            // Initial DataTable setup
+            initDataTables();
+
+            // Automatically open the first tab on page load
+            document.getElementById("defaultOpen").click();
+
+            // Set up AJAX polling to refresh data every 5 seconds
+            setInterval(function() {
+                $.ajax({
+                    url: window.location.href, // Fetch the current URL again
+                    type: 'GET',
+                    success: function(response) {
+                        // Parse the newly generated HTML from Flask
+                        let newHtml = $(response);
+
+                        // 1. Safely update standard tabs
+                        $('#SummaryTab').html(newHtml.find('#SummaryTab').html());
+                        $('#LogTab').html(newHtml.find('#LogTab').html());
+                        $('#PathogenTab').html(newHtml.find('#PathogenTab').html());
+
+                        // 2. Carefully update the CSV Tab to avoid breaking DataTables
+                        let newCsvContent = newHtml.find('#CSVTab').html();
+                        
+                        // Destroy existing tables before replacing the DOM elements
+                        $('.data-table').each(function() {
+                            if ($.fn.DataTable.isDataTable(this)) {
+                                $(this).DataTable().destroy();
+                            }
+                        });
+
+                        // Swap the HTML
+                        $('#CSVTab').html(newCsvContent);
+
+                        // Re-initialize DataTables on the fresh HTML
+                        initDataTables();
+
+                        // If the user is currently looking at the CSV tab, fix column alignments
+                        if ($('#CSVTab').is(':visible')) {
+                            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+                        }
+                    }
+                });
+            }, 5000); // 5000ms = 5 seconds. Adjust this interval as needed.
+        });
     </script>
+
+
 </body>
 </html>

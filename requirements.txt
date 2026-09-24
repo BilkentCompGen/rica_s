@@ -3,3 +3,5 @@ biopython
 pandas
 scipy
 numpy
+flask
+watchdog

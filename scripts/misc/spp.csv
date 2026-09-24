@@ -1,0 +1,985 @@
+Name,Accession,Taxid
+Achromobacter xylosoxidans,GCF_016728825.1,85698
+Acinetobacter albensis,GCF_900095025.1,1673609
+Acinetobacter amyesii,GCF_023499985.1,2942470
+Acinetobacter apis,GCF_054782275.1,1229165
+Acinetobacter baretiae,GCF_015627105.1,2605383
+Acinetobacter baumannii,GCF_009035845.1,470
+Acinetobacter baylyi ADP1,GCF_000046845.1,62977
+Acinetobacter beijerinckii CIP 110307,GCF_000369005.1,1217648
+Acinetobacter bereziniae,GCF_016576965.1,106648
+Acinetobacter bohemicus,GCF_058743305.1,1435036
+Acinetobacter boissieri,GCF_900096955.1,1219383
+Acinetobacter bouvetii,GCF_018324105.1,202951
+Acinetobacter brisouii CIP 110357,GCF_000488275.1,1341683
+Acinetobacter brisouioides,GCF_054454475.1,3438471
+Acinetobacter brisouisimilis,GCF_000368265.1,1217714
+Acinetobacter calcoaceticus,GCF_900444805.1,471
+Acinetobacter celticus,GCF_001707755.1,1891224
+Acinetobacter chengduensis,GCF_003664645.1,2420890
+Acinetobacter chenhuanii,GCF_041021895.1,3157354
+Acinetobacter chinensis,GCF_002165375.2,2004650
+Acinetobacter colistiniresistens,GCF_000413935.1,280145
+Acinetobacter corruptisaponis,GCF_030053775.1,3045147
+Acinetobacter courvalinii,GCF_014635545.1,280147
+Acinetobacter cumulans,GCF_003024525.3,2136182
+Acinetobacter defluvii,GCF_001704615.3,1871111
+Acinetobacter dispersus,GCF_009884975.1,70348
+Acinetobacter endophylla,GCF_053543775.1,3341851
+Acinetobacter entericus,GCF_026168575.1,2989714
+Acinetobacter equi,GCF_001307195.1,1324350
+Acinetobacter faecalis,GCF_034187745.1,2665161
+Acinetobacter gandensis,GCF_001678755.1,1443941
+Acinetobacter geminorum,GCF_013009345.1,2730922
+Acinetobacter gerneri DSM 14967 = CIP 107464 = MTCC 9824,GCF_000368565.1,1120926
+Acinetobacter guerrae,GCF_009372255.1,1843371
+Acinetobacter guillouiae,GCF_002370525.2,106649
+Acinetobacter gyllenbergii,GCF_001682515.1,134534
+Acinetobacter haemolyticus,GCF_003323815.1,29430
+Acinetobacter halobius,GCF_044130335.1,3344663
+Acinetobacter halotolerans,GCF_004208515.1,1752076
+Acinetobacter harbinensis,GCF_000816495.1,1353941
+Acinetobacter higginsii,GCF_000369845.1,70347
+Acinetobacter ihumii,GCF_900625095.1,2483802
+Acinetobacter indicus,GCF_009914475.1,756892
+Acinetobacter johnsonii ANC 3681,GCF_000368805.1,1217662
+Acinetobacter junii,GCF_018336855.1,40215
+Acinetobacter kanungonis,GCF_009939195.1,2699469
+Acinetobacter kookii,GCF_039543765.1,1226327
+Acinetobacter kyonggiensis,GCF_900107285.1,595670
+Acinetobacter lactucae,GCF_013122135.1,1785128
+Acinetobacter lanii,GCF_011578285.1,2715163
+Acinetobacter larvae,GCF_001704115.1,1789224
+Acinetobacter lwoffii,GCF_029024105.1,28090
+Acinetobacter marinus,GCF_900096915.1,281375
+Acinetobacter minutum,GCF_035916735.1,3016358
+Acinetobacter modestus,GCF_000367965.1,1776740
+Acinetobacter nectaris CIP 110549,GCF_000488215.1,1392540
+Acinetobacter nematophilus,GCF_026344175.1,2994642
+Acinetobacter nosocomialis,GCF_041021905.1,106654
+Acinetobacter oleivorans DR1,GCF_000196795.1,436717
+Acinetobacter parvus,GCF_042656365.1,134533
+Acinetobacter pecorum,GCF_014837015.1,2762215
+Acinetobacter pengchengensis,GCF_982235305.1,3434463
+Acinetobacter piscicola,GCF_002233755.1,2006115
+Acinetobacter pittii PHEA-2,GCF_000191145.1,871585
+Acinetobacter pollinis,GCF_015627175.1,2605270
+Acinetobacter populi,GCF_002174125.1,1582270
+Acinetobacter portensis,GCF_010646905.1,1839785
+Acinetobacter pragensis,GCF_001605895.1,1806892
+Acinetobacter proteolyticus,GCF_000367945.1,1776741
+Acinetobacter pseudolwoffii,GCF_042647985.1,2053287
+Acinetobacter pullicarnis,GCF_006352475.1,2576829
+Acinetobacter puyangensis,GCF_039542245.1,1096779
+Acinetobacter qingfengensis,GCF_008693185.1,1262585
+Acinetobacter radioresistens,GCF_003258335.1,40216
+Acinetobacter rathckeae,GCF_015627125.1,2605272
+Acinetobacter rongchengensis,GCF_003611475.1,2419601
+Acinetobacter rudis CIP 110305,GCF_000413895.1,421052
+Acinetobacter schindleri,GCF_010918895.1,108981
+Acinetobacter sedimenti,GCF_022601685.1,2919922
+Acinetobacter seifertii,GCF_016064815.1,1530123
+Acinetobacter septicus,GCF_019355975.1,465797
+Acinetobacter shaoyimingii,GCF_011578045.1,2715164
+Acinetobacter sichuanensis,GCF_003024515.2,2136183
+Acinetobacter silvestris,GCF_002135235.1,1977882
+Acinetobacter soli,GCF_018139125.1,487316
+Acinetobacter stercoris,GCF_900323515.1,2126983
+Acinetobacter suaedae,GCF_008630915.1,2609668
+Acinetobacter tandoii,GCF_008867985.1,202954
+Acinetobacter terrae,GCF_002135195.1,2731247
+Acinetobacter terrestris,GCF_004331155.1,2529843
+Acinetobacter thermotolerans,GCF_039865415.1,3151487
+Acinetobacter thutiue,GCF_030385805.1,2998078
+Acinetobacter tianfuensis,GCF_003611465.1,2419603
+Acinetobacter tibetensis,GCF_023824315.1,2943497
+Acinetobacter tjernbergiae,GCF_000759995.1,202955
+Acinetobacter towneri,GCF_017498585.1,202956
+Acinetobacter uliginosus,GCF_044130295.1,3344662
+Acinetobacter ursingii NIPH 706,GCF_000369885.1,1217716
+Acinetobacter variabilis,GCF_030518655.1,70346
+Acinetobacter venetianus RAG-1 = CIP 110063,GCF_000368585.1,1191460
+Acinetobacter vivianii,GCF_014635885.1,1776742
+Acinetobacter wanghuae,GCF_009557235.1,2662362
+Acinetobacter wuhouensis,GCF_001696605.3,1879050
+Acinetobacter yuyunsongii,GCF_041021915.1,3157368
+Acinetobacter zhairuonensis,GCF_047300875.1,2919921
+Aeromonas allosaccharophila,GCF_016026615.1,656
+Aeromonas aquatica,GCF_000764655.1,558964
+Aeromonas australiensis,GCF_000819725.1,1114880
+Aeromonas bestiarum,GCF_028751155.1,105751
+Aeromonas bivalvium,GCF_046078285.1,440079
+Aeromonas cavernicola,GCF_002795305.1,1006623
+Aeromonas caviae,GCF_900476005.1,648
+Aeromonas crassostreae,GCF_054052445.1,1917146
+Aeromonas dhakensis,GCF_002285935.1,196024
+Aeromonas diversa CDC 2478-85,GCF_000819805.1,1268237
+Aeromonas encheleia,GCF_900637545.1,73010
+Aeromonas enterica,GCF_054052465.1,1917145
+Aeromonas enteropelogenes,GCF_020097295.1,29489
+Aeromonas eucrenophila,GCF_000819865.1,649
+Aeromonas finlandensis,GCF_000764645.1,1543375
+Aeromonas fluvialis,GCF_000819885.1,591962
+Aeromonas hydrophila subsp. hydrophila ATCC 7966,GCF_000014805.1,380703
+Aeromonas ichthyocola,GCF_046087985.1,3367746
+Aeromonas intestinalis,GCF_054052485.1,1917144
+Aeromonas jandaei,GCF_016127195.1,650
+Aeromonas lacus,GCF_000764665.1,558884
+Aeromonas lusitana,GCF_002812985.1,931529
+Aeromonas media,GCF_020423125.1,651
+Aeromonas molluscorum,GCF_051376105.1,271417
+Aeromonas mytilicola subsp. aquatica,GCF_044336385.1,3366579
+Aeromonas oralensis,GCF_049665575.1,3415010
+Aeromonas piscicola,GCF_053714435.1,600645
+Aeromonas popoffii,GCF_037818705.1,70856
+Aeromonas rivipollensis,GCF_046079545.1,948519
+Aeromonas rivuli,GCF_020149575.1,648794
+Aeromonas salmonicida,GCF_028355655.1,645
+Aeromonas sanarellii,GCF_000820085.1,633415
+Aeromonas schubertii,GCF_001481395.1,652
+Aeromonas simiae,GCF_014892695.1,218936
+Aeromonas sobria,GCF_000820145.1,646
+Aeromonas taiwanensis,GCF_000820165.1,633417
+Aeromonas tecta,GCF_000820185.1,324617
+Aeromonas veronii,GCF_008693705.1,654
+Aggregatibacter actinomycetemcomitans,GCF_023518055.1,714
+Aggregatibacter aphrophilus ATCC 33389,GCF_900636915.1,985008
+Agrobacterium tumefaciens,GCF_013318015.2,358
+Aliarcobacter cryaerophilus ATCC 43158,GCF_003660105.1,1032070
+Arcanobacterium haemolyticum,GCF_900475915.1,28264
+Atlantibacter hermannii,GCF_016027855.1,565
+Avibacterium gallinarum,GCF_004362535.1,755
+Bacillus anthracis str. 'Ames Ancestor',GCF_000008445.1,261594
+Bacillus licheniformis,GCF_034478925.1,1402
+Bacillus mycoides,GCF_018739485.1,1405
+Bacillus paranthracis,GCF_024296885.1,2026186
+Bacillus pumilus SAFR-032,GCF_000017885.4,315750
+Bacteroides fragilis NCTC 9343,GCF_000025985.1,272559
+Bacteroides pyogenes,GCF_055384215.1,310300
+Bartonella acomydis,GCF_039543025.1,686234
+Bartonella alsatica,GCF_013388295.1,52764
+Bartonella ancashensis,GCF_001281405.1,1318743
+Bartonella australis AUST/NH1,GCF_000341355.1,1094489
+Bartonella bacilliformis KC583,GCF_000015445.1,360095
+Bartonella bennetti,GCF_045945445.1,3070220
+Bartonella bilalgolemi,GCF_023500045.1,2942911
+Bartonella birtlesii LL-WM9,GCF_000278095.1,1094552
+Bartonella bovis 91-4,GCF_000384965.1,1094491
+Bartonella callosciuri,GCF_014203215.1,686223
+Bartonella capreoli,GCF_902813205.1,155192
+Bartonella chomelii,GCF_014138465.1,236402
+Bartonella clarridgeiae 73,GCF_000253015.1,696125
+Bartonella doshiae,GCF_900445535.1,33044
+Bartonella eidoli,GCF_036576145.1,3112254
+Bartonella elizabethae,GCF_900638615.1,807
+Bartonella florencae,GCF_000312525.1,928210
+Bartonella fuyuanensis,GCF_014197255.1,1460968
+Bartonella gabonensis,GCF_903679515.1,2699889
+Bartonella gliris,GCF_045277155.1,3004109
+Bartonella grahamii as4aup,GCF_000022725.1,634504
+Bartonella harrusi,GCF_024297065.1,2961895
+Bartonella heixiaziensis,GCF_046245125.2,1461000
+Bartonella henselae,GCF_019930925.1,38323
+Bartonella jaculi,GCF_039543045.1,686226
+Bartonella japonica,GCF_040545385.1,357761
+Bartonella koehlerae C-29,GCF_000706625.1,1134510
+Bartonella kosoyi,GCF_003606325.2,2133959
+Bartonella krasnovii,GCF_003606345.3,2267275
+Bartonella machadoae,GCF_022559585.1,2893471
+Bartonella massiliensis,GCF_902150025.1,929795
+Bartonella mastomydis,GCF_900185775.1,1820002
+Bartonella melophagi K-2C,GCF_000278255.1,1094557
+Bartonella numerosa,GCF_037070845.1,3112255
+Bartonella occidentalis,GCF_037070875.1,3112256
+Bartonella pachyuromydis,GCF_039543065.1,931097
+Bartonella phoceensis,GCF_902825145.1,270249
+Bartonella propinqua,GCF_047263965.1,3385560
+Bartonella queenslandensis,GCF_018155095.1,481138
+Bartonella quintana,GCF_009936175.1,803
+Bartonella raoultii,GCF_019659805.1,1457020
+Bartonella rattaustraliani AUST/NH4,GCF_000312565.1,1205681
+Bartonella rattimassiliensis 15908,GCF_000278215.1,1094556
+Bartonella refiksaydamii,GCF_902652675.1,2654951
+Bartonella rhinolophi,GCF_036576165.1,3113620
+Bartonella rochalimae ATCC BAA-1498,GCF_000706645.1,685782
+Bartonella saheliensis,GCF_902162175.1,1457016
+Bartonella schoenbuchensis,GCF_039555305.1,165694
+Bartonella senegalensis OS02,GCF_000312545.1,929794
+Bartonella silvatica,GCF_040545155.1,357760
+Bartonella taylorii,GCF_023920085.1,33046
+Bartonella tribocorum CIP 105476,GCF_000196435.1,382640
+Bartonella vaga,GCF_037070895.1,3112257
+Bartonella vinsonii,GCF_900638635.1,33047
+Brachyspira pilosicoli 95/1000,GCF_000143725.1,759914
+Brevibacillus laterosporus DSM 25,GCF_002706795.1,1121121
+Brucella anthropi,GCF_015326295.1,529
+Brucella melitensis bv. 1 str. 16M,GCF_000007125.1,224914
+Burkholderia pseudomallei,GCF_030297255.1,28450
+Campylobacter rectus,GCF_004803795.1,203
+Candidatus Bartonella washoeensis Sb944nv,GCF_000278135.1,1094563
+Candidatus Chlamydia corallus,GCF_002817655.1,2038470
+Candidatus Chlamydia sanziniae,GCF_001653975.1,1806891
+Candidatus Corynebacterium faecigallinarum,GCF_058137965.1,2838528
+Candidatus Enterococcus clewellii,GCF_002140975.2,1834193
+Candidatus Enterococcus courvalinii,GCF_017315945.1,2815329
+Candidatus Enterococcus dunnyi,GCF_002174455.2,1834192
+Candidatus Enterococcus ferrettii,GCF_017377655.2,2815324
+Candidatus Enterococcus huntleyi,GCF_009933175.1,1857217
+Candidatus Enterococcus ikei,GCF_017316105.1,2815326
+Candidatus Enterococcus lemimoniae,GCF_002148425.2,1834167
+Candidatus Enterococcus lowellii,GCF_017426705.2,2230877
+Candidatus Enterococcus mangumiae,GCF_017316305.2,2230878
+Candidatus Enterococcus mansonii,GCF_002140715.2,1834181
+Candidatus Enterococcus moelleringii,GCF_017377575.1,2815325
+Candidatus Enterococcus murrayae,GCF_017315985.1,2815321
+Candidatus Enterococcus palustris,GCF_002141365.2,1834189
+Candidatus Enterococcus testudinis,GCF_002140915.1,1834191
+Candidatus Enterococcus willemsii,GCF_009933335.1,1857215
+Candidatus Enterococcus wittei,GCF_002140175.1,1987383
+Candidatus Legionella polyplacis,GCF_002776555.1,2005262
+Candidatus Mycoplasma haematobovis,GCF_001645765.1,432608
+Candidatus Mycoplasma haematohominis,GCF_902712995.1,1494318
+Candidatus Mycoplasma haematominutum 'Birmingham 1',GCF_000319365.1,1116213
+Candidatus Mycoplasma mahonii,GCF_030550815.1,3004105
+Capnocytophaga bilenii,GCF_017565765.1,2819369
+Capnocytophaga canimorsus,GCF_002302565.1,28188
+Capnocytophaga canis,GCF_043187445.1,1848903
+Capnocytophaga catalasegens,GCF_026005215.1,1004260
+Capnocytophaga cynodegmi,GCF_002302475.1,28189
+Capnocytophaga endodontalis,GCF_002209445.1,2708117
+Capnocytophaga felis,GCF_009684755.1,2267611
+Capnocytophaga gingivalis,GCF_002302415.1,1017
+Capnocytophaga granulosa,GCF_900446675.1,45242
+Capnocytophaga haemolytica,GCF_900187255.1,45243
+Capnocytophaga leadbetteri,GCF_003054025.1,327575
+Capnocytophaga ochracea DSM 7271,GCF_000023285.1,521097
+Capnocytophaga periodontitidis,GCF_016126015.1,2795027
+Capnocytophaga sputigena,GCF_002302495.1,1019
+Capnocytophaga stomatis,GCF_002302635.1,1848904
+Cardiobacterium hominis,GCF_900637305.1,2718
+Cardiobacterium valvarum,GCF_900460955.1,194702
+Chlamydia abortus,GCF_040235295.1,83555
+Chlamydia avium,GCF_000417735.2,1457141
+Chlamydia buteonis,GCF_019056495.1,2494525
+Chlamydia caviae GPIC,GCF_000007605.1,227941
+Chlamydia crocodili,GCF_018343815.1,2766982
+Chlamydia felis Fe/C-56,GCF_000009945.1,264202
+Chlamydia gallinacea 08-1274/3,GCF_000471025.2,1143323
+Chlamydia ibidis 10-1398/6,GCF_000454725.1,1046581
+Chlamydia muridarum str. Nigg,GCF_000006685.1,243161
+Chlamydia pecorum,GCF_020549965.1,85991
+Chlamydia pneumoniae TW-183,GCF_000007205.1,182082
+Chlamydia poikilotherma,GCF_900239975.1,1967783
+Chlamydia psittaci 6BC,GCF_000204255.1,331636
+Chlamydia serpentis,GCF_900239945.1,1967782
+Chlamydia suis,GCF_900149385.2,83559
+Chlamydia trachomatis D/UW-3/CX,GCF_000008725.1,272561
+Chlamydia vaughanii,GCF_964023145.2,3112552
+Chromobacterium aquaticum,GCF_021129195.1,467180
+Chromobacterium haemolyticum,GCF_009936155.1,394935
+Chromobacterium violaceum ATCC 12472,GCF_000007705.1,243365
+Chryseobacterium gleum,GCF_016766875.1,250
+Citrobacter amalonaticus,GCF_020099335.1,35703
+Citrobacter arsenatis,GCF_004353845.1,2546350
+Citrobacter bitternis,GCF_042658825.1,1585982
+Citrobacter braakii,GCF_009648935.1,57706
+Citrobacter cronae,GCF_016893685.1,1748967
+Citrobacter enshiensis,GCF_030487725.1,2971264
+Citrobacter europaeus,GCF_037482245.1,1914243
+Citrobacter farmeri,GCF_019048065.1,67824
+Citrobacter freundii,GCF_904859905.1,546
+Citrobacter gillenii,GCF_013337685.1,67828
+Citrobacter koseri ATCC BAA-895,GCF_000018045.1,290338
+Citrobacter meridianamericanus,GCF_041320245.1,2894201
+Citrobacter murliniae,GCF_004801125.1,67829
+Citrobacter pasteurii,GCF_019047765.1,1563222
+Citrobacter portucalensis,GCF_023374935.1,1639133
+Citrobacter rodentium NBRC 105723 = DSM 16636,GCF_021278985.1,1218085
+Citrobacter sedlakii,GCF_018128425.1,67826
+Citrobacter telavivensis,GCF_041807075.1,2653932
+Citrobacter tructae,GCF_004684345.1,2562449
+Citrobacter werkmanii,GCF_008693645.1,67827
+Citrobacter youngae,GCF_030294585.1,133448
+Clostridium cadaveris,GCF_020911725.1,1529
+Clostridium novyi NT,GCF_000014125.1,386415
+Clostridium perfringens,GCF_016027375.1,1502
+Clostridium septicum,GCF_003606265.1,1504
+Clostridium tertium,GCF_054733335.1,1559
+Clostridium thermopalmarium DSM 5974,GCF_002995795.1,1121340
+Comamonas kerstersii,GCF_002056725.1,225992
+Comamonas testosteroni,GCF_016599875.1,285
+Corynebacterium accolens,GCF_023520795.1,38284
+Corynebacterium afermentans subsp. lipophilum,GCF_030408375.1,144184
+Corynebacterium alimapuense,GCF_003716585.1,1576874
+Corynebacterium ammoniagenes DSM 20306,GCF_001941425.1,649754
+Corynebacterium amycolatum,GCF_016889425.1,43765
+Corynebacterium anserum,GCF_014262665.1,2684406
+Corynebacterium antarcticum,GCF_016595285.2,2800405
+Corynebacterium appendicis CIP 107643,GCF_030408415.1,1161099
+Corynebacterium aquatimens,GCF_030408395.1,1190508
+Corynebacterium aquilae DSM 44791,GCF_001941445.1,1431546
+Corynebacterium argentoratense DSM 44202,GCF_000590555.1,1348662
+Corynebacterium atrinae,GCF_030408455.1,1336740
+Corynebacterium atypicum,GCF_000732945.1,191610
+Corynebacterium aurimucosum ATCC 700975,GCF_000022905.1,548476
+Corynebacterium auris,GCF_030408575.1,44750
+Corynebacterium auriscanis,GCF_030408435.1,99807
+Corynebacterium axilliensis,GCF_046097495.1,3383589
+Corynebacterium belfantii,GCF_041898185.1,2014537
+Corynebacterium bouchesdurhonense,GCF_900078305.2,1720192
+Corynebacterium bovis,GCF_003932295.1,36808
+Corynebacterium breve,GCF_030252165.1,3049799
+Corynebacterium callunae DSM 20147,GCF_000344785.1,1121353
+Corynebacterium camporealensis,GCF_000980815.1,161896
+Corynebacterium canis,GCF_030408595.1,679663
+Corynebacterium capitovis DSM 44611,GCF_030440535.1,1121354
+Corynebacterium casei LMG S-19264,GCF_000550785.1,1285583
+Corynebacterium caspium DSM 44850,GCF_030440555.1,1121355
+Corynebacterium choanae,GCF_003813965.1,1862358
+Corynebacterium ciconiae DSM 44920,GCF_030440575.1,1121356
+Corynebacterium comes,GCF_009734405.1,2675218
+Corynebacterium confusum,GCF_030408715.1,71254
+Corynebacterium coyleae,GCF_019048165.1,53374
+Corynebacterium crudilactis,GCF_001643015.1,1652495
+Corynebacterium curieae,GCF_027570035.1,2913500
+Corynebacterium cystitidis,GCF_900187295.1,35757
+Corynebacterium dentalis,GCF_900232865.1,2014528
+Corynebacterium deserti GIMN1.010,GCF_001277995.1,931089
+Corynebacterium diphtheriae,GCF_001457455.1,1717
+Corynebacterium doosanense CAU 212 = DSM 45436,GCF_000767055.1,558173
+Corynebacterium drakensteinense,GCF_041224285.1,3104612
+Corynebacterium durum,GCF_030408675.1,61592
+Corynebacterium efficiens YS-314,GCF_000011305.1,196164
+Corynebacterium endometrii,GCF_004795735.1,2488819
+Corynebacterium epidermidicanis,GCF_001021025.1,1050174
+Corynebacterium evansiae,GCF_027570065.1,2913499
+Corynebacterium faecale,GCF_030408735.1,1758466
+Corynebacterium faecium,GCF_027257105.1,3016001
+Corynebacterium falsenii,GCF_020099275.1,108486
+Corynebacterium felinum,GCF_030408755.1,131318
+Corynebacterium flavescens,GCF_001941465.1,28028
+Corynebacterium fournieri,GCF_030408775.1,1852390
+Corynebacterium frankenforstense DSM 45800,GCF_001941485.1,1437875
+Corynebacterium freiburgense,GCF_030408815.1,556548
+Corynebacterium freneyi,GCF_019047805.1,134034
+Corynebacterium gallinarum,GCF_014837045.1,2762214
+Corynebacterium genitalium ATCC 33030,GCF_024453835.1,585529
+Corynebacterium gerontici,GCF_003813985.1,2079234
+Corynebacterium glaucum,GCF_030408855.1,187491
+Corynebacterium glucuronolyticum DSM 44120,GCF_030440595.1,1121361
+Corynebacterium glutamicum ATCC 13032,GCF_000011325.1,196627
+Corynebacterium glyciniphilum AJ 3170,GCF_000626675.1,1404245
+Corynebacterium godavarianum,GCF_007559235.1,2054421
+Corynebacterium gottingense,GCF_030408875.1,2041036
+Corynebacterium guangdongense,GCF_030408915.1,1783348
+Corynebacterium guaraldiae,GCF_053480195.1,3051103
+Corynebacterium hadale,GCF_002285125.1,2026255
+Corynebacterium haematomassiliense,GCF_013978595.1,2754726
+Corynebacterium halotolerans YIM 70093 = DSM 44683,GCF_000341345.1,1121362
+Corynebacterium hansenii,GCF_030408795.1,394964
+Corynebacterium heidelbergense,GCF_028609845.1,2055947
+Corynebacterium hesseae,GCF_037850265.1,2913502
+Corynebacterium hindlerae,GCF_014117265.1,699041
+Corynebacterium hiratae,GCF_009708045.1,3139423
+Corynebacterium humireducens NBRC 106098 = DSM 45392,GCF_000819445.1,1223515
+Corynebacterium hylobatis,GCF_003955685.1,1859290
+Corynebacterium ihumii,GCF_028609825.1,1232427
+Corynebacterium imitans,GCF_900187215.1,156978
+Corynebacterium incognitum,GCF_014217255.1,2754725
+Corynebacterium intestinale,GCF_023574125.1,2943492
+Corynebacterium jamesii,GCF_046097395.1,3383590
+Corynebacterium jeddahense,GCF_028609865.1,1414719
+Corynebacterium jeikeium,GCF_028609885.1,38289
+Corynebacterium kalidii,GCF_022869005.1,2931982
+Corynebacterium kalinowskii,GCF_009734385.1,2675216
+Corynebacterium kefirresidentii,GCF_016599755.1,1979527
+Corynebacterium kozikiae,GCF_024580965.1,2968469
+Corynebacterium kroppenstedtii DSM 44385,GCF_000023145.1,645127
+Corynebacterium kutscheri,GCF_000980835.1,35755
+Corynebacterium lactis RW2-5,GCF_001274895.1,1408189
+Corynebacterium lehmanniae,GCF_043161975.1,2913497
+Corynebacterium lemuris,GCF_024919295.1,1859292
+Corynebacterium liangguodongii,GCF_003070865.1,2079535
+Corynebacterium lipophiloflavum DSM 44291,GCF_000159635.1,525263
+Corynebacterium lipophilum,GCF_024102595.1,2804918
+Corynebacterium lizhenjunii,GCF_011038655.2,2709394
+Corynebacterium lowii,GCF_001412085.1,1544413
+Corynebacterium lubricantis DSM 45231,GCF_000379425.1,1121363
+Corynebacterium lujinxingii,GCF_014490555.1,2763010
+Corynebacterium macclintockiae,GCF_027570165.1,2913501
+Corynebacterium macginleyi,GCF_016889465.1,38290
+Corynebacterium marambiense,GCF_016342275.1,2765364
+Corynebacterium marinum DSM 44953,GCF_000835165.1,1224162
+Corynebacterium maris DSM 45190,GCF_000442645.1,1224163
+Corynebacterium marquesiae,GCF_027570155.1,2913503
+Corynebacterium massiliense DSM 45435,GCF_028609805.1,1121364
+Corynebacterium mastitidis DSM 44356,GCF_000375365.1,1121365
+Corynebacterium matruchotii ATCC 14266,GCF_000175375.1,553207
+Corynebacterium mayonis,GCF_038452275.1,3062461
+Corynebacterium megadyptis subsp. dunedinense,GCF_008930985.1,2080511
+Corynebacterium meitnerae,GCF_027570075.1,2913498
+Corynebacterium mendelii,GCF_017307055.1,2765362
+Corynebacterium meridianum,GCF_016342265.1,2765363
+Corynebacterium minutissimum,GCF_900478045.1,38301
+Corynebacterium mucifaciens,GCF_012396315.1,57171
+Corynebacterium mustelae,GCF_001020985.1,571915
+Corynebacterium mycetoides,GCF_900103625.1,38302
+Corynebacterium nasicanis,GCF_042658165.1,1448267
+Corynebacterium neomassiliense,GCF_900626215.1,2079482
+Corynebacterium nuruki S6-4,GCF_007970465.1,863239
+Corynebacterium occultum,GCF_009734425.1,2675219
+Corynebacterium oculi,GCF_001412105.1,1544416
+Corynebacterium otitidis ATCC 51513,GCF_000296405.1,883169
+Corynebacterium pacaense,GCF_900169525.1,1816684
+Corynebacterium parakroppenstedtii,GCF_019754935.1,2828363
+Corynebacterium pelargi,GCF_004114895.1,1471400
+Corynebacterium phocae,GCF_001941565.1,161895
+Corynebacterium phoceense,GCF_900092335.1,1686286
+Corynebacterium pilbarense,GCF_026930265.1,1288393
+Corynebacterium pilosum,GCF_900447205.1,35756
+Corynebacterium pollutisoli,GCF_900177745.1,1610489
+Corynebacterium poyangense,GCF_014522205.1,2684405
+Corynebacterium propinquum,GCF_016728665.1,43769
+Corynebacterium provencense,GCF_022641305.1,1737425
+Corynebacterium pseudodiphtheriticum,GCF_023509295.1,37637
+Corynebacterium pseudogenitalium,GCF_024453815.1,38303
+Corynebacterium pseudokroppenstedtii,GCF_030486685.2,2804917
+Corynebacterium pseudopelargi,GCF_003814005.1,2080757
+Corynebacterium pseudotuberculosis,GCF_002155265.1,1719
+Corynebacterium pygosceleis,GCF_016595275.2,2800406
+Corynebacterium pyruviciproducens ATCC BAA-1742,GCF_000411375.1,1125779
+Corynebacterium qintianiae,GCF_011038645.2,2709392
+Corynebacterium ramonii,GCF_000767685.1,3026968
+Corynebacterium renale,GCF_900478035.1,1724
+Corynebacterium resistens DSM 45100,GCF_000177535.2,662755
+Corynebacterium rhinophilum,GCF_030227225.2,3050197
+Corynebacterium riegelii,GCF_001263755.1,156976
+Corynebacterium rouxii,GCF_902702935.1,2719119
+Corynebacterium sanguinis,GCF_007641235.1,2594913
+Corynebacterium senegalense,GCF_900411315.1,2080750
+Corynebacterium silvaticum,GCF_002162115.2,2320431
+Corynebacterium simulans,GCF_001586235.1,146827
+Corynebacterium singulare,GCF_000833575.1,161899
+Corynebacterium sphenisci DSM 44792,GCF_001941505.1,1437874
+Corynebacterium spheniscorum,GCF_900113445.1,185761
+Corynebacterium sputi DSM 45148,GCF_000427865.1,1111729
+Corynebacterium stationis,GCF_001941345.1,1705
+Corynebacterium stercoris,GCF_024160105.1,2943490
+Corynebacterium striatum,GCF_016728105.1,43770
+Corynebacterium suedekumii,GCF_030252185.1,3049801
+Corynebacterium suicordis,GCF_031454255.1,203264
+Corynebacterium suranareeae,GCF_002355155.1,2506452
+Corynebacterium tapiri,GCF_006334925.1,1448266
+Corynebacterium terpenotabidum Y-11,GCF_000418365.1,1200352
+Corynebacterium testudinoris,GCF_001021045.1,136857
+Corynebacterium timonense 5401744,GCF_000312345.1,1203190
+Corynebacterium tuberculostearicum,GCF_016728365.1,38304
+Corynebacterium tuscaniense DNF00037,GCF_000759055.1,1401064
+Corynebacterium uberis,GCF_020616335.1,2883169
+Corynebacterium ulcerans 809,GCF_000215645.1,945711
+Corynebacterium ulceribovis DSM 45146,GCF_000372445.1,1121370
+Corynebacterium urealyticum,GCF_900187235.1,43771
+Corynebacterium ureicelerivorans,GCF_000747315.1,401472
+Corynebacterium urinipleomorphum,GCF_900155535.1,1852380
+Corynebacterium urogenitale,GCF_009026825.1,2487892
+Corynebacterium uropygiale,GCF_021568315.1,1775911
+Corynebacterium uterequi,GCF_001021065.1,1072256
+Corynebacterium variabile,GCF_006539825.1,1727
+Corynebacterium vitaeruminis DSM 20294,GCF_000550805.1,1224164
+Corynebacterium wankanglinii,GCF_013601005.1,2735136
+Corynebacterium xerosis NBRC 16721 = ATCC 373,GCF_001552415.1,1223513
+Corynebacterium yonathiae,GCF_027570195.1,2913504
+Corynebacterium yudongzhengii,GCF_003065405.1,2080740
+Corynebacterium zhongnanshanii,GCF_014490575.1,2768834
+Coxiella burnetii RSA 493,GCF_000007765.2,227377
+Cronobacter sakazakii,GCF_003516125.1,28141
+Cupriavidus gilardii,GCF_013347325.1,82541
+Cupriavidus pauculus,GCF_019931045.1,82633
+Cutaneotrichosporon arboriforme,GCA_002335565.1,387937
+Cutibacterium acnes subsp. acnes,GCF_006739385.1,1734925
+Delftia lacustris,GCF_040267515.1,558537
+Delftia tsuruhatensis,GCF_029215875.1,180282
+Desulfovibrio desulfuricans,GCF_017815575.1,876
+Desulfovibrio fairfieldensis,GCF_001553605.1,44742
+Desulfovibrio legallii,GCF_042652825.1,571438
+Eggerthella lenta,GCF_021378605.1,84112
+Eikenella corrodens,GCF_900187105.1,539
+Elizabethkingia anophelis R26,GCF_002023665.2,1246994
+Elizabethkingia meningoseptica,GCF_900475375.1,238
+Elizabethkingia miricola,GCF_001483145.1,172045
+Enterobacter adelaidei,GCF_041937165.1,3142537
+Enterobacter asburiae,GCF_007035805.1,61645
+Enterobacter bugandensis,GCF_900324475.1,881260
+Enterobacter cancerogenus,GCF_019047785.1,69218
+Enterobacter chengduensis,GCF_001984825.2,2494701
+Enterobacter chinensis,GCF_034008295.1,3030997
+Enterobacter chuandaensis,GCF_039718975.1,2497875
+Enterobacter cloacae,GCF_905331265.2,550
+Enterobacter dykesii,GCF_008364625.2,2797506
+Enterobacter hormaechei,GCF_019048245.1,158836
+Enterobacter huaxiensis,GCF_003594935.2,2494702
+Enterobacter intestinihominis,GCF_048568405.1,3133180
+Enterobacter kobei,GCF_023023125.1,208224
+Enterobacter ludwigii,GCF_001750725.1,299767
+Enterobacter mori,GCF_022014715.1,539813
+Enterobacter nematophilus,GCF_026344075.1,2994648
+Enterobacter oligotrophicus,GCF_009176645.1,2478464
+Enterobacter pasteurii,GCF_014930725.1,3029761
+Enterobacter pseudoroggenkampii,GCF_030406165.1,2996112
+Enterobacter quasihormaechei,GCF_004331385.1,2529382
+Enterobacter quasimori,GCF_018597345.1,2838947
+Enterobacter quasiroggenkampii,GCF_043972695.1,2497436
+Enterobacter roggenkampii,GCF_001729805.1,1812935
+Enterobacter rongchengensis,GCF_034008275.1,3030999
+Enterobacter sichuanensis,GCF_009036245.1,2071710
+Enterobacter soli,GCF_000224675.1,885040
+Enterobacter vonholyi,GCF_040834095.1,2797505
+Enterobacter wuhouensis,GCF_035835995.1,2529381
+Enterococcus alcedinis,GCF_014635985.1,1274384
+Enterococcus alishanensis,GCF_019218635.1,1303817
+Enterococcus aquimarinus,GCF_001885765.1,328396
+Enterococcus asini ATCC 700915,GCF_000407365.1,1158606
+Enterococcus avium,GCF_002891025.1,33945
+Enterococcus bulliens,GCF_053761865.1,1665476
+Enterococcus caccae ATCC BAA-1240,GCF_000394055.1,1158612
+Enterococcus camelliae,GCF_042685105.1,453959
+Enterococcus canintestini,GCF_053761725.1,317010
+Enterococcus canis NBRC 100695,GCF_001544375.1,1349765
+Enterococcus casseliflavus,GCF_029215545.1,37734
+Enterococcus cecorum,GCF_900474605.1,44008
+Enterococcus columbae DSM 7374 = ATCC 51263,GCF_000407225.1,1121865
+Enterococcus crotali,GCF_053761665.1,1453587
+Enterococcus devriesei,GCF_053761625.1,319970
+Enterococcus diestrammenae,GCF_049384045.1,1155073
+Enterococcus dispar ATCC 51266,GCF_000406945.1,1139219
+Enterococcus dongliensis,GCF_031927985.1,2559925
+Enterococcus durans,GCF_002277935.1,53345
+Enterococcus entomosocium,GCF_049319245.1,3034352
+Enterococcus eurekensis,GCF_042654605.1,1159753
+Enterococcus faecalis EnGen0336,GCF_000393015.1,1169293
+Enterococcus faecium,GCF_009734005.1,1352
+Enterococcus florum,GCF_004309355.1,2480627
+Enterococcus gallinarum,GCF_021496385.1,1353
+Enterococcus gilvus,GCF_003343305.1,160453
+Enterococcus haemoperoxidus ATCC BAA-382,GCF_000393995.1,1158608
+Enterococcus hailinensis,GCF_045862035.1,3238988
+Enterococcus hermanniensis,GCF_053761245.1,249189
+Enterococcus hirae,GCF_016766815.1,1354
+Enterococcus hulanensis,GCF_005405485.1,2559929
+Enterococcus infantis,GCF_049166715.1,3411036
+Enterococcus innesii,GCF_022846515.1,2839759
+Enterococcus italicus,GCF_023743875.1,246144
+Enterococcus lactis,GCF_019343125.1,357441
+Enterococcus larvae,GCF_017830045.1,2794352
+Enterococcus lemanii,GCF_016909125.1,1159752
+Enterococcus malodoratus,GCF_027659535.1,71451
+Enterococcus massiliensis,GCF_001050095.1,1640685
+Enterococcus mediterraneensis,GCF_900604485.1,2364791
+Enterococcus montenegrensis,GCF_029983095.1,3031993
+Enterococcus moraviensis ATCC BAA-383,GCF_000394015.1,1158609
+Enterococcus mundtii,GCF_002813755.1,53346
+Enterococcus nangangensis,GCF_005405245.1,2559926
+Enterococcus olivae,GCF_053760925.1,1242999
+Enterococcus pallens ATCC BAA-351,GCF_000393975.1,1158607
+Enterococcus phoeniculicola ATCC BAA-412,GCF_000394035.1,1158610
+Enterococcus pingfangensis,GCF_005405205.1,2559924
+Enterococcus plantarum,GCF_001730295.1,1077675
+Enterococcus pseudoavium NBRC 100491,GCF_001544295.1,1218092
+Enterococcus quebecensis,GCF_001730365.1,903983
+Enterococcus raffinosus,GCF_019175485.1,71452
+Enterococcus ratti,GCF_001886195.1,150033
+Enterococcus rivorum,GCF_042648305.1,762845
+Enterococcus rotai,GCF_040049835.1,118060
+Enterococcus saccharolyticus subsp. saccharolyticus,GCF_029023825.1,1814218
+Enterococcus saigonensis,GCF_011397115.1,1805431
+Enterococcus salsurae,GCF_054784955.1,3447172
+Enterococcus silesiacus,GCF_001886225.1,332949
+Enterococcus songbeiensis,GCF_055383875.1,2559927
+Enterococcus spodopteracolus,GCF_030441955.1,3034501
+Enterococcus sulfureus ATCC 49903,GCF_000407605.1,1140003
+Enterococcus termitis,GCF_001886275.1,332950
+Enterococcus thailandicus,GCF_002290025.1,417368
+Enterococcus timonensis,GCF_900104595.1,1852364
+Enterococcus ureasiticus,GCF_001730285.1,903984
+Enterococcus ureilyticus,GCF_001730315.1,1131292
+Enterococcus viikkiensis,GCF_005405345.1,930854
+Enterococcus villorum ATCC 700913,GCF_000407205.1,1158604
+Enterococcus wangshanyuanii,GCF_002197645.1,2005703
+Enterococcus xiangfangensis,GCF_005405365.1,1296537
+Erysipelothrix rhusiopathiae str. Fujisawa,GCF_000270085.1,650150
+Escherichia coli O157:H7 str. Sakai,GCF_000008865.2,386585
+Escherichia coli str. K-12 substr. MG1655,GCF_000005845.2,511145
+Fannyhessea vaginae,GCF_016026575.1,82135
+Faucicola osloensis,GCF_001553955.1,34062
+Finegoldia magna,GCF_057198065.1,1260
+Francisella tularensis subsp. novicida D9876,GCF_000833355.1,1450527
+Fusobacterium necrophorum subsp. funduliforme,GCF_050994935.1,143387
+Fusobacterium nucleatum subsp. nucleatum ATCC 25586,GCF_003019295.1,190304
+Gardnerella vaginalis ATCC 14018 = JCM 11026,GCF_001042655.1,585528
+Gemella bergeri ATCC 700627,GCF_000469465.1,1321820
+Gemella haemolysans,GCF_008692995.1,1379
+Gemella morbillorum,GCF_900476045.1,29391
+Gemella sanguinis,GCF_053758955.1,84135
+Globicatella sanguinis,GCF_002847845.2,13076
+Gordonia bronchialis DSM 43247,GCF_000024785.1,526226
+Gordonia polyisoprenivorans VH2,GCF_000247715.1,1112204
+Gordonia sputi NBRC 100414,GCF_000248055.1,1089453
+Gordonibacter pamelaeae,GCF_003340385.1,471189
+Hafnia alvei,GCF_011617105.1,569
+Helcococcus kunzii ATCC 51366,GCF_000245755.1,883114
+Helicobacter cinaedi PAGU611,GCF_000284635.1,1172562
+Helicobacter fennelliae,GCF_900451005.1,215
+Helicobacter pylori,GCF_025998455.1,210
+Hungatella hathewayi,GCF_025149285.1,154046
+Inquilinus limosus DSM 16000,GCF_000423185.1,1122125
+Kingella kingae,GCF_900475905.1,504
+Klebsiella aerogenes,GCF_019048125.1,548
+Klebsiella ornithinolytica,GCF_030505655.1,54291
+Klebsiella oxytoca,GCF_900636985.1,571
+Klebsiella planticola,GCF_000783935.2,575
+Klebsiella pneumoniae subsp. pneumoniae HS11286,GCF_000240185.1,1125630
+Kocuria rosea,GCF_004358895.1,1275
+Kytococcus schroeteri,GCF_042433515.1,138300
+Kytococcus sedentarius,GCF_044813075.1,1276
+Lacticaseibacillus rhamnosus,GCF_900636965.1,47715
+Lactobacillus acidophilus,GCF_034298135.1,1579
+Lactococcus lactis subsp. lactis,GCF_003176835.1,1360
+Lancefieldella rimae ATCC 49626,GCF_000174015.1,553184
+Laribacter hongkongensis DSM 14985,GCF_000423285.1,1122157
+Leclercia adecarboxylata,GCF_020097395.1,83655
+Legionella adelaidensis,GCF_001467055.1,45056
+Legionella anisa,GCF_003176875.1,28082
+Legionella antarctica,GCF_011764505.1,2708020
+Legionella beliardensis,GCF_900452395.1,91822
+Legionella birminghamensis,GCF_900452515.1,28083
+Legionella bononiensis,GCF_016786215.1,2793102
+Legionella bozemanae,GCF_900450575.1,447
+Legionella brunensis,GCF_001467025.1,29422
+Legionella busanensis,GCF_900461525.1,190655
+Legionella cardiaca,GCF_029026145.1,1071983
+Legionella cherrii DSM 19213,GCF_000621385.1,1122160
+Legionella cincinnatiensis,GCF_900452415.1,28085
+Legionella clemsonensis,GCF_002240035.1,1867846
+Legionella drancourtii LLAP12,GCF_000162755.2,658187
+Legionella dresdenensis,GCF_042649825.1,450200
+Legionella drozanskii LLAP-1,GCF_900640075.1,1212489
+Legionella erythra,GCF_001467615.1,448
+Legionella fairfieldensis,GCF_900640125.1,45064
+Legionella fallonii LLAP-10,GCF_000953135.1,1212491
+Legionella feeleii,GCF_900639755.1,453
+Legionella geestiana,GCF_004571195.1,45065
+Legionella gratiana,GCF_900452545.1,45066
+Legionella gresilensis,GCF_900639865.1,91823
+Legionella hackeliae,GCF_000953655.1,449
+Legionella impletisoli,GCF_900639875.1,343510
+Legionella israelensis,GCF_007361795.1,454
+Legionella jamestowniensis DSM 19215,GCF_900114725.1,1122163
+Legionella jordanis,GCF_900637635.1,456
+Legionella lansingensis,GCF_900187355.1,45067
+Legionella londiniensis,GCF_900452755.1,45068
+Legionella longbeachae NSW150,GCF_000091785.1,661367
+Legionella lytica,GCF_023921225.1,96232
+Legionella maceachernii,GCF_900460175.1,466
+Legionella maioricensis,GCF_023618015.1,2896528
+Legionella massiliensis,GCF_000756815.1,1034943
+Legionella micdadei,GCF_000953635.1,451
+Legionella moravica,GCF_900452715.1,39962
+Legionella nagasakiensis,GCF_900639915.1,535290
+Legionella nautarum,GCF_001467895.1,45070
+Legionella nigrisilvae,GCF_977063395.2,3438426
+Legionella norrlandica,GCF_000770585.1,1498499
+Legionella oakridgensis,GCF_001467925.1,29423
+Legionella parisiensis,GCF_900461585.1,45071
+Legionella petroniana,GCF_020806065.1,2886376
+Legionella pneumophila,GCF_001941585.1,446
+Legionella qingyii,GCF_003990155.1,2184757
+Legionella quateirensis,GCF_900452695.1,45072
+Legionella quinlivanii,GCF_001467975.1,45073
+Legionella resiliens,GCF_021344005.1,2905958
+Legionella rowbothamii,GCF_900639985.1,96229
+Legionella rubrilucens,GCF_900640015.1,458
+Legionella sainthelensi,GCF_002848365.2,28087
+Legionella santicrucis,GCF_001468135.1,45074
+Legionella saoudiensis,GCF_001465875.1,1750561
+Legionella septentrionalis,GCF_003989745.1,2498109
+Legionella shakespearei DSM 23087,GCF_001468025.1,1122169
+Legionella sheltonii,GCF_026191355.1,2992041
+Legionella spiritensis,GCF_900186965.1,452
+Legionella steelei,GCF_001468005.1,947033
+Legionella steigerwaltii,GCF_900452835.1,460
+Legionella stuttgartensis,GCF_977063405.2,3438425
+Legionella taurinensis,GCF_900452865.1,70611
+Legionella tucsonensis,GCF_900640035.1,40335
+Legionella tunisiensis,GCF_000308315.1,1034944
+Legionella wadsworthii,GCF_900452925.1,28088
+Legionella waltersii,GCF_900187095.1,66969
+Legionella worsleiensis,GCF_900453045.1,45076
+Legionella yabuuchiae,GCF_900640115.1,376727
+Leifsonia aquatica,GCF_014190775.1,144185
+Leuconostoc lactis,GCF_007954605.1,1246
+Leuconostoc pseudomesenteroides,GCF_016127255.1,33968
+Listeria aquatica,GCF_014223975.1,1494960
+Listeria booriae,GCF_000766865.1,1552123
+Listeria cornellensis FSL F6-0969,GCF_000525855.1,1265820
+Listeria cossartiae subsp. cossartiae,GCF_014228695.1,2713603
+Listeria costaricensis,GCF_900183385.1,2026604
+Listeria farberi,GCF_014229295.1,2713500
+Listeria fleischmannii 1991,GCF_001050295.1,1430899
+Listeria floridensis FSL S10-1187,GCF_000525875.1,1265817
+Listeria goaensis,GCF_900186125.1,1649188
+Listeria grandensis,GCF_014322885.1,1494963
+Listeria grayi,GCF_900638015.1,1641
+Listeria immobilis,GCF_014322845.1,2713502
+Listeria innocua,GCF_028596125.1,1642
+Listeria ivanovii subsp. ivanovii,GCF_000763515.1,202751
+Listeria kieliensis,GCF_003369925.1,1621700
+Listeria marthii,GCF_014227425.1,529731
+Listeria monocytogenes EGD-e,GCF_000196035.1,169963
+Listeria seeligeri serovar 1/2b str. SLCC3954,GCF_000027145.1,683837
+Listeria swaminathanii,GCF_031843265.2,2713501
+Listeria tempestatis,GCF_963575625.1,3422319
+Listeria valentina,GCF_011800755.1,2705293
+Listeria welshimeri,GCF_900187315.1,1643
+Methylobacterium adhaesivum,GCF_022179065.1,333297
+Methylobacterium aerolatum,GCF_022179085.1,418708
+Methylobacterium ajmalii,GCF_036448855.1,2738439
+Methylobacterium alsaeris,GCF_044003835.1,3344826
+Methylobacterium amylolyticum,GCF_030700245.1,3071472
+Methylobacterium aquaticum,GCF_050408745.1,270351
+Methylobacterium brachiatum,GCF_056780285.1,269660
+Methylobacterium brachythecii,GCF_014196345.1,1176177
+Methylobacterium bullatum,GCF_044501185.1,570505
+Methylobacterium carpenticola,GCF_042748905.1,3344827
+Methylobacterium cerastii,GCF_022179125.1,932741
+Methylobacterium crusticola,GCF_003574465.1,1697972
+Methylobacterium currus,GCF_003058325.1,2051553
+Methylobacterium dankookense,GCF_902141855.1,560405
+Methylobacterium durans,GCF_003173715.1,2202825
+Methylobacterium endophyticum,GCF_050591105.1,3418177
+Methylobacterium flocculans,GCF_025813715.1,2984843
+Methylobacterium frigidaeris,GCF_022179185.1,2038277
+Methylobacterium fujisawaense,GCF_039619325.1,107400
+Methylobacterium gnaphalii,GCF_007992215.1,1010610
+Methylobacterium goesingense,GCF_022179225.1,243690
+Methylobacterium gossipiicola,GCF_900113485.1,582675
+Methylobacterium gregans,GCF_022179245.1,374424
+Methylobacterium guangdongense,GCF_038442355.1,3138811
+Methylobacterium haplocladii,GCF_007992175.1,1176176
+Methylobacterium hispanicum,GCF_022179285.1,270350
+Methylobacterium indicum,GCF_017347565.1,1775910
+Methylobacterium iners,GCF_022179305.1,418707
+Methylobacterium isbiliense,GCF_022179325.1,315478
+Methylobacterium jeotgali,GCF_022179345.1,381630
+Methylobacterium komagatae DSM 19563,GCF_059568755.1,1122234
+Methylobacterium litchii,GCF_038442315.1,3138810
+Methylobacterium longum,GCF_022179385.1,767694
+Methylobacterium marchantiae,GCF_042679825.1,600331
+Methylobacterium mesophilicum,GCF_022179445.1,39956
+Methylobacterium nigriterrae,GCF_037106235.1,3127512
+Methylobacterium nodulans ORS 2060,GCF_000022085.1,460265
+Methylobacterium nonmethylotrophicum,GCF_004745635.1,1141884
+Methylobacterium organophilum,GCF_022533465.1,410
+Methylobacterium oryzae CBMB20,GCF_000757795.1,693986
+Methylobacterium oryzihabitans,GCF_004004555.2,2499852
+Methylobacterium oryzisoli,GCF_046557895.1,3385502
+Methylobacterium oxalidis,GCF_007992195.1,944322
+Methylobacterium persicinum,GCF_022179525.1,374426
+Methylobacterium phyllosphaerae,GCF_001936175.1,418223
+Methylobacterium phyllostachyos,GCF_900103445.1,582672
+Methylobacterium planeticum,GCF_008806345.1,2615211
+Methylobacterium platani,GCF_001653715.1,427683
+Methylobacterium pseudosasicola,GCF_900114535.1,582667
+Methylobacterium radiodurans,GCF_003173735.1,2202828
+Methylobacterium radiotolerans JCM 2831,GCF_000019725.1,426355
+Methylobacterium segetis,GCF_004348265.1,2488750
+Methylobacterium soli,GCF_008806385.1,553447
+Methylobacterium symbioticum,GCF_053570685.1,2584084
+Methylobacterium synurae,GCF_019216885.1,2718876
+Methylobacterium tardum,GCF_022179585.1,374432
+Methylobacterium tarhaniae,GCF_001043955.1,1187852
+Methylobacterium terrae,GCF_003173755.1,2202827
+Methylobacterium terricola,GCF_006151805.1,2583531
+Methylobacterium thuringiense,GCF_022179645.1,1003091
+Methylobacterium trifolii,GCF_022179685.1,1003092
+Methylobacterium variabile,GCF_001043975.1,298794
+Micrococcus aloeverae,GCF_022664405.1,1391911
+Micrococcus antarcticus,GCF_044872765.1,86171
+Micrococcus cohnii,GCF_014205175.1,993416
+Micrococcus endophyticus,GCF_014205115.1,455343
+Micrococcus flavus,GCF_014204815.1,384602
+Micrococcus lacusdianchii,GCF_023155805.1,2915940
+Micrococcus luteus NCTC 2665,GCF_900475555.1,465515
+Micrococcus lylae,GCF_900163825.1,1273
+Micrococcus porci,GCF_020097155.1,2856555
+Micrococcus terreus,GCF_900116905.1,574650
+Micrococcus yunnanensis,GCF_014138885.1,566027
+Moraxella catarrhalis,GCF_900476075.1,480
+Moraxella lacunata,GCF_029991695.1,477
+Moraxella nonliquefaciens,GCF_016028775.1,478
+Morganella morganii subsp. morganii,GCF_006094455.1,180434
+Mycobacterium intracellulare ATCC 13950,GCF_000277125.1,487521
+Mycobacterium marinum E11,GCF_000723425.2,1131442
+Mycobacterium tuberculosis H37Rv,GCF_000195955.2,83332
+Mycobacteroides abscessus ATCC 19977,GCF_000069185.1,561007
+Mycobacteroides chelonae CCUG 47445,GCF_001632805.1,1460372
+Mycolicibacter arupensis,GCF_002086515.1,342002
+Mycolicibacterium boenickei,GCF_010731295.1,146017
+Mycolicibacterium brisbanense,GCF_001570425.1,146020
+Mycolicibacterium canariasense,GCF_002101555.1,228230
+Mycolicibacterium cosmeticum,GCF_000613185.1,258533
+Mycolicibacterium fortuitum subsp. fortuitum,GCF_022179545.1,144549
+Mycolicibacterium houstonense,GCF_025823315.1,146021
+Mycolicibacterium neworleansense,GCF_001245615.1,146018
+Mycolicibacterium peregrinum,GCF_002102345.1,43304
+Mycolicibacterium senegalense,GCF_019645875.1,1796
+Mycoplasma amphoriforme A39,GCF_000723365.1,572419
+Mycoplasma anserisalpingitidis,GCF_007859615.1,519450
+Mycoplasma aquilae ATCC BAA-1896,GCF_048074525.1,547986
+Mycoplasma bradburyae,GCF_024338845.1,2963128
+Mycoplasma buteonis,GCF_000733865.1,171280
+Mycoplasma capricolum subsp. capricolum ATCC 27343,GCF_000012765.1,340047
+Mycoplasma corogypsi,GCF_045276875.1,2106
+Mycoplasma cottewii,GCF_024918975.1,51364
+Mycoplasma crocodyli MP145,GCF_000025845.1,512564
+Mycoplasma elephantis ATCC 51980,GCF_000687815.1,1408459
+Mycoplasma enhydrae,GCF_025779955.1,2499220
+Mycoplasma feriruminatoris,GCF_029677705.1,1179777
+Mycoplasma hafezii,GCF_049942695.1,525886
+Mycoplasma haliaeeti,GCF_048284645.1,3398774
+Mycoplasma iguanae,GCF_024722375.1,292461
+Mycoplasma leachii PG50,GCF_000183365.1,880447
+Mycoplasma leonicaptivi ATCC 49890,GCF_000622205.1,1448135
+Mycoplasma marinum,GCF_004335975.1,1937190
+Mycoplasma milvi,GCF_048284715.1,3398775
+Mycoplasma miroungigenitalium,GCF_013008635.1,754515
+Mycoplasma miroungirhinis,GCF_013008815.1,754516
+Mycoplasma mycoides subsp. capri,GCF_018389705.1,40477
+Mycoplasma nasistruthionis,GCF_006228185.1,353852
+Mycoplasma ovis str. Michigan,GCF_000508245.1,1415773
+Mycoplasma paraquilae,GCF_048284415.1,3398773
+Mycoplasma parvum str. Indiana,GCF_000477415.1,1403316
+Mycoplasma phocimorsus,GCF_030077865.1,3045839
+Mycoplasma phocoenae,GCF_012934855.1,754517
+Mycoplasma phocoeninasale,GCF_012934885.1,2726117
+Mycoplasma pogonae,GCF_054170725.1,3472838
+Mycoplasma procyoni,GCF_017052595.1,568784
+Mycoplasma putrefaciens,GCF_900476175.1,2123
+Mycoplasma razini,GCF_048076865.1,3398776
+Mycoplasma seminis,GCF_030718845.1,512749
+Mycoplasma simbae ATCC 49888,GCF_000702705.1,1408469
+Mycoplasma struthionis,GCF_003855455.1,538220
+Mycoplasma suis str. Illinois,GCF_000179035.2,768700
+Mycoplasma tauri,GCF_016925555.1,547987
+Mycoplasma testudineum,GCF_004362335.1,244584
+Mycoplasma todarodis,GCF_004335995.1,1937191
+Mycoplasma tracheobuteonis,GCF_054456995.1,3568880
+Mycoplasma tullyi,GCF_014068355.1,1612150
+Mycoplasma wenyonii str. Massachusetts,GCF_000277795.1,1197325
+Mycoplasma yeatsii GM274B,GCF_000875755.1,743967
+Mycoplasma zalophi,GCF_025486335.1,191287
+Mycoplasma zalophidermidis,GCF_024742155.1,398174
+Naganishia albida,GCA_001599735.1,100951
+Neisseria bacilliformis,GCF_014055025.1,267212
+Neisseria elongata,GCF_900453895.1,495
+Neisseria macacae ATCC 33926,GCF_022749495.1,997348
+Neisseria meningitidis,GCF_022869645.1,487
+Niallia circulans,GCF_013267435.1,1397
+Nocardia asteroides,GCF_900637185.1,1824
+Nocardia cyriacigeorgica,GCF_002949635.1,135487
+Nocardia farcinica IFM 10152,GCF_000009805.1,247156
+Nocardia neocaledoniensis,GCF_003182135.1,236511
+Nocardia thailandica NBRC 100428,GCF_000308795.1,1206740
+Oscillibacter ruminantium GH1,GCF_000307265.1,1007096
+Paenibacillus alvei,GCF_025547055.2,44250
+Pantoea agglomerans,GCF_019048385.1,549
+Pantoea dispersa,GCF_019890955.1,59814
+Papiliotrema laurentii,GCA_031326905.1,5418
+Paraclostridium sordellii,GCF_000953675.1,1505
+Parvimonas micra,GCF_900637905.1,33033
+Peptoniphilus asaccharolyticus,GCF_016791605.1,1258
+Peptoniphilus catoniae,GCF_901447155.2,1660341
+Peptoniphilus duerdenii ATCC BAA-1640,GCF_000146345.1,862517
+Peptoniphilus equinus,GCF_027921445.1,3016343
+Peptoniphilus faecalis,GCF_012976305.1,2731255
+Peptoniphilus genitalis,GCF_023614525.1,3036303
+Peptoniphilus gorbachii,GCF_016908115.1,411567
+Peptoniphilus grossensis ph5,GCF_000311825.1,1118057
+Peptoniphilus harei,GCF_016726485.1,54005
+Peptoniphilus indolicus,GCF_900454665.1,33030
+Peptoniphilus koenoeneniae,GCF_030812875.1,507751
+Peptoniphilus lacrimalis,GCF_900454715.1,33031
+Peptoniphilus lacydonensis,GCF_900106515.1,1673725
+Peptoniphilus mikwangii,GCF_000468535.1,1354300
+Peptoniphilus obesi ph1,GCF_000311865.1,1118062
+Peptoniphilus olsenii,GCF_040545475.1,411570
+Peptoniphilus ovalis,GCF_018919265.1,2841503
+Peptoniphilus pacaensis,GCF_900088125.1,1776390
+Peptoniphilus phoceensis,GCF_001517665.2,1720298
+Peptoniphilus porci,GCF_001940285.1,2652280
+Peptoniphilus rachelemmaiella,GCF_943169845.1,2811779
+Peptoniphilus raoultii,GCF_900099555.1,1776387
+Peptoniphilus rhinitidis 1-13,GCF_000246925.1,875454
+Peptoniphilus senegalensis JC140,GCF_000321025.1,1033744
+Peptoniphilus stercorisuis,GCF_017874395.1,1436965
+Peptoniphilus timonensis JC401,GCF_000312025.1,1095770
+Peptoniphilus vaginalis,GCF_900176605.1,1756987
+Peptostreptococcus anaerobius 653-L,GCF_000178095.1,596329
+Plesiomonas shigelloides,GCF_020991025.1,703
+Porphyromonas gingivalis ATCC 33277,GCF_000010505.1,431947
+Prescottella equi,GCF_003013675.1,43767
+Prevotella bivia DSM 20514,GCF_000262545.1,868129
+Priestia megaterium NBRC 15308 = ATCC 14581,GCF_006094495.1,1348623
+Propionibacterium acidifaciens,GCF_003798325.1,556499
+Propionibacterium australiense,GCF_900637915.1,119981
+Propionibacterium cyclohexanicum,GCF_900111365.1,64702
+Propionibacterium freudenreichii subsp. freudenreichii,GCF_000940845.1,66712
+Propionibacterium ruminifibrarum,GCF_900289195.1,1962131
+Providencia alcalifaciens,GCF_002393505.1,126385
+Providencia heimbachae,GCF_900475855.1,333962
+Providencia rettgeri,GCF_019048105.1,587
+Providencia rustigianii,GCF_900637755.1,158850
+Providencia stuartii,GCF_035747985.1,588
+Pseudomonas aeruginosa PAO1,GCF_000006765.1,208964
+Pseudomonas oryzihabitans,GCF_008693825.1,47885
+Pseudomonas putida NBRC 14164,GCF_000412675.1,1211579
+Ralstonia mannitolilytica,GCF_000954135.1,105219
+Ralstonia pickettii,GCF_014142625.1,329
+Ralstonia pickettii,GCF_902374465.2,329
+Rothia kristinae,GCF_016028855.1,37923
+Serratia marcescens,GCF_030291735.1,615
+Shewanella algae,GCF_009183365.2,38313
+Shigella flexneri 2a str. 301,GCF_000006925.2,198214
+Shouchella clausii,GCF_034479305.1,79880
+Solobacterium moorei,GCF_036323475.1,102148
+Sphingobacterium spiritivorum,GCF_016725645.1,258
+Sphingomonas paucimobilis,GCF_016027095.1,13689
+Staphylococcus aureus subsp. aureus NCTC 8325,GCF_000013425.1,93061
+Staphylococcus capitis subsp. urealyticus,GCF_040739365.1,74703
+Staphylococcus epidermidis,GCF_006094375.1,1282
+Staphylococcus haemolyticus,GCF_006094395.1,1283
+Staphylococcus hominis,GCF_003812505.1,1290
+Staphylococcus lugdunensis,GCF_001558775.1,28035
+Staphylococcus nepalensis,GCF_002442935.1,214473
+Staphylococcus saprophyticus subsp. saprophyticus ATCC 15305 = NCTC 7292,GCF_000010125.1,342451
+Staphylococcus simulans,GCF_025561465.1,1286
+Staphylococcus warneri,GCF_003571725.1,1292
+Stenotrophomonas maltophilia,GCF_020641395.2,40324
+Streptococcus agalactiae,GCF_949788565.1,1311
+Streptococcus anginosus,GCF_900636475.1,1328
+Streptococcus equinus,GCF_049393805.1,1335
+Streptococcus gordonii,GCF_019046945.1,1302
+Streptococcus pneumoniae,GCF_001457635.1,1313
+Streptococcus pyogenes,GCF_900475035.1,1314
+Tissierella praeacuta,GCF_900460335.1,43131
+Tropheryma whipplei TW08/27,GCF_000196075.1,218496
+Tsukamurella pulmonis,GCF_900460155.1,47312
+Tsukamurella tyrosinosolvens,GCF_040790855.1,57704
+Ureibacillus massiliensis 4400831 = CIP 108448 = CCUG 49529,GCF_002200855.1,1211035
+Veillonella dispar,GCF_900637515.1,39778
+Veillonella parvula,GCF_900186885.1,29466
+Vibrio vulnificus NBRC 15645 = ATCC 27562,GCF_002224265.1,1219061
+Weissella confusa,GCF_004771075.1,1583
+Winkia neuii subsp. neuii DSM 8576,GCF_000420405.1,1120945
+Wohlfahrtiimonas chitiniclastica,GCF_002252325.1,400946
+Yersinia enterocolitica subsp. palearctica Y11,GCF_000253175.1,930944
+Yersinia pseudotuberculosis,GCF_900637475.1,633

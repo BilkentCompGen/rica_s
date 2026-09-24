@@ -2,29 +2,429 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <title>RICA-S</title>
+    <style>
+        /* Base & Layout (Matched to Dashboard) */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 90%;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            color: #333;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #234eb9;
+            background-color: #fff;
+        }
+
+        /* Collapsible Advanced Options Styling */
+        .advanced-options {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            background-color: #f8fafc;
+        }
+
+        .advanced-options summary {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 12px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+            /* Hides default browser arrow */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        /* Remove default arrow for Webkit browsers */
+        .advanced-options summary::-webkit-details-marker {
+            display: none;
+        }
+
+        /* Custom toggle arrow */
+        .advanced-options summary::after {
+            content: "▼";
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .advanced-options[open] summary {
+            border-radius: 6px 6px 0 0;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .advanced-options[open] summary::after {
+            transform: rotate(180deg);
+            /* Flips arrow when open */
+        }
+
+        .advanced-options summary:hover {
+            background-color: #cbd5e1;
+        }
+
+        .advanced-content {
+            padding: 20px;
+        }
+
+        /* Section Styling (Matched to Dashboard Summary Tables) */
+        .section {
+            margin-bottom: 25px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background-color: #fff;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-header {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 10px 15px;
+            border-radius: 6px 6px 0 0;
+            margin: 0;
+            font-size: 16px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .checkbox-container {
+            padding: 15px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .checkbox-label:last-child {
+            margin-bottom: 0;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #234eb9;
+        }
+
+        /* Submit Button (Matched to Dashboard Active Tab) */
+        input[type="submit"] {
+            background-color: #234eb9;
+            color: #ffffff;
+            border: 1px solid #1d4099;
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 20%;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #1a3a8a;
+        }
+
+        ul {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        /* Read Path input + Browse button on one row */
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-row input[type="text"] {
+            flex: 1;
+        }
+
+        /* Secondary button (Matched to Dashboard Inactive Tab) */
+        button {
+            background-color: #e2e8f0;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            padding: 12px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #cbd5e1;
+        }
+
+        /* File Explorer Modal (Matched to Container) */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        .modal-backdrop.open {
+            display: block;
+        }
+
+        #file_modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 480px;
+            max-width: calc(100% - 40px);
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #file_modal h3 {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 12px 15px;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .current-path {
+            color: #334155;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 0 0 15px 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #btn_confirm {
+            background-color: #234eb9;
+            color: #ffffff;
+            border: 1px solid #1d4099;
+        }
+
+        #btn_confirm:hover {
+            background-color: #1a3a8a;
+        }
+
+        #folder_list {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+
+        #folder_list li {
+            margin-bottom: 8px;
+        }
+
+        #folder_list button {
+            width: 100%;
+            text-align: left;
+            font-weight: normal;
+            background-color: #f8fafc;
+            padding: 10px 12px;
+        }
+
+        #folder_list button:hover {
+            background-color: #e2e8f0;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>rica_s</h1>
-    <form id="run_params" action="/submitted" method="post">
-        <ul>
-            <input type="text" id="tb_readpath"  name="tb_readpath" value="/path/to/reads/"/>
-
-            {% for stg in stages %}
-            <h2>{{ stg[0] }}</h2>
-            {% for s in stg[1] %}
-
-                <input type="checkbox" id="cb_{{ s }}" name="cb_{{ s }}" value="{{ s }}"/>
-                {{ s }} </br>
-                {% endfor %}
-
-            {% endfor %}
-        </ul>
+    <div class="container">
+        <h1>rica_s</h1>
 
 
-        <input type="submit" name="submit" id="submit"  value="Submit" />
-    </form>
+
+        <form id="run_params" action="/submitted" method="post">
+
+            <div class="form-group">
+                <label for="tb_readpath">Read Path</label>
+                <div class="input-row">
+                    <input type="text" id="tb_readpath" name="tb_readpath" value="/path/to/reads/" />
+                    <button type="button" id="btn_browse">Browse...</button>
+                </div>
+                <label for="tb_runid">Run ID</label>
+                <div class="input-row">
+                    <input type="text" id="tb_runid" name="tb_runid" />
+                    <script>document.getElementById('tb_runid').value = new Date().toISOString().replace(/\..+/, '').replace(/[^0-9]/g, '_');</script>
+                </div>
+
+            </div>
+
+            <!-- Native HTML5 Collapsible Block -->
+            <details class="advanced-options">
+                <summary>Advanced Options</summary>
+                <div class="advanced-content">
+                    <ul>
+                        {% for stg in stages %}
+                        <li>
+                            <div class="section">
+                                <h2 class="summary-header">{{ stg[0] }}</h2>
+                                <div class="checkbox-container">
+                                    {% for s in stg[1] %}
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="cb_{{ s }}" name="cb_{{ s }}" value="{{ s }}" />
+                                        {{ s }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </details>
+
+            <input type="submit" name="submit" id="submit" value="Submit Run" />
+        </form>
+    </div>
+
+    <!-- Custom File Explorer Modal -->
+    <div class="modal-backdrop" id="modal_backdrop">
+        <div id="file_modal">
+            <h3>Select Directory</h3>
+            <div class="modal-body">
+                <p class="current-path" id="current_path_display">/</p>
+
+                <div class="modal-actions">
+                    <button type="button" id="btn_confirm">Select This Folder</button>
+                    <button type="button" id="btn_cancel">Cancel</button>
+                </div>
+
+                <ul id="folder_list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to control the explorer -->
+    <script>
+        const modal = document.getElementById('modal_backdrop');
+        const tb_readpath = document.getElementById('tb_readpath');
+        const folderList = document.getElementById('folder_list');
+        const pathDisplay = document.getElementById('current_path_display');
+        let serverPath = '/';
+
+        // Open modal
+        document.getElementById('btn_browse').onclick = () => {
+            modal.classList.add('open');
+            loadFolders('/');
+        };
+
+        // Close/Cancel
+        document.getElementById('btn_cancel').onclick = () => modal.classList.remove('open');
+
+        // Select the folder and put it in the textbox
+        document.getElementById('btn_confirm').onclick = () => {
+            tb_readpath.value = serverPath;
+            modal.classList.remove('open');
+        };
+
+        // Fetch folders from the Python backend
+        function loadFolders(path) {
+            fetch(`/api/folders?path=${encodeURIComponent(path)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+
+                    serverPath = data.current;
+                    pathDisplay.textContent = serverPath;
+                    folderList.innerHTML = '';
+
+                    // Generate 'Up' button
+                    folderList.innerHTML += `<li><button type="button" onclick="loadFolders('${data.parent}')">📁 [Up Directory]</button></li>`;
+
+                    // Generate subfolders
+                    data.folders.forEach(folder => {
+                        // Ensure slashes don't double up
+                        let nextPath = serverPath.endsWith('/') ? serverPath + folder : serverPath + '/' + folder;
+                        folderList.innerHTML += `<li><button type="button" onclick="loadFolders('${nextPath}')">📁 ${folder}</button></li>`;
+                    });
+                });
+        }
+    </script>
+
+
 
 </body>
 

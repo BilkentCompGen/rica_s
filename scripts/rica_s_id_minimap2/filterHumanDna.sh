@@ -1,11 +1,4 @@
 #! /bin/bash
-
-echo '[i]> === minimap2'
-date
-echo ""
-
-
-
 inputfile="$1"
 outdir="$2"
 indexfile="/opt/rica_s/tools/rica_s_id_minimap2/human_v38.mmi"
@@ -26,6 +19,3 @@ samtools view -f 4 "$outdir/$filename".filterHumanDna.sam |awk '{print $1}' | so
 # echo "seqtk subseq $inputfile $outdir/rica_s_fl_minimap2/nonhuman_unmapped_sequence_names.txt > $outdir/rica_s_fl_minimap2/$filename.cleaned.fasta"
 # seqtk subseq -A $inputfile $outdir/$filename.nonhuman_unmapped_sequence_names.txt > $outdir/$filename.cleaned.fasta
 seqtk subseq $inputfile $outdir/$filename.nonhuman_unmapped_sequence_names.txt | seqtk seq -A > $outdir/$filename.cleaned.fasta
-echo ""
-date
-echo '[i]> minimap2 ==='

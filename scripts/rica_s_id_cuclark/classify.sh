@@ -1,9 +1,5 @@
 #! /bin/bash
 
-echo '[i]> === cuclark'
-date
-echo
-
 inputfile="$1"
 outputfile=$(basename $inputfile)
 outdir="$2"
@@ -34,8 +30,3 @@ END {
         printf "%s\t%d\n", r, count[r]
     }
 }' $outdir/$outputfile.cuclark.csv.csv > $outdir/$outputfile.cuclark.csv.csv.tsv
-
-
-echo
-date
-echo '[i]> cuclark ==='

@@ -2,13 +2,17 @@ import os
 import subprocess
 import datetime
 import docker
-from config import PROJECT_HOME
+from scripts.config import PROJECT_HOME, run_outdir
+import logging
 
-def all_classify(runid, inputfile):
-    print("[i]> Begin of classification stage")
-    print(datetime.datetime.now())
-    
-    outdir = os.path.join(PROJECT_HOME, "output", runid)
+logger = logging.getLogger(__name__)
+
+
+def all_classify(runid, inputfile, parent=None):
+    logger.info("[i]> Begin of classification stage")
+    logger.info(datetime.datetime.now())
+
+    outdir = run_outdir(runid, parent)
     os.makedirs(outdir, exist_ok=True)
     logfile = os.path.join(outdir, f"{runid}.log")
     
@@ -28,13 +32,15 @@ def all_classify(runid, inputfile):
                 "LINES": "24", 
                 "MALLOC_ARENA_MAX": "2"
             }
-            
+            logger.info(f"[i]> {container.name} ===")
+
             exit_code, output_stream = container.exec_run(
-                cmd=[script_path, inputfile, os.path.join("/opt/rica_s/output/", runid)],
+                cmd=[script_path, inputfile, outdir],
                 environment=env_vars,
                 tty=True,
                 stream=True
             )
+            logger.info(f"[i]> === {container.name}")
 
             with open(logfile, "a") as log:
                 for chunk in output_stream:
@@ -53,8 +59,8 @@ def all_classify(runid, inputfile):
     # Executing external dependencies via local shell
     taxid_script = os.path.join(PROJECT_HOME, "scripts", "misc", "replace_taxid_for_spp_tsv.sh")
     acc_script = os.path.join(PROJECT_HOME, "scripts", "misc", "replace_acc_for_spp_tsv.sh")
-    subprocess.run(f"sh {taxid_script} 1 /opt/rica_s/output/{runid}/*.tsv", shell=True)
-    subprocess.run(f"sh {acc_script} 1 /opt/rica_s/output/{runid}/*.tsv", shell=True)
+    subprocess.run(f"sh {taxid_script} 1 {outdir}/*.tsv", shell=True)
+    subprocess.run(f"sh {acc_script} 1 {outdir}/*.tsv", shell=True)
     
-    print(datetime.datetime.now())
-    print("[i]> End of classification stage")
+    logger.info(datetime.datetime.now())
+    logger.info("[i]> End of classification stage")

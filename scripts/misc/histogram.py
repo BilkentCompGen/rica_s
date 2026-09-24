@@ -101,5 +101,89 @@ def main():
         print(f"System error: {e}")
 
 
+
+def plot_df(df, outfile):
+    
+    if len(df.index) == 0:
+        print("Empty TSV")
+
+
+        fig = go.Figure()
+
+        fig.update_layout(
+            # Kill the axes entirely
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+
+            # Clean white background
+            plot_bgcolor="white",
+            paper_bgcolor="white",
+
+            # Drop the annotation right in the center
+            annotations=[
+                dict(
+                    text="NO DATA",
+                    xref="paper",
+                    yref="paper",
+                    x=0.5,
+                    y=0.5,
+                    showarrow=False,
+                    font=dict(size=24, color="gray")
+                )
+            ]
+        )
+
+        
+    else:
+        # Grab the top 10 highest counts.
+        # top10_df = df.nlargest(10, 'Count').sort_values(by='Count', ascending=True)
+
+        # THE STREET MAGIC: Merge the Reference and Count into a single formatted string
+        # top10_df['Label'] = "<i>"+top10_df['Reference'] + \
+            # "</i> <b>(" + top10_df['Count'].astype(str) + ")</b>  "
+
+        fig = px.bar(
+            df,
+            x=df.columns[1],
+            y="y_label",  # Use our new merged column here
+            orientation='h',
+            # title='Top 10 Mapped References',
+            color=df.columns[1],
+            color_continuous_scale='Turbo'
+            # Notice we dropped the text='Count' argument here so it doesn't double-print
+        )
+
+        fig.update_layout(
+            # template='plotly_dark',
+            xaxis_title="Number of Reads Mapped",
+            yaxis_title="",  # Leave this blank so we don't crowd your new labels
+            # font=dict(family="Courier New, monospace", size=14),
+            margin=dict(l=10, r=10, t=0, b=60),
+            coloraxis_showscale=False
+        )
+
+        # Kept the bars nice and lean at 60% thickness
+        fig.update_traces(width=0.5)
+
+    
+    out_html = f"{outfile}.html"
+    out_pdf = f"{outfile}.pdf"
+    out_svg = f"{outfile}.svg"
+    out_png = f"{outfile}.png"
+
+
+    try:
+        fig.write_html(out_html)
+        fig.write_image(out_pdf, width=600)
+        fig.write_image(out_png, width=600)
+        fig.write_image(out_svg, width=600)
+        print(f"[*] Files saved: {out_pdf} {out_html}")
+    except ValueError as e:
+        print(f"System error: {e}")
+
+
+
+
+
 if __name__ == "__main__":
     main()

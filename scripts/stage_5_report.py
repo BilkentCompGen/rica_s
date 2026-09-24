@@ -3,14 +3,23 @@ import glob
 import pandas as pd
 import html
 import sys
+import logging
+from scripts.config import run_outdir
+import datetime
+logger = logging.getLogger(__name__)
 
-# ==========================================
-# Configuration & Execution
-# ==========================================
 
-def all_report(runid):
+def all_report(runid, parent=None):
+
+
+    logger.info("[i]> Begin of reporting stage")
+    logger.info(datetime.datetime.now())
+
+
+    logger.info(f"[i]> building ===")
+
     # Consolidate the base directory logic
-    output_dir = f"/opt/rica_s/output/{runid}/"
+    output_dir = run_outdir(runid, parent)
     LOG_FILE = os.path.join(output_dir, f"{runid}.log")
     AMR_CSV_PATTERN = os.path.join(output_dir, "*.abricate.csv")
     OUTPUT_HTML = os.path.join(output_dir, f"{runid}_final_report.html")
@@ -180,10 +189,16 @@ def all_report(runid):
     with open(OUTPUT_HTML, 'w', encoding='utf-8') as f:
         f.write(html_template)
     
-    print(f"Success! Report generated at: {OUTPUT_HTML}")
+    logger.info(f"Success! Report generated at: {OUTPUT_HTML}")
+
+    logger.info(f"[i]> === building")
+
+    logger.info(datetime.datetime.now())
+    logger.info("[i]> End of reporting stage")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python report_script.py <runid>")
+        print("Usage: python3 -m scripts.stage_5_report <runid> [parent]")
         sys.exit(1)
-    all_report(sys.argv[1])
+    all_report(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None)

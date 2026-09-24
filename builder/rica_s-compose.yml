@@ -1,6 +1,5 @@
-#  
+#
 # docker-compose.yml
-
 
 networks:
     rica_s_net:
@@ -10,56 +9,57 @@ networks:
                 - subnet: 172.20.0.0/24 # Define the subnet for your network
 
 services:
-
-    rica_s_ui_web:
-            extends:
-                file: ui/rica_s_ui_web-compose.yml
-                service: rica_s_ui_web
+    #    rica_s_ui_web:
+    #            extends:
+    #                file: ui/rica_s_ui_web-compose.yml
+    #                service: rica_s_ui_web
 
     rica_s_bc_dorado:
         extends:
             file: bc/rica_s_bc_dorado-compose.yml
             service: rica_s_bc_dorado
-            
+
     rica_s_id_clark:
         extends:
             file: id/rica_s_id_clark-compose.yml
             service: rica_s_id_clark
 
     rica_s_id_blast:
-            extends:
-                file: id/rica_s_id_blast-compose.yml
-                service: rica_s_id_blast
+        extends:
+            file: id/rica_s_id_blast-compose.yml
+            service: rica_s_id_blast
 
     rica_s_id_bwa:
-            extends:
-                file: id/rica_s_id_bwa-compose.yml
-                service: rica_s_id_bwa
+        extends:
+            file: id/rica_s_id_bwa-compose.yml
+            service: rica_s_id_bwa
 
     rica_s_id_cuclark:
-            extends:
-                file: id/rica_s_id_cuclark-compose.yml
-                service: rica_s_id_cuclark
-
+        extends:
+            file: id/rica_s_id_cuclark-compose.yml
+            service: rica_s_id_cuclark
 
     rica_s_id_kraken2:
-            extends:
-                file: id/rica_s_id_kraken2-compose.yml
-                service: rica_s_id_kraken2
-
+        extends:
+            file: id/rica_s_id_kraken2-compose.yml
+            service: rica_s_id_kraken2
 
     rica_s_id_minimap2:
-            extends:
-                file: id/rica_s_id_minimap2-compose.yml
-                service: rica_s_id_minimap2
+        extends:
+            file: id/rica_s_id_minimap2-compose.yml
+            service: rica_s_id_minimap2
 
     rica_s_id_ngmlr:
-            extends:
-                file: id/rica_s_id_ngmlr-compose.yml
-                service: rica_s_id_ngmlr
+        extends:
+            file: id/rica_s_id_ngmlr-compose.yml
+            service: rica_s_id_ngmlr
 
     rica_s_pr_abricate:
-            extends:
-                file: pr/rica_s_pr_abricate-compose.yml
-                service: rica_s_pr_abricate
+        extends:
+            file: pr/rica_s_pr_abricate-compose.yml
+            service: rica_s_pr_abricate
 
+    rica_s_pr_l-easyarg:
+        extends:
+            file: pr/rica_s_pr_l-easyarg-compose.yml
+            service: rica_s_pr_l-easyarg

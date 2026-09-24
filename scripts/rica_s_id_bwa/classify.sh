@@ -1,12 +1,6 @@
 #! /bin/bash
 # this will classify (align, identify) a read against the pathogen DB.
 # set -x
-
-echo "[i]> === bwa"
-date
-echo ""
-
-
 inputfile="$1"
 outputfile=$(basename $inputfile)
 outdir="$2"
@@ -19,9 +13,3 @@ index=/opt/rica_s/tools/rica_s_id_bwa/all_pathogens.fasta
 
 
 samtools view -F 2308 $outdir/$outputfile.bwa.sam | awk '{print $3}' | sort | uniq -c | awk -v OFS='\t' '{print $2, $1}' | sort -nr > $outdir/$outputfile.bwa.sam.tsv
-
-
-echo ""
-date
-echo "[i]> bwa ==="
-

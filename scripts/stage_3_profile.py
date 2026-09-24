@@ -1,13 +1,17 @@
 import os
 import datetime
 import docker
-from config import PROJECT_HOME
+from scripts.config import PROJECT_HOME, run_outdir
+import logging
 
-def all_profile(runid, inputfile):
-    print("[i]> Begin of profiling stage")
-    print(datetime.datetime.now())
-    
-    outdir = os.path.join(PROJECT_HOME, "output", runid)
+logger = logging.getLogger(__name__)
+
+
+def all_profile(runid, inputfile, parent=None):
+    logger.info("[i]> Begin of profiling stage")
+    logger.info(datetime.datetime.now())
+
+    outdir = run_outdir(runid, parent)
     os.makedirs(outdir, exist_ok=True)
     logfile = os.path.join(outdir, f"{runid}.log")
     
@@ -20,11 +24,14 @@ def all_profile(runid, inputfile):
         script_path = os.path.join(PROJECT_HOME, "scripts", container_name, "profile.sh")
         try:
             container = client.containers.get(container_name)
+            logger.info(f"[i]> {container.name} ===")
+
             exit_code, output_stream = container.exec_run(
-                cmd=[script_path, inputfile, os.path.join("/opt/rica_s/output/", runid)],
+                cmd=[script_path, inputfile, outdir],
                 tty=True,
                 stream=True
             )
+            logger.info(f"[i]> === {container.name}")
 
             with open(logfile, "a") as log:
                 for chunk in output_stream:
@@ -37,5 +44,5 @@ def all_profile(runid, inputfile):
         except Exception as e:
             log.write(f"Error running in {container_name}: {e}\n")
             
-    print(datetime.datetime.now())
-    print("[i]> End of profiling stage")
+    logger.info(datetime.datetime.now())
+    logger.info("[i]> End of profiling stage")

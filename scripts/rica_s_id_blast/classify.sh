@@ -1,11 +1,6 @@
 #! /bin/bash
 # this will classify (align, identify) a read against the pathogen DB.
 
-echo "[i]> === blast"
-echo -n "[i]> " && date
-echo ""
-
-
 inputfile="$1"
 outputfile=$(basename $inputfile).blastout.tab
 outdir="$2"
@@ -22,10 +17,3 @@ blastdbfile="/opt/rica_s/tools/rica_s_id_blast/pathogen_references.fasta.blastdb
 awk -F'\t' '!seen[$1]++ {print $2}' "$outdir/$outputfile.6" | \
 sort | uniq -c | \
 awk -v OFS='\t' '{print $2, $1}' > "$outdir/${outputfile}.tsv"
-
-
-
-echo ""
-echo -n "[i]> " && date
-echo "[i]> blast ==="
-

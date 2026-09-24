@@ -4,7 +4,7 @@ services:
 
     hostname: rica_s_ui_web
 
-    image: ubuntu:stonking
+    image: alkanlab/rica_s_ui_web:v1.2
 
     ipc: private
 
@@ -25,6 +25,7 @@ services:
 
     volumes:
       - /opt/rica_s:/opt/rica_s
+      - /:/host_root/
 
     environment:
       - PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin

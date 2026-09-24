@@ -1,3 +1,6 @@
+<!-- 4h of reads -> 1h process -->
+
+
 # RICA_S
 
 **A container-base, modular workflow for rapid pathogen identification and antimicrobial‑resistance (AMR) profiling from long‑read sequencing data, geared toward sepsis diagnostics.**
@@ -30,7 +33,7 @@ Diagnosing bloodstream infections and sepsis quickly matters - every hour of del
 
 The design philosophy is **one tool, one container**. Each bioinformatics tool (minimap2, kraken2, BLAST, ABRicate, ...) lives in its own image, and the host orchestrates them by executing scripts inside the running containers. This keeps dependency graphs isolated, makes it trivial to add or swap a classifier, and lets the same read set be evaluated against many methods at once for comparison.
 
-A processing run is identified by a **run id** (`runid`) and all of its artifacts are written under `output/<runid>/`.
+A processing run is identified by a **run id** (`runid`) and all of its artifacts are written under `output/<runid>/`. A run covers every `.pod5` file found in the submitted read path, and each of those files is processed independently as a **sub-run** named `<runid>_<n>`, nested inside the run's own directory. So one run is always one directory: `output/<runid>/` holds the `<runid>.info` manifest plus one `output/<runid>/<runid>_<n>/` directory per input file, and that sub-run directory is where the stage artifacts land.
 
 <!-- 
 ## Pipeline architecture
@@ -58,7 +61,7 @@ _1AllFilter.sh   →  _2AllClassify.sh   →  _3AllProfile.sh
 2. **Classify (`_2AllClassify.sh`)** — iterates over every `rica_s_id_*` container and runs its `classify.sh` against the pathogen database, producing per‑tool results plus a normalized `.tsv`.
 3. **Profile (`_3AllProfile.sh`)** — iterates over every `rica_s_pr_*` container and runs its `profile.sh` to detect resistance and virulence genes.
 
-Each stage appends its stdout/stderr to a per‑run log at `output/<runid>/<runid>.log`.
+Each stage appends its stdout/stderr to a per‑sub‑run log at `output/<runid>/<runid>_<n>/<runid>_<n>.log`. The web report concatenates the logs of every sub-run of a run onto one page.
 
 ```
         raw reads (FASTA/FASTQ)
@@ -222,10 +225,10 @@ $ scripts/AllRun.sh <runid> </path/to/input/data.fasta>
 ## Stage and tool reference
 
 ### Filtering — `rica_s_id_minimap2/filterHumanDna.sh`
-Aligns reads to the human reference index `tools/rica_s_id_minimap2/human_v38.mmi` with `minimap2 -a`, then uses `samtools` to split mapped (human) vs. unmapped (non‑human) read names and `seqtk subseq` to extract the non‑human reads. Produces, in `output/<runid>/rica_s_fl_minimap2/`:
-- `human_mapped_sequence_names.txt`
-- `nonhuman_unmapped_sequence_names.txt`
-- `nonhuman_unmapped_sequence_names.fasta` ← the input for classification.
+Aligns reads to the human reference index `tools/rica_s_id_minimap2/human_v38.mmi` with `minimap2 -a`, then uses `samtools` to split mapped (human) vs. unmapped (non‑human) read names and `seqtk subseq` to extract the non‑human reads. Produces, flat in the sub-run directory `output/<runid>/<runid>_<n>/`:
+- `<reads>.human_mapped_sequence_names.txt`
+- `<reads>.nonhuman_unmapped_sequence_names.txt`
+- `<reads>.cleaned.fasta` ← the input for classification.
 
 ### Identification (`id`) classifiers
 All classify against the curated pathogen database and emit a normalized two‑column `.tsv` (species vs. read count / identity) that downstream tooling can plot.
@@ -245,7 +248,7 @@ All classify against the curated pathogen database and emit a normalized two‑c
 > **Status note.** `krakenuniq/classify.sh` and `ganon2/classify.sh` are scaffolded — their commands are present but commented out and they currently print `N/A`. minimap2, kraken2, BLAST, BWA, NGMLR, CLARK, and CU‑CLARK are the working classifiers. CLARK/CU‑CLARK require their databases (see the download step) and run `set_targets.sh` before classifying.
 
 ### Profiling (`pr`) — `rica_s_pr_abricate/profile.sh`
-Runs **ABRicate** over the read file against a broad set of resistance and virulence databases and concatenates the hits into one TSV with a full header. Databases queried: `resfinder`, `victors`, `vfdb`, `upec_expec_vf`, `ecoli_vf`, `argannot`, `megares`, `plasmidfinder`, `card`, `ncbi`, `bacmet2`, `ecoh`. Output: `output/<runid>/<reads>.abricate.csv` (tab‑separated).
+Runs **ABRicate** over the read file against a broad set of resistance and virulence databases and concatenates the hits into one TSV with a full header. Databases queried: `resfinder`, `victors`, `vfdb`, `upec_expec_vf`, `ecoli_vf`, `argannot`, `megares`, `plasmidfinder`, `card`, `ncbi`, `bacmet2`, `ecoh`. Output: `output/<runid>/<runid>_<n>/<reads>.abricate.csv` (tab‑separated).
 
 The companion `get_common_treatment.py` queries the bundled SQLite database `rica_s.db` to map an identified organism name to a suggested/common treatment:
 
@@ -261,28 +264,38 @@ python scripts/rica_s_pr_abricate/get_common_treatment.py "Escherichia coli"
 
 ## Output files
 
-For a given run, all the output files are collected at `/opt/rica/output/<runid>/`:
+For a given run, all the output files are collected at `/opt/rica_s/output/<runid>/`. The run directory itself holds only the manifest; every artifact belongs to a sub-run, one per input `.pod5` file:
 
 ```
 output/<runid>/
-├── <runid>.log                                  # combined stage log
-├── rica_s_fl_minimap2/                          # filtering stage
-│   ├── human_mapped_sequence_names.txt
-│   ├── nonhuman_unmapped_sequence_names.txt
-│   └── nonhuman_unmapped_sequence_names.fasta
-├── <inputfile>.minimap2.[ paf|tsv|pdf|eps ]
-├── <inputfile>.kraken2.[ report|tsv|pdf|eps ]
-├── <inputfile>.blastout.tab.[ 6|tsv|pdf|eps ]
-├── <inputfile>.bwa.[ sam|tsv|pdf|eps ]
-├── <inputfile>.ngmlr.[ sam|tsv|pdf|eps ]
-├── <inputfile>.[ clark|cuclark ].csv.[ csv|tsv|pdf|eps ]
-└── <inputfile>.abricate.csv                         # profiling stage
+├── <runid>.info                                     # manifest: runid, readpath, pod5 list
+├── <runid>_0/                                       # sub-run for the 1st pod5 file
+│   ├── <runid>_0.log                                # combined stage log
+│   ├── <runid>_0.status                             # started | finished | killed
+│   ├── <runid>_0.summary                            # per-stage read/yield metrics
+│   ├── <inputfile>.fastq                            # basecalling stage
+│   ├── <inputfile>.human_mapped_sequence_names.txt  # filtering stage
+│   ├── <inputfile>.nonhuman_unmapped_sequence_names.txt
+│   ├── <inputfile>.cleaned.fasta                    # → input for classification
+│   ├── <inputfile>.minimap2.[ paf|tsv|pdf|eps ]
+│   ├── <inputfile>.kraken2.[ report|tsv|pdf|eps ]
+│   ├── <inputfile>.blastout.tab.[ 6|tsv|pdf|eps ]
+│   ├── <inputfile>.bwa.[ sam|tsv|pdf|eps ]
+│   ├── <inputfile>.ngmlr.[ sam|tsv|pdf|eps ]
+│   ├── <inputfile>.[ clark|cuclark ].csv.[ csv|tsv|pdf|eps ]
+│   ├── <inputfile>.abricate.csv                     # profiling stage
+│   ├── <runid>_0.tsv                                # merged normalized hits
+│   └── <runid>_0_final_report.html                  # standalone report
+└── <runid>_1/                                       # sub-run for the 2nd pod5 file
+    └── ...
 ```
+
+The web UI serves one aggregated page per run at `/report/<runid>`, merging the summaries, logs, AMR tables and plots of every sub-run, and `/check_status?runid=<runid>` rolls the sub-run statuses up into a single answer (`killed` if any sub-run died, `finished` once all have, otherwise `started`).
 <!-- 
-The `.tsv` files are the normalized, comparable summaries (species vs. read count / identity). Use `scripts/histogram.py` to visualize the top hits:
+The `.tsv` files are the normalized, comparable summaries (species vs. read count / identity). Use `scripts/misc/histogram.py` to visualize the top hits:
 
 ```bash
-python scripts/histogram.py output/<runid>/<reads>.kraken2.report.tsv
+python scripts/misc/histogram.py output/<runid>/<runid>_0/<reads>.kraken2.report.tsv
 ```
 
 It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders a horizontal Plotly bar chart. (Requires `pandas` and `plotly`.) -->
