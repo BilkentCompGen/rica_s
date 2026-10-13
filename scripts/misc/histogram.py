@@ -4,13 +4,20 @@
 import argparse
 import os
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+
+# stage_4_plot.py runs this file directly, where the "scripts" package is not
+# importable; main_run.py imports it as scripts.misc.histogram. Support both.
+try:
+    from scripts.misc.mpl_common import (barh_figure, no_data_figure,
+                                         save_figure, species_label)
+except ImportError:
+    from mpl_common import (barh_figure, no_data_figure,
+                            save_figure, species_label)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate horizontal bar charts (HTML & PDF) for the top 10 mapped references.")
+        description="Generate horizontal bar charts (HTML & images) for the top 10 mapped references.")
     parser.add_argument("input_tsv", help="Input TSV file (Reference, Count)")
     args = parser.parse_args()
 
@@ -25,164 +32,47 @@ def main():
 
     if len(df.index) == 0:
         print("Empty TSV")
-
-
-        fig = go.Figure()
-
-        fig.update_layout(
-            # Kill the axes entirely
-            xaxis=dict(visible=False),
-            yaxis=dict(visible=False),
-
-            # Clean white background
-            plot_bgcolor="white",
-            paper_bgcolor="white",
-
-            # Drop the annotation right in the center
-            annotations=[
-                dict(
-                    text="NO DATA",
-                    xref="paper",
-                    yref="paper",
-                    x=0.5,
-                    y=0.5,
-                    showarrow=False,
-                    font=dict(size=24, color="gray")
-                )
-            ]
-        )
-
-        
+        fig = no_data_figure()
     else:
-        # Grab the top 10 highest counts.
+        # Grab the top 10 highest counts. Horizontal bars are drawn bottom to
+        # top, so ascending puts the biggest one at the top of the chart.
         top10_df = df.nlargest(10, 'Count').sort_values(by='Count', ascending=True)
 
-        # THE STREET MAGIC: Merge the Reference and Count into a single formatted string
-        top10_df['Label'] = "<i>"+top10_df['Reference'] + \
-            "</i> <b>(" + top10_df['Count'].astype(str) + ")</b>  "
+        # Merge the Reference and Count into a single formatted tick label.
+        labels = [species_label(name, count) for name, count
+                  in zip(top10_df['Reference'], top10_df['Count'])]
 
-        fig = px.bar(
-            top10_df,
-            x='Count',
-            y='Label',  # Use our new merged column here
-            orientation='h',
-            # title='Top 10 Mapped References',
-            color='Count',
-            color_continuous_scale='Turbo'
-            # Notice we dropped the text='Count' argument here so it doesn't double-print
-        )
-
-        fig.update_layout(
-            # template='plotly_dark',
-            xaxis_title="Number of Reads Mapped",
-            yaxis_title="",  # Leave this blank so we don't crowd your new labels
-            # font=dict(family="Courier New, monospace", size=14),
-            margin=dict(l=10, r=10, t=0, b=60),
-            coloraxis_showscale=False
-        )
-
-        # Kept the bars nice and lean at 60% thickness
-        fig.update_traces(width=0.5)
+        fig = barh_figure(labels, top10_df['Count'], cmap='turbo')
 
     base_name, _ = os.path.splitext(args.input_tsv)
-    out_html = f"{base_name}.html"
-    out_pdf = f"{base_name}.pdf"
-    out_svg = f"{base_name}.svg"
-    out_png = f"{base_name}.png"
-
 
     try:
-        fig.write_html(out_html)
-        fig.write_image(out_pdf, width=600)
-        fig.write_image(out_png, width=600)
-        fig.write_image(out_svg, width=600)
-        print(f"[*] Files saved: {out_pdf} {out_html}")
+        # PDF is deliberately left out here; only plot_df writes one.
+        written = save_figure(fig, base_name, formats=("html", "png", "svg"))
+        print(f"[*] Files saved: {' '.join(written)}")
     except ValueError as e:
         print(f"System error: {e}")
-
 
 
 def plot_df(df, outfile):
-    
+    """Plot an already-prepared frame.
+
+    The caller is expected to have added a "y_label" column and sorted the
+    rows ascending by count; the count itself is read positionally from the
+    second column, as it always was.
+    """
     if len(df.index) == 0:
         print("Empty TSV")
-
-
-        fig = go.Figure()
-
-        fig.update_layout(
-            # Kill the axes entirely
-            xaxis=dict(visible=False),
-            yaxis=dict(visible=False),
-
-            # Clean white background
-            plot_bgcolor="white",
-            paper_bgcolor="white",
-
-            # Drop the annotation right in the center
-            annotations=[
-                dict(
-                    text="NO DATA",
-                    xref="paper",
-                    yref="paper",
-                    x=0.5,
-                    y=0.5,
-                    showarrow=False,
-                    font=dict(size=24, color="gray")
-                )
-            ]
-        )
-
-        
+        fig = no_data_figure()
     else:
-        # Grab the top 10 highest counts.
-        # top10_df = df.nlargest(10, 'Count').sort_values(by='Count', ascending=True)
-
-        # THE STREET MAGIC: Merge the Reference and Count into a single formatted string
-        # top10_df['Label'] = "<i>"+top10_df['Reference'] + \
-            # "</i> <b>(" + top10_df['Count'].astype(str) + ")</b>  "
-
-        fig = px.bar(
-            df,
-            x=df.columns[1],
-            y="y_label",  # Use our new merged column here
-            orientation='h',
-            # title='Top 10 Mapped References',
-            color=df.columns[1],
-            color_continuous_scale='Turbo'
-            # Notice we dropped the text='Count' argument here so it doesn't double-print
-        )
-
-        fig.update_layout(
-            # template='plotly_dark',
-            xaxis_title="Number of Reads Mapped",
-            yaxis_title="",  # Leave this blank so we don't crowd your new labels
-            # font=dict(family="Courier New, monospace", size=14),
-            margin=dict(l=10, r=10, t=0, b=60),
-            coloraxis_showscale=False
-        )
-
-        # Kept the bars nice and lean at 60% thickness
-        fig.update_traces(width=0.5)
-
-    
-    out_html = f"{outfile}.html"
-    out_pdf = f"{outfile}.pdf"
-    out_svg = f"{outfile}.svg"
-    out_png = f"{outfile}.png"
-
+        fig = barh_figure(df["y_label"], df[df.columns[1]], cmap='turbo')
 
     try:
-        fig.write_html(out_html)
-        fig.write_image(out_pdf, width=600)
-        fig.write_image(out_png, width=600)
-        fig.write_image(out_svg, width=600)
-        print(f"[*] Files saved: {out_pdf} {out_html}")
+        written = save_figure(fig, outfile,
+                              formats=("html", "pdf", "png", "svg"))
+        print(f"[*] Files saved: {' '.join(written)}")
     except ValueError as e:
         print(f"System error: {e}")
-
-
-
 
 
 if __name__ == "__main__":

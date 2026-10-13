@@ -34,12 +34,8 @@ echo -e "#FILE\tSEQUENCE\tSTART\tEND\tSTRAND\tGENE\tCOVERAGE\tCOVERAGE_MAP\tGAPS
 # 2. Run the loop to hit every database and append the raw data (without extra headers)
 for db in resfinder victors vfdb upec_expec_vf ecoli_vf argannot megares plasmidfinder card ncbi bacmet2 ecoh; do
     # echo "=== $db ===" >> out.tsv
-    abricate --db $db $inputfile | tail -n +2 >> $outdir/$outputfile
+    /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" abricate --db $db $inputfile | tail -n +2 >> $outdir/$outputfile
 done
-
-# grep  -v "#FILE" $outdir/$outputfile > "$outdir/tmp"
-# mv $outdir/tmp $outdir/$outputfile
-# rm $outdir/tmp
 
 
 echo ""

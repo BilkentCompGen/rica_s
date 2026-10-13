@@ -1,7 +1,13 @@
 #! /usr/bin/python
 
 import numpy as np
-import plotly.express as px
+
+try:
+    from scripts.misc.mpl_common import save_image
+except ImportError:  # run directly, outside the scripts package
+    from mpl_common import save_image
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator, MultipleLocator
 
 rl = [544684,
       480922,
@@ -5134,45 +5140,34 @@ exact_bins = 20
 step_size = (data_max - data_min) / exact_bins
 
 
-fig = px.histogram(
-    rl,
-    # title="<b>Read Length Distribution</b>"
-).update_xaxes(showgrid=True,
-    gridcolor='LightGray',  # Line color
-    gridwidth=0.2,           # Line width in pixels
-    # Line style (e.g., 'solid', 'dash', 'dot')
-    griddash='solid',
-    linecolor='black', 
-    mirror=True, 
-    minor=dict(
-        showgrid=True,         # Turn on minor grid lines
-        gridcolor='whitesmoke',# Light color for minor lines
-        dtick=25000             # Minor grid line every 0.25 units
-    )
-).update_yaxes(
-    showgrid=True,
-    gridcolor='LightGray',  # Line color
-    gridwidth=0.2,           # Line width in pixels
-    griddash='solid',        # Line style (e.g., 'solid', 'dash', 'dot')
-    linecolor='black', 
-    mirror=True, 
-    minor=dict(
-        showgrid=True,         # Turn on minor grid lines
-        gridcolor='whitesmoke',# Light color for minor lines
-        dtick=100             # Minor grid line every 0.25 units
-    )
-).update_traces(
-    xbins=dict(start=data_min, end=data_max, size=step_size),
-    marker_line_width=0.5,
-    marker_line_color="#000",
-    opacity=.85
-).update_layout(
-    showlegend=False,
-    xaxis_title="<b>Length</b>",
-    yaxis_title="<b>Frequency</b>",
-    margin={'t': 0, 'l': 0, 'b': 60, 'r': 0},
+fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
+fig.patch.set_facecolor("white")
+ax.set_facecolor("white")
 
-    bargap=0.2
-)
+ax.hist(rl,
+        bins=np.arange(data_min, data_max + step_size, step_size),
+        rwidth=0.8,              # was bargap=0.2
+        edgecolor="#000",
+        linewidth=0.5,
+        alpha=.85)
 
-fig.write_image("output_haistogram.pdf", width=400, height=200)
+# Read lengths run to six figures, which collide at this canvas size;
+# Plotly thinned the ticks automatically, so cap them here too.
+ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
+
+# Major grid, then a finer minor grid on both axes.
+ax.grid(True, which="major", color="LightGray", linewidth=0.2)
+ax.xaxis.set_minor_locator(MultipleLocator(25000))
+ax.yaxis.set_minor_locator(MultipleLocator(100))
+ax.grid(True, which="minor", color="whitesmoke", linewidth=0.2)
+ax.set_axisbelow(True)
+
+# mirror=True drew the axis line on all four sides.
+for spine in ax.spines.values():
+    spine.set_visible(True)
+    spine.set_color("black")
+
+ax.set_xlabel("Length", fontweight="bold")
+ax.set_ylabel("Frequency", fontweight="bold")
+
+save_image(fig, "output_histogram.pdf")

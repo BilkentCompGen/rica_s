@@ -1,22 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}Pipeline Status{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Pipeline Status</title>
-    
-</head>
+{% block content %}
+<div class="page-head">
+    <h1>Job submitted</h1>
+</div>
 
-<body>
+{% set report_url = url_for('generate_report', runid=runid) %}
+<p>Check <a href="{{ report_url }}">{{ request.host_url.rstrip('/') }}{{ report_url }}</a> for report.</p>
 
-    <div class="card">
-        <h1>Job submitted</h1>
-        Check <a href='http://localhost:5000/report/{{runid}}'>http://localhost:5000/report/{{runid}}</a> for report. </p>       
-        <h3>Run ID</h3> <pre>{{runid}}</pre>
-        <h3>Input reads</h3> <pre>{{readpath}}</pre>
+<h3>Run ID</h3>
+<pre>{{ runid }}</pre>
 
-    </div>
-
-</body>
-
-</html>
+<h3>Input reads</h3>
+<pre>{{ readpath }}</pre>
+{% endblock %}

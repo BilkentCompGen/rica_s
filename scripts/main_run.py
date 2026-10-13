@@ -4,7 +4,8 @@ import os
 import sys
 import datetime
 import time
-from scripts.config import PROJECT_HOME, run_outdir, parse_run_info, c
+from scripts.config import (PROJECT_HOME, run_outdir, parse_run_info,
+                            read_run_info, run_info_tuple, run_info_tools, c)
 from scripts.stage_0_basecall import all_basecall
 from scripts.stage_1_filter import all_filter
 from scripts.stage_2_classify import all_classify
@@ -22,14 +23,24 @@ import argparse
 import logging
 import pandas as pd
 from pathlib import Path
-import plotly.express as px
-
+from scripts.misc.mpl_common import (RICA_CMAP, barh_figure,
+                                     save_image, species_label)
+from time import sleep
 
 logger = logging.getLogger(__name__)
 
 
 def start_run(run_info):
-    runid, inputfile_path, inputfile_names = parse_run_info(run_info)
+    print("=======")
+    with open(run_info, "r") as f:
+        print(f.read())
+    print("=======")
+    
+    fields = read_run_info(run_info)
+    runid, inputfile_path, inputfile_names = run_info_tuple(fields)
+    # One selection for the whole run: it is a property of the run, not of the
+    # individual pod5. None means the .info predates the selector: run everything.
+    tools = run_info_tools(fields)
 
     logging.basicConfig(
         level=logging.INFO,
@@ -51,7 +62,8 @@ def start_run(run_info):
     os.system("echo started > "+statusfile)
 
     for i, f in enumerate(inputfile_names):
-        all_run(f"{runid}_{i}", os.path.join(inputfile_path, f), parent=runid)
+        all_run(f"{runid}_{i}", os.path.join(inputfile_path, f), parent=runid,
+                tools=tools)
 
     # load tsv of subruns of _id_ and merge in a pandas df
     # add them in one df
@@ -156,48 +168,28 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
 
         if col_name in merged_df.columns and col_count in merged_df.columns:
 
-            # 1. Format the Y-axis labels using HTML tags for italics <i> and bold <b>
-            merged_df['y_label'] = "<i>" + merged_df[col_name].astype(
-                str) + "</i> <b>(" + merged_df[col_count].astype(str) + ")</b>"
+            # 1. Format the Y-axis labels: species name italic, count bold
+            merged_df['y_label'] = [
+                species_label(name, count) for name, count
+                in zip(merged_df[col_name], merged_df[col_count])]
 
             # 2. Sort the DataFrame so the largest values appear at the top
-            # Plotly draws horizontal charts from bottom to top, so we sort ascending
+            # Horizontal bars are drawn bottom to top, so we sort ascending
             merged_df = merged_df.sort_values(by=col_count, ascending=True)
 
-            # 3. Create the horizontal bar chart
-            fig = px.bar(
-                merged_df,
-                x=col_count,
-                y='y_label',
-                orientation='h',
-                color=col_count,  # Map bar color to the count value
-                # Custom color scale to match the dark purple -> blue -> dark red gradient
-                color_continuous_scale=['#22092e', '#3948b8', '#7a0000']
-            )
-
-            # 4. Replicate the specific styling from the target image
-            fig.update_layout(
-                width=800,  # Adjusted width better suited for bar charts
-                height=600,
-                xaxis_title="Number of Reads Mapped",
-                yaxis_title=None,          # Remove the default y-axis title
-                coloraxis_showscale=False,  # Hide the color scale legend on the right
-                plot_bgcolor='#e5ecf6',    # Matches the light blue/gray Plotly default background
-                paper_bgcolor='white',
-                xaxis=dict(
-                    showgrid=True,
-                    gridcolor="white",     # Solid white vertical grid lines
-                    zeroline=False
-                ),
-                yaxis=dict(
-                    showgrid=False,        # Removes horizontal grid lines
-                    # Slightly larger font for readability
-                    tickfont=dict(size=13)
-                )
+            # 3. Create the horizontal bar chart, at the 800x600 the previous
+            # layout pinned and the 3x scale it was exported at.
+            fig = barh_figure(
+                merged_df['y_label'],
+                merged_df[col_count],
+                cmap=RICA_CMAP,   # dark purple -> blue -> dark red
+                figsize=(8, 6),
+                dpi=300,
+                ytick_size=13,
             )
 
             # Save the figure to disk
-            fig.write_image(output_image_path, scale=3)
+            save_image(fig, output_image_path)
 
             logger.info(f"Plot saved successfully to: {output_image_path}")
 
@@ -216,7 +208,7 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
     return merged_df
 
 
-def all_run(runid, inputfile_raw, parent=None):
+def all_run(runid, inputfile_raw, parent=None, tools=None):
 
     try:
 
@@ -408,7 +400,7 @@ def all_run(runid, inputfile_raw, parent=None):
 
         # Uncomment the following when ready to execute full pipeline end-to-end:
         logger.info(f"AllClassify {runid} {inputfile_cleaned}")
-        all_classify(runid, inputfile_cleaned, parent)
+        all_classify(runid, inputfile_cleaned, parent, tools=tools)
         # input("Continue? Press Enter.")
 
 ##############################################################################
@@ -456,7 +448,7 @@ def all_run(runid, inputfile_raw, parent=None):
 ##############################################################################
 
         logger.info(f"AllProfile {runid} {inputfile_cleaned}")
-        all_profile(runid, inputfile_cleaned, parent)
+        all_profile(runid, inputfile_cleaned, parent, tools=tools)
         # input("Continue? Press Enter.")
 
         logger.info(f"AllPlot {runid}")
@@ -478,11 +470,121 @@ def all_run(runid, inputfile_raw, parent=None):
         os.system("echo killed > "+statusfile)
         logger.error(f"An unexpected error occurred: {e}")
 
+###################
 
+
+def write_runinfo(readpath, runid, run_dir, info_path):
+
+    tools_line = "tools\trica_s_id_blast,rica_s_id_bwa,rica_s_id_clark,rica_s_id_cuclark,rica_s_id_kraken2,rica_s_id_minimap2,rica_s_id_ngmlr,rica_s_pr_abricate\n"
+
+    try:
+        run_dir.mkdir(parents=True, exist_ok=True)
+        pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
+        print(f"searching pod5s in {readpath}")
+        print(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
+        info_path.write_text(
+            f"runid\t{runid}\n"
+            f"readpath\t{readpath}\n"
+            f"pod5\t{','.join(pod5_filenames)}\n"
+            + tools_line
+        )
+        print(f"Success: wrote {info_path}")
+
+    except Exception:
+        print(f"CRITICAL ERROR: {e}.")
+    
+    return
+
+##################################################
+# tests:
+
+
+def write_runinfo(readpath, runid, run_dir, info_path):
+
+    tools_line = "tools\trica_s_id_blast,rica_s_id_bwa,rica_s_id_clark,rica_s_id_cuclark,rica_s_id_kraken2,rica_s_id_minimap2,rica_s_id_ngmlr,rica_s_pr_abricate\n"
+
+    try:
+        run_dir.mkdir(parents=True, exist_ok=True)
+        pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
+        print(f"searching pod5s in {readpath}")
+        print(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
+        info_path.write_text(
+            f"runid\t{runid}\n"
+            f"readpath\t{readpath}\n"
+            f"pod5\t{','.join(pod5_filenames)}\n"
+            + tools_line
+        )
+        print(f"Success: wrote {info_path}")
+
+    except Exception:
+        print(f"CRITICAL ERROR: {e}.")
+    
+    return
+
+def run_test(rp, ri, rd, ip):
+    write_runinfo(rp, ri, rd, ip)
+    # input("ready.")
+    sleep(1)
+    start_run(ip)
+
+
+
+###################
 if __name__ == "__main__":
-    if len(sys.argv) in (3, 4):
-        all_run(sys.argv[1], sys.argv[2], sys.argv[3]
-                if len(sys.argv) > 3 else None)
-    else:
-        print(
-            "Usage: python3 -m scripts.main_run <runid> <inputfile> [parent]")
+    # if len(sys.argv) in (3, 4, 5):
+    #     parent = sys.argv[3] if len(sys.argv) > 3 else None
+    #     # Omitted means every installed tool, matching the pre-selector CLI.
+    #     tools = sys.argv[4].split(",") if len(sys.argv) > 4 else None
+    #     all_run(sys.argv[1], sys.argv[2], parent, tools=tools)
+    # else:
+    #     print(
+#             "Usage: python3 -m scripts.main_run <runid> <inputfile> [parent] [tool1,tool2]")
+
+
+    rps=[
+        "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.001A_1H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.010A_2H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.001A_2H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.010A_1H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.001A_2H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.100A_2H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.010A_2H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.100A_1H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.100A_2H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.010A_1H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.100A_1H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.001A_1H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.010A_2H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.100A_1H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.001A_1H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.010A_1H/",
+        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.001A_2H/"
+    ]
+
+
+    ris=[
+        "05B_0.001A_1H",
+        # "15B_0.010A_2H",
+        # "15B_0.001A_2H",
+        # "05B_0.010A_1H",
+        # "10B_0.001A_2H",
+        # "15B_0.100A_2H",
+        # "10B_0.010A_2H",
+        # "05B_0.100A_1H",
+        # "05B_0.100A_2H",
+        # "10B_0.010A_1H",
+        # "15B_0.100A_1H",
+        # "10B_0.001A_1H",
+        # "05B_0.010A_2H",
+        # "10B_0.100A_1H",
+        # "15B_0.001A_1H",
+        # "15B_0.010A_1H",
+        # "05B_0.001A_2H"
+    ]
+    for i in range(len(rps)):
+        rp = rps[i]
+        ri = ris[i]
+        rd = Path(run_outdir(ri))
+        ip = rd / f"{ri}.info"
+        run_test(rp, ri, rd, ip)
+

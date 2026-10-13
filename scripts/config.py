@@ -67,11 +67,11 @@ def subrun_dirs(runid):
     return found
 
 
-def parse_run_info(info_path):
-    """Read a <runid>.info file into (runid, readpath, [pod5 names]).
+def read_run_info(info_path):
+    """Every "key<TAB>value" line of a <runid>.info file, as a dict.
 
     Parsed by key rather than by line position, so a missing or reordered field
-    degrades to an empty value instead of an IndexError.
+    degrades to an absent key instead of an IndexError.
     """
     fields = {}
     with open(info_path, "r") as fd:
@@ -80,8 +80,35 @@ def parse_run_info(info_path):
                 continue
             key, value = line.split("\t", 1)
             fields[key.strip()] = value.strip()
+    return fields
 
+
+def run_info_tuple(fields):
+    """(runid, readpath, [pod5 names]) out of already-parsed fields."""
     names = sorted(
         n for n in (part.strip() for part in fields.get("pod5", "").split(",")) if n
     )
     return fields.get("runid", ""), fields.get("readpath", ""), names
+
+
+def run_info_tools(fields):
+    """Selected container names, or None when the file has no "tools" field.
+
+    None means "run everything": that is what every .info written before the
+    tool selector existed means. It is deliberately distinct from an empty
+    list, which is a real "the user selected nothing". The distinction survives
+    the round trip because "tools\t\n" still contains a tab, so the key lands
+    in fields with an empty value, while an older file has no key at all.
+    """
+    if "tools" not in fields:
+        return None
+    return [t for t in (part.strip() for part in fields["tools"].split(",")) if t]
+
+
+def parse_run_info(info_path):
+    """Read a <runid>.info file into (runid, readpath, [pod5 names]).
+
+    Kept at three values so existing callers that index or unpack it are
+    unaffected; the tool selection is read separately via run_info_tools.
+    """
+    return run_info_tuple(read_run_info(info_path))

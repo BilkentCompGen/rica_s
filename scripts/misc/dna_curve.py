@@ -1,10 +1,17 @@
 #! /usr/bin/python3
 
+import os
+
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
 from Bio import SeqIO
 import pathlib
+
+try:
+    from scripts.misc.mpl_common import save_figure
+except ImportError:  # run directly, outside the scripts package
+    from mpl_common import save_figure
+import matplotlib.pyplot as plt
 
 
 def parse_sequence(file_path, file_format="fasta"):
@@ -79,7 +86,7 @@ def generate_dv_curve_coords(sequence):
 
 def plot_dna_curves(file_path, file_format="fasta", method="dv"):
     """
-    Generates an interactive Plotly HTML chart tracking the sequence walk.
+    Generates a chart tracking the sequence walk, as HTML/PNG/SVG.
     """
     # 1. Read the sequence file
     sequence, seq_id = parse_sequence(file_path, file_format)
@@ -95,40 +102,34 @@ def plot_dna_curves(file_path, file_format="fasta", method="dv"):
     # else:
     #     raise ValueError("Invalid method selection. Use 'dv' or 'dn'.")
         
-    # 3. Optimize data display (Subsample only for massive files to preserve memory)
-    # Plotly handles up to 500k points easily, but let's map indexes for custom hover data
-    indices = list(range(len(x)))
-    
-    # 4. Generate Interactive Plotly Trace
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=x, y=y,
-        mode='lines',
-        line=dict(width=2, color='#1f77b4'),
-        name=method.upper(),
-        hoverinfo='text',
-        text=[f"Base Position: {idx}<br>X: {coord_x:.0f}, Y: {coord_y:.0f}" for idx, coord_x, coord_y in zip(indices, x, y)]
-    ))
-    
-    # 5. Add start/end landmarks
-    fig.add_trace(go.Scatter(x=[x[0]], y=[y[0]], mode='markers', marker=dict(size=10, color='green'), name='Start (5\')'))
-    fig.add_trace(go.Scatter(x=[x[-1]], y=[y[-1]], mode='markers', marker=dict(size=10, color='red'), name='End (3\')'))
-    
-    # 6. Apply formatting layout
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=16)),
-        xaxis_title="Cumulative X Vector Walk",
-        yaxis_title="Cumulative Y Vector Walk",
-        template="plotly_white",
-        hovermode="closest",
-        showlegend=True,
-        # width=1000,
-        # height=700
-    )
-    
-    # 7. Open plot dynamically in browser
-    # fig.show()
-    fig.save("cosa.html")
+    # 3. Draw the walk. The per-point hover readout the Plotly version carried
+    # has no equivalent here; the start and end stay marked instead.
+    fig, ax = plt.subplots(figsize=(10, 7), dpi=100)
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+
+    ax.plot(x, y, linewidth=2, color='#1f77b4', label=method.upper())
+
+    # 4. Add start/end landmarks
+    ax.plot([x[0]], [y[0]], marker='o', markersize=10, color='green',
+            linestyle='none', label="Start (5')")
+    ax.plot([x[-1]], [y[-1]], marker='o', markersize=10, color='red',
+            linestyle='none', label="End (3')")
+
+    # 5. Apply formatting, matching the old "plotly_white" template
+    ax.set_title(title, fontsize=16)
+    ax.set_xlabel("Cumulative X Vector Walk")
+    ax.set_ylabel("Cumulative Y Vector Walk")
+    ax.grid(True, color="#eeeeee")
+    ax.set_axisbelow(True)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    ax.legend()
+
+    # 6. Write the chart next to the sequence it came from
+    base_name, _ = os.path.splitext(file_path)
+    written = save_figure(fig, base_name, formats=("html", "png", "svg"))
+    print(f"[*] Files saved: {' '.join(written)}")
 # --- Example Execution Usage ---
 if __name__ == "__main__":
     import sys
@@ -139,6 +140,6 @@ if __name__ == "__main__":
     #     f.write(example_fasta_content)
         
     # Execute visualization for the sample file (Change method to 'dn' for double nucleotide)
-    plot_dna_curves(sys.argv[1], file_format=pathlib.Path(sys.argv[1]).suffix, method="dv")
+    plot_dna_curves(sys.argv[1], file_format=pathlib.Path(sys.argv[1]).suffix.lstrip("."), method="dv")
     # plot_dna_curves("/opt/rica_s/input/pathogens_100.fasta", file_format="fasta", method="dv")
 # 

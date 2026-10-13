@@ -1,343 +1,295 @@
+{% extends "base.html" %}
+{% block title %}Analysis Report: {{ runid }}{% endblock %}
+{% block body_class %}fill{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Analysis Report: {{ runid }}</title>
+{% block head %}
+<script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.dataTables.min.css') }}">
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
 
-    <!-- jQuery and DataTables Libraries -->
-    <script src="{{ url_for('static', filename='js/jquery-3.7.1.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.dataTables.min.css') }}">
-    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
-    
-    <style>
-        /* Base & Layout */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f8f9fa;
-            height: 100vh;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
+<style>
+    /* Tabs */
+    .tab {
+        overflow: hidden;
+        border-bottom: 1px solid #ccc;
+        background-color: #f1f1f1;
+        border-radius: 6px 6px 0 0;
+        flex-shrink: 0;
+    }
 
+    .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        padding: 14px 24px;
+        font-size: 16px;
+        color: #555;
+    }
+
+    .tab button:hover {
+        background-color: #ddd;
+    }
+
+    .tab button.active {
+        background-color: var(--accent);
+        border: 1px solid #ccc;
+        border-bottom: none;
+        color: #fff;
+    }
+
+    .tabcontent {
+        display: none;
+        padding: 20px;
+        border: 1px solid #fff;
+        border-top: none;
+        background: #fff;
+        border-radius: 0 0 6px 6px;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .section h3 {
+        color: #333;
+    }
+
+    .dataTables_wrapper {
+        margin-top: 15px;
+    }
+
+    img.plot {
+        max-width: 90%;
+        height: auto;
+        border: 1px solid var(--line-soft);
+        border-radius: 6px;
+    }
+
+    hr.divider {
+        border: 0;
+        border-top: 1px solid #eee;
+        margin: 40px 0;
+    }
+
+    /* PDF export: flatten the tabs into one continuous document. */
+    @media print {
+
+        body,
+        html,
         .container {
-            max-width: 90%;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            box-sizing: border-box;
+            height: auto !important;
+            overflow: visible !important;
+            background-color: #fff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            max-width: 100% !important;
         }
 
-        h1 { margin-top: 0; flex-shrink: 0; }
-
-        /* Tabs Navigation */
-        .tab {
-            overflow: hidden;
-            border-bottom: 1px solid #ccc;
-            background-color: #f1f1f1;
-            border-radius: 6px 6px 0 0;
-            flex-shrink: 0;
+        .tab,
+        #btn_print {
+            display: none !important;
         }
 
-        .tab button {
-            background-color: inherit;
-            float: left;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 14px 24px;
-            transition: 0.3s;
-            font-size: 16px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .tab button:hover { background-color: #ddd; }
-        .tab button.active {
-            background-color: #234eb9;
-            border: 1px solid #ccc;
-            border-bottom: none;
-            color: #ffffff;
-        }
-
-        /* Tab Content Area */
         .tabcontent {
-            display: none;
-            padding: 20px;
-            border: 1px solid #ffffff;
-            border-top: none;
-            background: #fff;
-            border-radius: 0 0 6px 6px;
-            flex-grow: 1;
-            overflow-y: auto;
+            display: block !important;
+            border: none !important;
+            padding: 0 !important;
+            margin-bottom: 30px !important;
+            overflow: visible !important;
         }
 
-        /* General Sections */
-        .section { margin-bottom: 30px; }
-        .section h3 { color: #333; }
-        .text-center { text-align: center; }
-
-        /* Log Formatting */
-        pre {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        #LogTab {
+            display: none !important;
         }
 
-        /* DataTables */
-        .dataTables_wrapper { margin-top: 15px; }
-
-        /* Summary Tables */
-        .summary-header {
-            background-color: #e2e8f0;
-            color: #334155;
-            padding: 10px 15px;
-            border-radius: 6px 6px 0 0;
-            margin: 0;
-            font-size: 16px;
-            font-family: monospace;
-            word-break: break-all;
+        .section {
+            page-break-inside: avoid;
+            break-inside: avoid;
+            margin-bottom: 20px !important;
         }
 
-        .summary-table {
-            border-collapse: collapse;
-            width: 100%;
-            border: 1px solid #cbd5e1;
-            border-top: none;
-            font-size: 14px;
+        .dataTables_wrapper,
+        .dataTables_scrollBody {
+            overflow: visible !important;
+            height: auto !important;
         }
 
-        .summary-table td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #e2e8f0;
+        img.plot {
+            max-width: 100% !important;
         }
+    }
+</style>
+{% endblock %}
 
-        .summary-table td:first-child {
-            font-weight: bold;
-            width: 40%;
-            border-right: 1px solid #e2e8f0;
-        }
+{% block content %}
+<div class="page-head">
+    <h1>Analysis Dashboard: [{{ runid }}]</h1>
+    <button class="primary" id="btn_print" onclick="window.print()">🖨️ Export PDF</button>
+</div>
 
-        .summary-table tr:nth-child(even) { background-color: #f8fafc; }
+<div class="tab">
+    <button class="tablinks" id="defaultOpen" onclick="openTab(event, 'SummaryTab')">Data Summary</button>
+    <button class="tablinks" onclick="openTab(event, 'PathogenTab')">Pathogen Presence</button>
+    <button class="tablinks" onclick="openTab(event, 'CSVTab')">CSV Data</button>
+    <button class="tablinks" onclick="openTab(event, 'LogTab')">System Log</button>
+</div>
 
-        /* iFrame Formatting */
-        iframe {
-            width: 90%;
-            height: 90%;
-            border: none;
-            background: transparent;
-            overflow: hidden;
-        }
-        
-        hr.divider {
-            border: 0;
-            border-top: 1px solid #eee;
-            margin: 40px 0;
-        }
-    </style>
-</head>
+<div id="SummaryTab" class="tabcontent">
+    {% for section in summary_data %}
+    <div class="section">
+        {% if loop.first or section.header .split(' ')[0] != summary_data[loop.index0 - 1].header.split(' ')[0] %}
 
-<body>
-    <div class="container">
-        <h1>Analysis Dashboard: [{{ runid }}]</h1>
+        <h2 class="subrun-header"> <b>Read file: {{ section.header }}</b></h2>
 
-        <!-- Tab Links -->
-        <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'SummaryTab')" id="defaultOpen">Data Summary</button>
-            <button class="tablinks" onclick="openTab(event, 'PathogenTab')">Pathogen Presence</button>
-            <button class="tablinks" onclick="openTab(event, 'CSVTab')">CSV Data</button>
-            <button class="tablinks" onclick="openTab(event, 'LogTab')">System Log</button>
-        </div>
-
-        <!-- Tab Content: Data Summary -->
-        <div id="SummaryTab" class="tabcontent">
-            {% if not summary_data %}
-                <p>No summary data found for this run.</p>
-            {% else %}
-                {% for section in summary_data %}
-                    <div class="section">
-                        <h3 class="summary-header">{{ section.header }}</h3>
-                        <table class="summary-table">
-                            {% for key, value in section.rows.items() %}
-                                <tr>
-                                    <td>{{ key }}</td>
-                                    <td>{{ value }}</td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
-
-        <!-- Tab Content: Logs -->
-        <div id="LogTab" class="tabcontent">
-            {% if log_text %}
-                <pre>{{ log_text }}</pre>
-            {% else %}
-                <p>Log file not found.</p>
-            {% endif %}
-        </div>
-
-        <!-- Tab Content: CSV / AMR Data -->
-        <div id="CSVTab" class="tabcontent">
-            {% if not csv_data %}
-                <p>No CSV files found matching the pattern.</p>
-            {% else %}
-                {% for csv in csv_data %}
-                    <div class="section">
-                        <h3>Source: {{ csv.filename }}</h3>
-                        {% if csv.error %}
-                            <p>Error loading file: {{ csv.error }}</p>
-                        {% else %}
-                            {{ csv.table_html | safe }}
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
-
-        <!-- Tab Content: Pathogen HTMLs -->
-        <div id="PathogenTab" class="tabcontent">
-            {% if not pathogen_data %}
-                <p>No HTML files found in the specified directory.</p>
-            {% else %}
-                {% for item in pathogen_data %}
-                    <div class="section text-center">
-                        <h3>Source: {{ item.filename }}</h3>
-                        <iframe scrolling="no" src="{{ item.url }}" loading="lazy"></iframe>
-                    </div>
-                    <hr class="divider">
-                {% endfor %}
-            {% endif %}
-        </div>
+        {% endif %}
+        <h3 class="summary-header">{{ section.header }}</h3>
+        <table class="summary-table">
+            {% for key, value in section.rows.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
+    {% else %}
+    <p>No summary data found for this run.</p>
+    {% endfor %}
+</div>
 
-    <!-- Scripts -->
-    <!-- <script>
-        function openTab(evt, tabName) {
-            let tabcontent = document.getElementsByClassName("tabcontent");
-            for (let i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
+<div id="PathogenTab" class="tabcontent">
+    {% for item in pathogen_data %}
+    <div class="section text-center">
+        {% if loop.first or item.filename.split('/')[0] != pathogen_data[loop.index0 - 1].filename.split('/')[0] %}
 
-            let tablinks = document.getElementsByClassName("tablinks");
-            for (let i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
+        <h2 class="subrun-header"> <b>Sub-run: {{ item.filename }}</b></h2>
 
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
+        {% endif %}
+        <h3 class="summary-header">Source: {{ item.filename }}</h3>
+        <br>
+        {% if item.png %}
+        <a href="{{ item.url }}" target="_blank" rel="noopener">
+            <img class="plot" src="{{ item.png if item.png.endswith('.png') else item.png ~ '.png' }}" loading="lazy"
+                alt="{{ item.filename }}">
+        </a>
+        {% else %}
+        <p><a href="{{ item.url }}" target="_blank" rel="noopener">Open interactive plot</a></p>
+        {% endif %}
+    </div>
+    <hr class="divider">
+    {% else %}
+    <p>No HTML files found in the specified directory.</p>
+    {% endfor %}
+</div>
 
-            if (tabName === 'CSVTab') {
-                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
-            }
+<div id="CSVTab" class="tabcontent">
+    {% for table in csv_data %}
+    <div class="section">
+        <h3>Source: {{ table.filename }}</h3>
+        {% if table.error %}
+        <p>Error loading file: {{ table.error }}</p>
+        {% else %}
+        <table id="{{ table.table_id }}" class="display compact data-table">
+            <thead>
+                <tr>{% for column in table.columns %}<th>{{ column }}</th>{% endfor %}</tr>
+            </thead>
+            <tbody>
+                {% for row in table.rows %}
+                <tr>
+                    {% for cell in row %}
+                    <td>{% for line in cell %}{{ line }}{{ "<br>" | safe if not loop.last }}{% endfor %}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    {% else %}
+    <p>No CSV files found matching the pattern.</p>
+    {% endfor %}
+</div>
+
+<div id="LogTab" class="tabcontent">
+    {% if log_text %}
+    <pre class="log">{{ log_text }}</pre>
+    {% else %}
+    <p>Log file not found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const STATUS_URL = "{{ url_for('api_check_status', runid=runid) }}";
+    const PANELS = ["SummaryTab", "PathogenTab", "CSVTab", "LogTab"];
+
+    let status = {{ status | tojson }};
+    let revision = {{ revision | tojson }};
+
+    function openTab(evt, tabName) {
+        for (const panel of document.getElementsByClassName("tabcontent")) {
+            panel.style.display = "none";
+        }
+        for (const link of document.getElementsByClassName("tablinks")) {
+            link.classList.remove("active");
         }
 
-        $(document).ready(function () {
-            $('.data-table').DataTable({
-                "pageLength": 25,
-                "order": [],
-                "scrollX": true,
-                "destroy": true,
-                "fixedHeader": true,
-            });
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.add("active");
+
+        // DataTables sizes columns from the visible width, which is zero while
+        // the panel is hidden.
+        if (tabName === 'CSVTab') {
+            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        }
+    }
+
+    function initTables() {
+        $('.data-table').DataTable({ pageLength: 25, order: [], scrollX: true });
+    }
+
+    async function refresh() {
+        const doc = new DOMParser().parseFromString(
+            await (await fetch(location.href)).text(), "text/html");
+
+        // DataTables holds references into the markup, so tear it down before
+        // the panels are replaced.
+        $('.data-table').each(function () {
+            if ($.fn.DataTable.isDataTable(this)) $(this).DataTable().destroy();
         });
 
-        // Automatically open the first tab on page load
+        // Only the panel contents are swapped, so the open tab stays open.
+        for (const id of PANELS) {
+            document.getElementById(id).innerHTML = doc.getElementById(id).innerHTML;
+        }
+
+        initTables();
+        if ($('#CSVTab').is(':visible')) {
+            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        }
+    }
+
+    $(document).ready(function () {
+        initTables();
         document.getElementById("defaultOpen").click();
-    </script> -->
 
+        // A finished run produces nothing further, so only a live run polls.
+        if (status === "finished" || status === "killed") return;
 
-    <!-- Scripts -->
-    <script>
-        function openTab(evt, tabName) {
-            let tabcontent = document.getElementsByClassName("tabcontent");
-            for (let i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
+        const poll = setInterval(async () => {
+            const data = await (await fetch(STATUS_URL)).json();
+
+            // The status endpoint is a few dozen bytes; the page itself is only
+            // re-fetched once the run has actually written something new.
+            if (data.is_running !== status || data.revision !== revision) {
+                status = data.is_running;
+                revision = data.revision;
+                await refresh();
             }
 
-            let tablinks = document.getElementsByClassName("tablinks");
-            for (let i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-
-            if (tabName === 'CSVTab') {
-                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
-            }
-        }
-
-        function initDataTables() {
-            $('.data-table').DataTable({
-                "pageLength": 25,
-                "order": [],
-                "scrollX": true,
-                "destroy": true,
-                "fixedHeader": true,
-            });
-        }
-
-        $(document).ready(function () {
-            // Initial DataTable setup
-            initDataTables();
-
-            // Automatically open the first tab on page load
-            document.getElementById("defaultOpen").click();
-
-            // Set up AJAX polling to refresh data every 5 seconds
-            setInterval(function() {
-                $.ajax({
-                    url: window.location.href, // Fetch the current URL again
-                    type: 'GET',
-                    success: function(response) {
-                        // Parse the newly generated HTML from Flask
-                        let newHtml = $(response);
-
-                        // 1. Safely update standard tabs
-                        $('#SummaryTab').html(newHtml.find('#SummaryTab').html());
-                        $('#LogTab').html(newHtml.find('#LogTab').html());
-                        $('#PathogenTab').html(newHtml.find('#PathogenTab').html());
-
-                        // 2. Carefully update the CSV Tab to avoid breaking DataTables
-                        let newCsvContent = newHtml.find('#CSVTab').html();
-                        
-                        // Destroy existing tables before replacing the DOM elements
-                        $('.data-table').each(function() {
-                            if ($.fn.DataTable.isDataTable(this)) {
-                                $(this).DataTable().destroy();
-                            }
-                        });
-
-                        // Swap the HTML
-                        $('#CSVTab').html(newCsvContent);
-
-                        // Re-initialize DataTables on the fresh HTML
-                        initDataTables();
-
-                        // If the user is currently looking at the CSV tab, fix column alignments
-                        if ($('#CSVTab').is(':visible')) {
-                            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
-                        }
-                    }
-                });
-            }, 5000); // 5000ms = 5 seconds. Adjust this interval as needed.
-        });
-    </script>
-
-
-</body>
-</html>
+            if (status === "finished" || status === "killed") clearInterval(poll);
+        }, 5000);
+    });
+</script>
+{% endblock %}

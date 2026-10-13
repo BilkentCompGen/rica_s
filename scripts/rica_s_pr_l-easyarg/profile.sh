@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
+
 echo '[i]> === L-EasyARG' && date && echo ""
 
-inputdir="$1"
-outputfile=$(basename $inputfile).abricate.csv
-
+inputdir=$(dirname "$1")
+echo "inputdir: " $inputdir
 outdir="$2"
-
-source /root/.bashrc
-micromamba activate
+echo "outdir: " $outdir
 
 
-./easyARG.sh --rawdata XXX --database YYY --threads NNN
+/usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" /bin/bash -ic "cd $outdir && conda activate && easyARG.sh --rawdata $inputdir --database '/opt/rica_s/tools/rica_s_pr-l-easyarg/database/' --threads `nproc`"
 
 
 echo "" && date && echo '[i]> L-EasyARG ==='

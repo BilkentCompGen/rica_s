@@ -99,7 +99,7 @@ Each stage appends its stdout/stderr to a per‑sub‑run log at `output/<runid>
   - NVIDIA Container Toolkit (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 - Python 3
   - Pandas
-  - plotly
+  - matplotlib
 
 
 <!--
@@ -298,7 +298,7 @@ The `.tsv` files are the normalized, comparable summaries (species vs. read coun
 python scripts/misc/histogram.py output/<runid>/<runid>_0/<reads>.kraken2.report.tsv
 ```
 
-It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders a horizontal Plotly bar chart. (Requires `pandas` and `plotly`.) -->
+It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders a horizontal matplotlib bar chart. (Requires `pandas` and `matplotlib`.) -->
 
 
 
