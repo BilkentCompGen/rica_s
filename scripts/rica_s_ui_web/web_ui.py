@@ -9,6 +9,8 @@ import logging
 from scripts.config import c, run_outdir, subrun_dirs, parse_run_info
 from scripts.tool_registry import tool_groups, all_tools
 
+
+logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 
@@ -400,8 +402,8 @@ def submitted_page():
         # This list decides how many sub-runs there are, so join it directly
         # rather than scrubbing a repr of the list.
         pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
-        print(f"searching pod5s in {readpath}")
-        print(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
+        logger.info(f"searching pod5s in {readpath}")
+        logger.info(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
 
         # Globbed before the file is opened, and written in one call: the
         # listener starts the run as soon as .info is created, so it must never
@@ -415,9 +417,9 @@ def submitted_page():
         print(f"Success: wrote {info_path}")
 
     except PermissionError:
-        print(f"CRITICAL ERROR: Permission denied. Cannot write to {run_dir}.")
+        logger.info(f"CRITICAL ERROR: Permission denied. Cannot write to {run_dir}.")
     except OSError as e:
-        print(f"CRITICAL ERROR: An OS error occurred: {e}")
+        logger.info(f"CRITICAL ERROR: An OS error occurred: {e}")
 
     return render_template('submitted.html', runid=runid, readpath=readpath)
 

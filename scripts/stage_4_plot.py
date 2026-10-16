@@ -52,3 +52,13 @@ def all_plot(runid, parent=None):
 
     logger.info(datetime.datetime.now())
     logger.info("[i]> End of plotting stage")
+
+
+
+
+if __name__ == "__main__":
+    
+    if sys.argv[1] == "plot":
+        search_pattern = os.path.join(sys.argv[2], "**", "*.tsv")
+        tsvs = glob.glob(search_pattern, recursive=True)
+        

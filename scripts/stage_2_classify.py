@@ -1,3 +1,4 @@
+import sys
 import os
 import subprocess
 import datetime
@@ -14,60 +15,130 @@ import csv
 logger = logging.getLogger(__name__)
 
 
-def check_accession(s):
-    reg_ex = r"\b(?:PMC\d+|[A-Z]{2}_[A-Z]{0,6}\d{5,}(?:\.\d+)?|[A-Z]{1,3}\d{5,7}(?:\.\d+)?|[A-Z]{4,6}\d{8,}(?:\.\d+)?|PRJ[A-Z]{2}\d+|SAM[A-Z]{1,2}\d+|[SDE]R[RXSP]\d{6,})\b"
-    r = re.findall(reg_ex, s)
-    if len(r) > 0: 
-        return (True, r[0])
-    else:
-        return (False, s)
 
+def extract_identifier(cell_value):
+    """Parses a string to extract an NCBI Accession, TaxID, or Kraken TaxID."""
+    val = str(cell_value).strip()
+    if not val:
+        return None
+        
+        
+    # 3. NCBI Accession / Genome / Reference number
+    # Matches formats like NC_010397.1, NZ_BAABHT010000001.1, CP068211
+    # Looks for 1-6 capital letters, optional underscore, 4-15 digits, and optional .version
+    match = re.search(r"\b(?:PMC\d+|[A-Z]{2}_[A-Z]{0,6}\d{5,}(?:\.\d+)?|[A-Z]{1,3}\d{5,7}(?:\.\d+)?|[A-Z]{4,6}\d{8,}(?:\.\d+)?|PRJ[A-Z]{2}\d+|SAM[A-Z]{1,2}\d+|[SDE]R[RXSP]\d{6,})\b", val)
+    if match:
+        return match.group()
 
-def check_taxid(s):
-    if "taxid|" in s:
-        v = s.split("taxid|")[1]
-        v = v.split()[0]
-        return (True, v)
-    else:
-        return (False, s)
+    # 2. Taxonomical ID (strictly digits)
+    if val.isdigit():
+        return val
 
+    # 1. Kraken format (e.g., "taxid|1234" or "kraken:taxid|1234")
+    if "taxid|" in val:
+        return val.split("taxid|")[1].split()[0]
+            
+    return None
 
+def fix_names(filepath, nr, delimiter="\t"):
+    # Skip completely empty 0-byte files to prevent errors
+    if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
+        logger.info(f"[-] Skipping {filepath}: File is empty.")
+        return
 
-def process_cell(val, t: NameResolver):
+    temp_file = filepath + ".tmp"
     
-    is_accession, spp_from_acc = check_accession(val)
-    if is_accession:
-        return t.accession2name(spp_from_acc)
-    else:
-        is_taxid, spp_from_taxid = check_taxid(val)
-        if is_taxid:
-            return t.tax2name(spp_from_taxid)
-        else:
-            return val
-
-
-
-
-
-
-def fix_names(tsv_files):
-    t = NameResolver("/opt/rica_s/scripts/misc/spp.csv")
-    
-    for target_tsv in tsv_files:
-        try:
-            if os.path.getsize(target_tsv) > 0:
-                with open(target_tsv, "r", encoding="utf-8") as fileR:
-                    reader = csv.reader(fileR, delimiter="\t")
-                    rows = list(reader)
-                    for row in rows:
-                        row[0] = process_cell(row[0], t)
-                    with open(target_tsv, "w", encoding="utf-8") as fileW:
-                        writer = csv.writer(fileW, delimiter="\t")
-                        writer.writerows(rows)
+    try:
+        with open(filepath, 'r', encoding='utf-8') as fin, \
+             open(temp_file, 'w', encoding='utf-8', newline='') as fout:
+             
+            reader = csv.reader(fin, delimiter=delimiter)
+            writer = csv.writer(fout, delimiter=delimiter)
+            
+            for row in reader:
+                # Ensure the row actually has data before trying to access index 0
+                if row and len(row) > 0:
+                    
+                    # Step 1: Parse the first column for the identifier
+                    extracted_id = extract_identifier(row[0])
+                    
+                    # Step 2: If a valid ID is found, pass it to id2spp()
+                    if extracted_id:
+                        resolved_name = nr.id2spp(extracted_id)
+                        
+                        # Step 3: Replace column 1 only if id2spp returns a valid, non-empty string
+                        if resolved_name and str(resolved_name).strip():
+                            row[0] = resolved_name
+                            
+                # Write the row to the temp file (either modified or exactly as it was)
+                writer.writerow(row)
                 
-        except Exception as e:
-            print(e)
-        print("[*] Done.")
+        # Safely overwrite the original file with the completed temp file
+        os.replace(temp_file, filepath)
+        logger.info(f"[*] Successfully processed {filepath}")
+        
+    except Exception as e:
+        logger.info(f"[!] Error processing {filepath}: {e}")
+        # Clean up the temp file if the script crashes halfway through
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+
+
+
+def merge_repeats(filepath, delimiter="\t"):
+    # Skip completely empty or missing files
+    if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
+        logger.info(f"[-] Skipping {filepath}: File is empty or missing.")
+        return
+
+    merged_data = {}
+    temp_file = filepath + ".tmp"
+    
+    try:
+        # 1. Read and accumulate sums
+        with open(filepath, 'r', encoding='utf-8') as fin:
+            reader = csv.reader(fin, delimiter=delimiter)
+            
+            for row in reader:
+                # Ensure the row has at least 2 columns
+                if len(row) >= 2:
+                    search_query = row[0].strip()
+                    
+                    try:
+                        # Attempt to parse the 2nd column as a float
+                        # (Using float handles both ints and decimals)
+                        value = float(row[1])
+                    except ValueError:
+                        # If it fails (e.g., it's a header like "Count" or "Abundance"), skip it
+                        continue
+                    
+                    # Accumulate the sum
+                    if search_query in merged_data:
+                        merged_data[search_query] += value
+                    else:
+                        merged_data[search_query] = value
+                        
+        # 2. Write the merged dictionary back to a temporary file
+        with open(temp_file, 'w', encoding='utf-8', newline='') as fout:
+            writer = csv.writer(fout, delimiter=delimiter)
+            
+            for query, total in merged_data.items():
+                # Clean up formatting: if the sum is exactly 5.0, print it as an integer '5'
+                formatted_total = int(total) if total.is_integer() else total
+                writer.writerow([query, formatted_total])
+                
+        # 3. Replace the original file
+        os.replace(temp_file, filepath)
+        logger.info(f"[*] Successfully merged counts for {filepath}")
+        
+    except Exception as e:
+        logger.info(f"[!] Error processing {filepath}: {e}")
+        # Clean up the temp file if something crashes
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+    return
+
+
 
 
 def all_classify(runid, inputfile, parent=None, tools=None):
@@ -122,15 +193,34 @@ def all_classify(runid, inputfile, parent=None, tools=None):
         except Exception:
             logger.exception(f"[e]> error running in {container_name}")
 
-    # taxid_script = os.path.join(
-    #     PROJECT_HOME, "scripts", "misc", "replace_taxid_for_spp_tsv.sh")
-    # acc_script = os.path.join(PROJECT_HOME, "scripts",
-    #                           "misc", "replace_acc_for_spp_tsv.sh")
-    # subprocess.run(f"sh {taxid_script} 1 {outdir}/*.tsv", shell=True)
-    # subprocess.run(f"sh {acc_script} 1 {outdir}/*.tsv", shell=True)
 
+
+    logger.info("[i]> Fixing TSVs")
     tsv_files = glob.glob(os.path.join(outdir, "*.tsv"))
-    fix_names(tsv_files)
+    nr=NameResolver("/opt/rica_s/scripts/misc/spp.tar.gz")
+
+    for tsv in tsv_files:
+        fix_names(tsv,nr)
+        merge_repeats(tsv)
 
     logger.info(datetime.datetime.now())
     logger.info("[i]> End of classification stage")
+
+
+
+
+############################################################################
+############################################################################
+############################################################################
+if __name__ == "__main__":
+    
+    if sys.argv[1] == "fix_names":
+        search_pattern = os.path.join(sys.argv[2], "**", "*.tsv")
+        tsvs = glob.glob(search_pattern, recursive=True)
+        nr=NameResolver("/opt/rica_s/scripts/misc/spp.tar.gz")
+
+        for tsv in tsvs:
+            # if("05B_0.001A_1H_0_aggregate" in tsv):
+            #     print("here")
+            fix_names(tsv,nr)
+            merge_repeats(tsv)

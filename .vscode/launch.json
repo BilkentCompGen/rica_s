@@ -1,17 +1,68 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+        // --rawdata "$RAW_DATA" --threads "$THREADS" ${LAST_BIN:+--last_bin "$LAST_BIN"} --database "$DATABASE"
         {
-            "name": "Python Debugger: Current File with Arguments",
+            "name": "L-easyARG-P1",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["xx_1", "/opt/rica_s/input/pod5/output_1h.pod5"]
-        }
+            "justMyCode": true,
+            "args": [
+                "--rawdata",
+                "/opt/rica_s/datasets/",
+                "--threads",
+                "1",
+                "--database",
+                "/opt/rica_s/tools/rica_s_pr_l-easyarg/database"
+            ]
+        },
+        {
+            "name": "PyF",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "n2a",
+                "E. Coli"
+            ]
+        },
+        {
+            "name": "PyMod",
+            "sudo": true,
+            "type": "python",
+            "request": "launch",
+            "module": "scripts.run_listener",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+        },
+        {
+            "name": "noGUI test",
+            "sudo": true,
+            "type": "python",
+            "request": "launch",
+            "module": "scripts.main_run",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+        },
+        {
+            "name": "PyMod stage_2_classify",
+            "sudo": true,
+            "type": "python",
+            "request": "launch",
+            "module": "scripts.stage_2_classify",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "fix_names",
+                "/opt/rica_s/output/05B_0.001A_1H"
+            ]
+        },
     ]
 }

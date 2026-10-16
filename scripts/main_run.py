@@ -26,15 +26,16 @@ from pathlib import Path
 from scripts.misc.mpl_common import (RICA_CMAP, barh_figure,
                                      save_image, species_label)
 from time import sleep
+import subprocess
 
 logger = logging.getLogger(__name__)
 
 
 def start_run(run_info):
-    print("=======")
+    logger.info("=======")
     with open(run_info, "r") as f:
-        print(f.read())
-    print("=======")
+        logger.info(f.read())
+    logger.info("=======")
     
     fields = read_run_info(run_info)
     runid, inputfile_path, inputfile_names = run_info_tuple(fields)
@@ -208,6 +209,41 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
     return merged_df
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def all_run(runid, inputfile_raw, parent=None, tools=None):
 
     try:
@@ -231,11 +267,17 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         logger.info(f"input file: {inputfile}")
         logger.info(f"output dir: {outdir}")
         logger.info("-" * 30)
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
 
 ##############################################################################
 ##############################################################################
 ##############################################################################
 
+
+    try:
         logger.info(f"[i]> getting metadata for {inputfile}")
 
         # pod5 data
@@ -261,21 +303,35 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
                     # Failsafe in case the pod5 file is completely empty
                     sf.write("Error: No reads found in this POD5 file.\n")
 
-##############################################################################
-##############################################################################
-##############################################################################
 
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
+
+
+##############################################################################
+##############################################################################
+##############################################################################
+    try:
         # 0. Basecall
         logger.info(f"AllBasecall {runid} {inputfile}")
         all_basecall(runid, inputfile, parent)
         inputfile_bc = os.path.join(
             outdir, f"{os.path.basename(inputfile)}.fastq")
         # input("Continue? Press Enter.")
-
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
 ##############################################################################
 ##############################################################################
 ##############################################################################
 
+
+
+    try:
+        logger.info("[i]> fetching fastqs metadata")
         # fastq data
         lengths = []
         q_scores = []
@@ -327,20 +383,37 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
             for key, value in metrics.items():
                 f.write(f"{key}: {value}\n")
 
+
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
+
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
 
+    try:
         # 1. Filter
         logger.info(f"AllFilter {runid} {inputfile_bc}")
         all_filter(runid, inputfile_bc, parent)
         inputfile_cleaned = os.path.join(
             outdir, f"{os.path.basename(inputfile_bc)}.cleaned.fasta")
         # input("Continue? Press Enter.")
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
+
 
 ##############################################################################
 ##############################################################################
 ##############################################################################
+
+
+    try:
+        logger.info("[i]> fetching fasta metadata")
 
         lengths = []
         channels = set()
@@ -394,20 +467,32 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
             for key, value in metrics.items():
                 f.write(f"{key}: {value}\n")
 
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
 
+
+    try:
         # Uncomment the following when ready to execute full pipeline end-to-end:
         logger.info(f"AllClassify {runid} {inputfile_cleaned}")
         all_classify(runid, inputfile_cleaned, parent, tools=tools)
         # input("Continue? Press Enter.")
-
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
 ##############################################################################
 ##############################################################################
 ##############################################################################
 
-    # def compile_tsvs(target_dir, output_file="summarydata.json"):
+    try:
+        logger.info("[i]> fetching tsv metadata")
+
         # Initialize the main dictionary
         summarydata = {}
 
@@ -443,26 +528,55 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
                 f.write("Tools used: " + str(len(tsv_files))+"\n")
                 f.write("Pathogens detected: "+str(len(summarydata))+"\n")
 
+
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
 
+    try:
         logger.info(f"AllProfile {runid} {inputfile_cleaned}")
         all_profile(runid, inputfile_cleaned, parent, tools=tools)
         # input("Continue? Press Enter.")
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
+##############################################################################
+##############################################################################
+##############################################################################
 
+    try:
         logger.info(f"AllPlot {runid}")
         all_plot(runid, parent)
         # input("Continue? Press Enter.")
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
+##############################################################################
+##############################################################################
+##############################################################################
 
+
+    try:
         logger.info(f"AllReport {runid}")
         all_report(runid, parent)
         # input("Continue? Press Enter.")
+    except Exception as e:
+        os.system("echo killed > "+statusfile)
+        logger.error(f"An unexpected error occurred: {e}")
+        exit(-1)
+
 
 ##############################################################################
 ##############################################################################
 ##############################################################################
-
+    try:
         logger.info(datetime.datetime.now())
         logger.info("[i]> End of sepsis detection")
         os.system("echo finished > "+statusfile)
@@ -473,6 +587,49 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 ###################
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def write_runinfo(readpath, runid, run_dir, info_path):
 
     tools_line = "tools\trica_s_id_blast,rica_s_id_bwa,rica_s_id_clark,rica_s_id_cuclark,rica_s_id_kraken2,rica_s_id_minimap2,rica_s_id_ngmlr,rica_s_pr_abricate\n"
@@ -480,18 +637,18 @@ def write_runinfo(readpath, runid, run_dir, info_path):
     try:
         run_dir.mkdir(parents=True, exist_ok=True)
         pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
-        print(f"searching pod5s in {readpath}")
-        print(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
+        logger.info(f"searching pod5s in {readpath}")
+        logger.info(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
         info_path.write_text(
             f"runid\t{runid}\n"
             f"readpath\t{readpath}\n"
             f"pod5\t{','.join(pod5_filenames)}\n"
             + tools_line
         )
-        print(f"Success: wrote {info_path}")
+        logger.info(f"Success: wrote {info_path}")
 
     except Exception:
-        print(f"CRITICAL ERROR: {e}.")
+        logger.info(f"CRITICAL ERROR: {e}.")
     
     return
 
@@ -506,24 +663,47 @@ def write_runinfo(readpath, runid, run_dir, info_path):
     try:
         run_dir.mkdir(parents=True, exist_ok=True)
         pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
-        print(f"searching pod5s in {readpath}")
-        print(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
+        logger.info(f"searching pod5s in {readpath}")
+        logger.info(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
         info_path.write_text(
             f"runid\t{runid}\n"
             f"readpath\t{readpath}\n"
             f"pod5\t{','.join(pod5_filenames)}\n"
             + tools_line
         )
-        print(f"Success: wrote {info_path}")
+        logger.info(f"Success: wrote {info_path}")
 
     except Exception:
-        print(f"CRITICAL ERROR: {e}.")
+        logger.info(f"CRITICAL ERROR: {e}.")
     
     return
 
 def run_test(rp, ri, rd, ip):
     write_runinfo(rp, ri, rd, ip)
     # input("ready.")
+
+    logger.info(f"[i]> === Starting containers")
+    try:
+
+        command = [
+            f"{c['PROJECT_HOME']}/builder/docker_control.sh", "restart"
+        ]
+
+        process = subprocess.Popen(
+            command,
+            cwd=f"{c['PROJECT_HOME']}/builder/",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
+        logger.info(process.stdout.read())
+        process.wait()
+    except Exception as e:
+        logger.info(f"An exception ocurred while starting the containers: {e}")
+        exit(-1)
+
+    logger.info(f"[i]> Containers started ===")
     sleep(1)
     start_run(ip)
 
@@ -531,60 +711,89 @@ def run_test(rp, ri, rd, ip):
 
 ###################
 if __name__ == "__main__":
-    # if len(sys.argv) in (3, 4, 5):
-    #     parent = sys.argv[3] if len(sys.argv) > 3 else None
-    #     # Omitted means every installed tool, matching the pre-selector CLI.
-    #     tools = sys.argv[4].split(",") if len(sys.argv) > 4 else None
-    #     all_run(sys.argv[1], sys.argv[2], parent, tools=tools)
-    # else:
-    #     print(
-#             "Usage: python3 -m scripts.main_run <runid> <inputfile> [parent] [tool1,tool2]")
+    if sys.argv[1] == "one_run":
+        # if len(sys.argv) in (3, 4, 5):
+        #     parent = sys.argv[3] if len(sys.argv) > 3 else None
+        #     # Omitted means every installed tool, matching the pre-selector CLI.
+        #     tools = sys.argv[4].split(",") if len(sys.argv) > 4 else None
+        #     all_run(sys.argv[1], sys.argv[2], parent, tools=tools)
+        # else:
+        #     print(
+    #             "Usage: python3 -m scripts.main_run <runid> <inputfile> [parent] [tool1,tool2]")
 
 
-    rps=[
-        "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.001A_1H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.010A_2H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.001A_2H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.010A_1H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.001A_2H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.100A_2H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.010A_2H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.100A_1H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.100A_2H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.010A_1H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.100A_1H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.001A_1H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.010A_2H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/10B_0.100A_1H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.001A_1H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/15B_0.010A_1H/",
-        # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/05B_0.001A_2H/"
-    ]
+        rps=[
+            "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.001A_1H/", #done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.010A_2H/", #done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.001A_2H/", #done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.010A_1H/", #done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.001A_2H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.100A_2H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.010A_2H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.100A_1H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.100A_2H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.010A_1H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.100A_1H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.001A_1H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.010A_2H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.100A_1H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.001A_1H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.010A_1H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.001A_2H/",#done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.001A_4H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.010A_4H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.100A_4H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.001A_4H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.010A_4H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.100A_2H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.100A_4H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.001A_4H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.010A_2H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.010A_4H",
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.100A_4H"
+        ]
 
 
-    ris=[
-        "05B_0.001A_1H",
-        # "15B_0.010A_2H",
-        # "15B_0.001A_2H",
-        # "05B_0.010A_1H",
-        # "10B_0.001A_2H",
-        # "15B_0.100A_2H",
-        # "10B_0.010A_2H",
-        # "05B_0.100A_1H",
-        # "05B_0.100A_2H",
-        # "10B_0.010A_1H",
-        # "15B_0.100A_1H",
-        # "10B_0.001A_1H",
-        # "05B_0.010A_2H",
-        # "10B_0.100A_1H",
-        # "15B_0.001A_1H",
-        # "15B_0.010A_1H",
-        # "05B_0.001A_2H"
-    ]
-    for i in range(len(rps)):
-        rp = rps[i]
-        ri = ris[i]
-        rd = Path(run_outdir(ri))
-        ip = rd / f"{ri}.info"
-        run_test(rp, ri, rd, ip)
+        ris=[
+            "05B_0.001A_1H",#done
+            # "15B_0.010A_2H",#done
+            # "15B_0.001A_2H",#done
+            # "05B_0.010A_1H",#done
+            # "10B_0.001A_2H",#done
+            # "15B_0.100A_2H",#done
+            # "10B_0.010A_2H",#done
+            # "05B_0.100A_1H",#done
+            # "05B_0.100A_2H",#done
+            # "10B_0.010A_1H",#done
+            # "15B_0.100A_1H",#done
+            # "10B_0.001A_1H",#done
+            # "05B_0.010A_2H",#done
+            # "10B_0.100A_1H",#done
+            # "15B_0.001A_1H",#done
+            # "15B_0.010A_1H",#done
+            # "05B_0.001A_2H",#done
+            # "05B_0.001A_4H",
+            # "05B_0.010A_4H",
+            # "05B_0.100A_4H",
+            # "10B_0.001A_4H",
+            # "10B_0.010A_4H",
+            # "10B_0.100A_2H",
+            # "10B_0.100A_4H",
+            # "15B_0.001A_4H",
+            # "15B_0.010A_2H",
+            # "15B_0.010A_4H",
+            # "15B_0.100A_4H",
+        ]
+        for i in range(len(rps)):
+            rp = rps[i]
+            ri = ris[i]
+            rd = Path(run_outdir(ri))
+            ip = rd / f"{ri}.info"
+            run_test(rp, ri, rd, ip)
 
+    elif sys.argv[1] == "do_main_run":
+        basepath=Path(sys.argv[2])
+        run_infos = list(basepath.rglob("*.info"))
+        
+        for run_info in run_infos:
+            start_run(run_info)

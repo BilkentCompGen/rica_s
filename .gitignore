@@ -8,6 +8,10 @@ reference_genomes/
 tools/
 input/
 tmp/
+backup/
 
 # compiled python files
 *.pyc
+
+
+spp.csv
