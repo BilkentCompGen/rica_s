@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-# Save this as: plot_top10.py
+
 
 import argparse
 import os
 import pandas as pd
 
-# stage_4_plot.py runs this file directly, where the "scripts" package is not
-# importable; main_run.py imports it as scripts.misc.histogram. Support both.
+
 try:
     from scripts.misc.mpl_common import (barh_figure, no_data_figure,
                                          save_figure, species_label)
@@ -17,7 +16,7 @@ except ImportError:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate horizontal bar charts (HTML & images) for the top 10 mapped references.")
+        description="Generate horizontal bar charts (HTML & images) for the top 20 mapped references.")
     parser.add_argument("input_tsv", help="Input TSV file (Reference, Count)")
     args = parser.parse_args()
 
@@ -34,15 +33,15 @@ def main():
         print("Empty TSV")
         fig = no_data_figure()
     else:
-        # Grab the top 10 highest counts. Horizontal bars are drawn bottom to
+        # Grab the top 20 highest counts. Horizontal bars are drawn bottom to
         # top, so ascending puts the biggest one at the top of the chart.
-        top10_df = df.nlargest(10, 'Count').sort_values(by='Count', ascending=True)
+        top20_df = df.nlargest(20, 'Count').sort_values(by='Count', ascending=True)
 
         # Merge the Reference and Count into a single formatted tick label.
         labels = [species_label(name, count) for name, count
-                  in zip(top10_df['Reference'], top10_df['Count'])]
+                  in zip(top20_df['Reference'], top20_df['Count'])]
 
-        fig = barh_figure(labels, top10_df['Count'], cmap='turbo')
+        fig = barh_figure(labels, top20_df['Count'], cmap='turbo')
 
     base_name, _ = os.path.splitext(args.input_tsv)
 

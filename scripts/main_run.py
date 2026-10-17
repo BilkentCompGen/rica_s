@@ -69,8 +69,7 @@ def start_run(run_info):
     # load tsv of subruns of _id_ and merge in a pandas df
     # add them in one df
     # generate plot
-    merge_and_plot_subruns(
-        runid, c["OUT_DIR"]+"/"+runid, c["OUT_DIR"]+"/"+runid+"/_bigfile.png")
+    merge_and_plot_subruns(runid, c["OUT_DIR"]+"/"+runid, c["OUT_DIR"]+"/"+runid+"/_bigfile.png")
 
     # load tsv of subruns of _pr_
     # add them in 1
@@ -116,10 +115,10 @@ def merge_abricate_tsvs(run_id, target_dir):
     logger.info(
         f"Successfully merged {len(merged_df)} rows and saved to {output_file}")
 
-    with open(f"{target_dir}/{run_id}.merged_pr_.csv", "w") as f:
-        f.write(merged_df.to_string(max_rows=None, max_cols=None))
+    # with open(f"{target_dir}/{run_id}.merged_pr_.csv", "w") as f:
+    #     f.write(merged_df.to_string(max_rows=None, max_cols=None))
 
-    return merged_df
+    # return merged_df
 
 
 def merge_and_plot_subruns(run_id, target_dir, output_image_path):
@@ -168,7 +167,7 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
         col_count = merged_df.columns[1]
 
         if col_name in merged_df.columns and col_count in merged_df.columns:
-
+            merged_df = merged_df.nlargest(50, col_count)
             # 1. Format the Y-axis labels: species name italic, count bold
             merged_df['y_label'] = [
                 species_label(name, count) for name, count
@@ -190,7 +189,7 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
             )
 
             # Save the figure to disk
-            save_image(fig, output_image_path)
+            # save_image(fig, output_image_path)
 
             logger.info(f"Plot saved successfully to: {output_image_path}")
 
@@ -324,6 +323,9 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         os.system("echo killed > "+statusfile)
         logger.error(f"An unexpected error occurred: {e}")
         exit(-1)
+
+
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
@@ -390,6 +392,7 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         exit(-1)
 
 
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
@@ -405,6 +408,7 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         os.system("echo killed > "+statusfile)
         logger.error(f"An unexpected error occurred: {e}")
         exit(-1)
+
 
 
 ##############################################################################
@@ -472,6 +476,8 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         logger.error(f"An unexpected error occurred: {e}")
         exit(-1)
 
+
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
@@ -489,6 +495,8 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 ##############################################################################
 ##############################################################################
 ##############################################################################
+
+
 
     try:
         logger.info("[i]> fetching tsv metadata")
@@ -534,9 +542,13 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         logger.error(f"An unexpected error occurred: {e}")
         exit(-1)
 
+
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
+
+
 
     try:
         logger.info(f"AllProfile {runid} {inputfile_cleaned}")
@@ -546,9 +558,14 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         os.system("echo killed > "+statusfile)
         logger.error(f"An unexpected error occurred: {e}")
         exit(-1)
+
+
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
+
+
 
     try:
         logger.info(f"AllPlot {runid}")
@@ -558,6 +575,9 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         os.system("echo killed > "+statusfile)
         logger.error(f"An unexpected error occurred: {e}")
         exit(-1)
+
+
+
 ##############################################################################
 ##############################################################################
 ##############################################################################
@@ -712,18 +732,10 @@ def run_test(rp, ri, rd, ip):
 ###################
 if __name__ == "__main__":
     if sys.argv[1] == "one_run":
-        # if len(sys.argv) in (3, 4, 5):
-        #     parent = sys.argv[3] if len(sys.argv) > 3 else None
-        #     # Omitted means every installed tool, matching the pre-selector CLI.
-        #     tools = sys.argv[4].split(",") if len(sys.argv) > 4 else None
-        #     all_run(sys.argv[1], sys.argv[2], parent, tools=tools)
-        # else:
-        #     print(
-    #             "Usage: python3 -m scripts.main_run <runid> <inputfile> [parent] [tool1,tool2]")
 
 
         rps=[
-            "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.001A_1H/", #done
+            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.001A_1H/", #done
             # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.010A_2H/", #done
             # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.001A_2H/", #done
             # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.010A_1H/", #done
@@ -755,7 +767,7 @@ if __name__ == "__main__":
 
 
         ris=[
-            "05B_0.001A_1H",#done
+            # "05B_0.001A_1H",#done
             # "15B_0.010A_2H",#done
             # "15B_0.001A_2H",#done
             # "05B_0.010A_1H",#done
@@ -793,7 +805,14 @@ if __name__ == "__main__":
 
     elif sys.argv[1] == "do_main_run":
         basepath=Path(sys.argv[2])
-        run_infos = list(basepath.rglob("*.info"))
+        # run_infos = list(basepath.rglob("*.info"))
         
-        for run_info in run_infos:
-            start_run(run_info)
+        # for run_info in run_infos:
+
+        #     start_run(run_info)
+        start_run("/opt/rica_s/output/05B_0.001A_2H/05B_0.001A_2H.info")
+
+
+        
+        
+        

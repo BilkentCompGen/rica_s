@@ -49,6 +49,10 @@
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "justMyCode": false,
+            "args": [
+                "do_main_run",
+                "/opt/rica_s/output/"
+            ]
         },
         {
             "name": "PyMod stage_2_classify",
@@ -61,6 +65,20 @@
             "justMyCode": false,
             "args": [
                 "fix_names",
+                "/opt/rica_s/output/05B_0.001A_1H"
+            ]
+        },
+        {
+            "name": "PyMod stage_4_plot",
+            "sudo": true,
+            "type": "python",
+            "request": "launch",
+            "module": "scripts.stage_4_plot",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "replot",
                 "/opt/rica_s/output/05B_0.001A_1H"
             ]
         },

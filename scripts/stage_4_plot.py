@@ -53,12 +53,47 @@ def all_plot(runid, parent=None):
     logger.info(datetime.datetime.now())
     logger.info("[i]> End of plotting stage")
 
+# def replot():
+
 
 
 
 if __name__ == "__main__":
     
-    if sys.argv[1] == "plot":
+    if sys.argv[1] == "replot":
         search_pattern = os.path.join(sys.argv[2], "**", "*.tsv")
         tsvs = glob.glob(search_pattern, recursive=True)
+
+        total = defaultdict(int)
+        for file in tsvs:
+            with open(file, "r") as f:
+                for line in f:
+                    parts = line.strip().split('\t')
+                    if len(parts) >= 2:
+                        try:
+                            total[parts[0]] += int(parts[1])
+                        except ValueError:
+                            pass
+                            
+        merged_tsv = os.path.join(sys.argv[2], f"{runid}_aggregate.tsv")
+        with open(merged_tsv, "w") as f:
+            for ref, count in sorted(total.items(), key=lambda x: x[1], reverse=True):
+                f.write(f"{ref}\t{count}\n")
+        logger.info("[i]> done.")
         
+        logger.info("[i]> generating plots...")
+        hist_script = os.path.join(PROJECT_HOME, "scripts", "misc", "histogram.py")
+        
+        for file in glob.glob(os.path.join(sys.argv[2], "*.tsv")):
+            subprocess.run(["python3", hist_script, file])
+        
+        logger.info("[i]> done.")
+        
+        logger.info("[i]> generating EPS...")
+        for pdf in glob.glob(os.path.join(sys.argv[2], "*.pdf")):
+            subprocess.run(["pdftops", pdf, f"{pdf}.eps"])
+        logger.info("[i]> done.")
+        
+        logger.info(f"[i]> === plotting")
+    
+        print(tsvs)
