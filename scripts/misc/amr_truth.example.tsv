@@ -1,0 +1,23 @@
+# AMR gene ground truth for scripts/evaluate_run.py (tab-separated, one file per run).
+# Complete truth for run expr2_05B_0.100A_4H_3G.
+#
+# read_id : read name exactly as it appears in the run's FASTA/FASTQ (first word of the header)
+# gene    : AMR gene carried by the read. A read with two genes gets two rows.
+# aliases : optional, "|"-separated names that also count as this gene in any database.
+#           Names are compared after normalization (lowercase, no "(Class)" prefix,
+#           no "_N" allele suffix, no punctuation), so dfrA5_4 and (Tmt)dfrA5 already
+#           match dfrA5. Aliases are merged across all rows of the same gene, so they
+#           only need to be written once. A family name (e.g. megares "DFRA") lets
+#           that database match, but then every gene of the family counts as this one;
+#           add it only when no other gene of that family is in the sample.
+# Reads not listed carry no gene: any hit on them counts as a false positive.
+# List every gene really present (including chromosomal ones), or precision will be low.
+# Lines starting with "#" are ignored.
+read_id	gene	aliases
+seq_330	dfrA5	DFRA
+seq_399	dfrA5
+seq_1052	dfrA5
+seq_2257	EreA	ere(A)|EreA2|ere(A2)
+seq_2627	EreA
+seq_2665	floR2	floR|CmlA9|FLOR
+seq_3392	floR2

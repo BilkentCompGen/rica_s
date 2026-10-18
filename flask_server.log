@@ -10210,3 +10210,365 @@
 127.0.0.1 - - [17/Oct/2026 12:27:37] "GET /report/05B_0.001A_2H HTTP/1.1" 200 -
 127.0.0.1 - - [17/Oct/2026 12:27:43] "GET /check_status?runid=05B_0.001A_2H HTTP/1.1" 200 -
 127.0.0.1 - - [17/Oct/2026 12:27:43] "GET /report/05B_0.001A_2H HTTP/1.1" 200 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 13:43:41] "GET /report/15B_0.010A_4H HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 13:43:41] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 13:43:41] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 13:43:41] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 13:43:41] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 18:47:58] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 18:47:58] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 18:47:59] "GET /api/folders?path=/ HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 18:51:27] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 18:51:27] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 18:53:16] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 18:53:22] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 18:54:37] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 18:54:37] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 19:05:05] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 19:05:05] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 19:39:56] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 19:39:56] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 19:40:45] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 19:40:56] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 19:42:24] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 19:42:25] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 19:45:09] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 19:45:14] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 20:05:41] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:05:48] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 20:20:00] "GET /report/expr2_05B_0.100A_4H_1G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:20:00] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 20:20:00] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 20:20:00] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 20:20:00] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 20:20:03] "GET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G/_bigfile.png.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:20:03] "GET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.blastout.tab.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:20:03] "GET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.bwa.sam.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:20:03] "GET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.clark.csv.csv.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:20:03] "GET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.kraken2.report.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:20:03] "GET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.cuclark.csv.csv.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:20:03] "GET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.minimap2.paf.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:20:03] "GET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.ngmlr.sam.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 20:20:03] "GET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G_0_aggregate.png HTTP/1.1" 200 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 21:07:55] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:08:02] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:22:12] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:22:12] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:26:20] "GET /report/expr2_10B_0.100A_4H_1G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:26:20] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:26:20] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:26:20] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:26:20] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:26:25] "GET /check_status?runid=expr2_10B_0.100A_4H_1G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:27:48] "GET /report/expr2_10B_0.100A_4H_1G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:27:48] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:27:48] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:27:48] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:27:48] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:27:53] "GET /check_status?runid=expr2_10B_0.100A_4H_1G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:27:58] "GET /check_status?runid=expr2_10B_0.100A_4H_1G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:28:03] "GET /check_status?runid=expr2_10B_0.100A_4H_1G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:28:07] "GET /report/expr2_05B_0.100A_4H_1G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:28:07] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:07] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:07] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:07] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:13] "[36mGET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G/_bigfile.png.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:13] "[36mGET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.bwa.sam.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:13] "[36mGET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.blastout.tab.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:13] "[36mGET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.clark.csv.csv.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:13] "[36mGET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.kraken2.report.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:13] "[36mGET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.cuclark.csv.csv.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:13] "[36mGET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.minimap2.paf.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:13] "[36mGET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G.fasta.ngmlr.sam.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:28:13] "[36mGET /report/expr2_05B_0.100A_4H_1G/plot/expr2_05B_0.100A_4H_1G_0/expr2_05B_0.100A_4H_1G_0_aggregate.png HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:40:02] "GET /report/expr2_05B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:40:02] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:40:02] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:40:02] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:40:02] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:40:08] "GET /report/expr2_05B_0.100A_4H_3G/plot/expr2_05B_0.100A_4H_3G/_bigfile.png.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:40:08] "GET /report/expr2_05B_0.100A_4H_3G/plot/expr2_05B_0.100A_4H_3G_0/expr2_05B_0.100A_4H_3G.fasta.blastout.tab.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:40:08] "GET /report/expr2_05B_0.100A_4H_3G/plot/expr2_05B_0.100A_4H_3G_0/expr2_05B_0.100A_4H_3G.fasta.bwa.sam.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:40:08] "GET /report/expr2_05B_0.100A_4H_3G/plot/expr2_05B_0.100A_4H_3G_0/expr2_05B_0.100A_4H_3G.fasta.clark.csv.csv.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:40:08] "GET /report/expr2_05B_0.100A_4H_3G/plot/expr2_05B_0.100A_4H_3G_0/expr2_05B_0.100A_4H_3G.fasta.cuclark.csv.csv.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:40:08] "GET /report/expr2_05B_0.100A_4H_3G/plot/expr2_05B_0.100A_4H_3G_0/expr2_05B_0.100A_4H_3G.fasta.kraken2.report.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:40:08] "GET /report/expr2_05B_0.100A_4H_3G/plot/expr2_05B_0.100A_4H_3G_0/expr2_05B_0.100A_4H_3G.fasta.minimap2.paf.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:40:08] "GET /report/expr2_05B_0.100A_4H_3G/plot/expr2_05B_0.100A_4H_3G_0/expr2_05B_0.100A_4H_3G.fasta.ngmlr.sam.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:40:08] "GET /report/expr2_05B_0.100A_4H_3G/plot/expr2_05B_0.100A_4H_3G_0/expr2_05B_0.100A_4H_3G_0_aggregate.png HTTP/1.1" 200 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 21:50:40] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:50:40] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:50:42] "GET /report/05B_0.001A_4H HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:50:44] "GET /report/05B_0.001A_1H HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:51:01] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:51:01] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:55:50] "GET /report/expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:55:50] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:55:50] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:55:50] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:55:50] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 21:55:56] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:01] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:06] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:11] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:11] "GET /report/expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:16] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:21] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:26] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:31] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:36] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:41] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:46] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:51] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:56:56] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:01] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:06] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:11] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:11] "GET /report/expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:16] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:21] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:26] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:31] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:36] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:41] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:46] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:51] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:57:56] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:01] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:06] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:06] "GET /report/expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:11] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:16] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:21] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:26] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:31] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:36] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:41] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:58:46] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:59:31] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 21:59:31] "GET /report/expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:00:12] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:00:12] "GET /report/expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:00:16] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:00:16] "GET /report/expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:00:21] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:00:21] "GET /report/expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:00:26] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:00:31] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:00:36] "GET /check_status?runid=expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Oct/2026 22:09:05] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:05] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:09:13] "GET /report/expr2_10B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:13] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:09:13] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:09:13] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:09:13] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:09:15] "GET /report/expr2_10B_0.100A_4H_3G/plot/expr2_10B_0.100A_4H_3G/_bigfile.png.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:15] "GET /report/expr2_10B_0.100A_4H_3G/plot/expr2_10B_0.100A_4H_3G_0/expr2_10B_0.100A_4H_3G.fasta.blastout.tab.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:15] "GET /report/expr2_10B_0.100A_4H_3G/plot/expr2_10B_0.100A_4H_3G_0/expr2_10B_0.100A_4H_3G.fasta.bwa.sam.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:15] "GET /report/expr2_10B_0.100A_4H_3G/plot/expr2_10B_0.100A_4H_3G_0/expr2_10B_0.100A_4H_3G.fasta.clark.csv.csv.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:15] "GET /report/expr2_10B_0.100A_4H_3G/plot/expr2_10B_0.100A_4H_3G_0/expr2_10B_0.100A_4H_3G.fasta.cuclark.csv.csv.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:15] "GET /report/expr2_10B_0.100A_4H_3G/plot/expr2_10B_0.100A_4H_3G_0/expr2_10B_0.100A_4H_3G.fasta.kraken2.report.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:15] "GET /report/expr2_10B_0.100A_4H_3G/plot/expr2_10B_0.100A_4H_3G_0/expr2_10B_0.100A_4H_3G.fasta.minimap2.paf.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:15] "GET /report/expr2_10B_0.100A_4H_3G/plot/expr2_10B_0.100A_4H_3G_0/expr2_10B_0.100A_4H_3G.fasta.ngmlr.sam.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:09:15] "GET /report/expr2_10B_0.100A_4H_3G/plot/expr2_10B_0.100A_4H_3G_0/expr2_10B_0.100A_4H_3G_0_aggregate.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:10:19] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:10:19] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:10:27] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:10:27] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:23:16] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:23:16] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:24:29] "GET /report/expr2_15B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:30] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:24:30] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:24:30] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:24:30] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:24:36] "GET /check_status?runid=expr2_15B_0.100A_4H_3G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:38] "GET /report/expr2_15B_0.100A_4H_1G HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:38] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:24:38] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:24:38] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:24:38] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Oct/2026 22:24:46] "GET /report/expr2_15B_0.100A_4H_1G/plot/expr2_15B_0.100A_4H_1G/_bigfile.png.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:46] "GET /report/expr2_15B_0.100A_4H_1G/plot/expr2_15B_0.100A_4H_1G_0/expr2_15B_0.100A_4H_1G.fasta.clark.csv.csv.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:46] "GET /report/expr2_15B_0.100A_4H_1G/plot/expr2_15B_0.100A_4H_1G_0/expr2_15B_0.100A_4H_1G.fasta.blastout.tab.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:46] "GET /report/expr2_15B_0.100A_4H_1G/plot/expr2_15B_0.100A_4H_1G_0/expr2_15B_0.100A_4H_1G.fasta.bwa.sam.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:46] "GET /report/expr2_15B_0.100A_4H_1G/plot/expr2_15B_0.100A_4H_1G_0/expr2_15B_0.100A_4H_1G.fasta.cuclark.csv.csv.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:46] "GET /report/expr2_15B_0.100A_4H_1G/plot/expr2_15B_0.100A_4H_1G_0/expr2_15B_0.100A_4H_1G.fasta.kraken2.report.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:46] "GET /report/expr2_15B_0.100A_4H_1G/plot/expr2_15B_0.100A_4H_1G_0/expr2_15B_0.100A_4H_1G.fasta.minimap2.paf.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:46] "GET /report/expr2_15B_0.100A_4H_1G/plot/expr2_15B_0.100A_4H_1G_0/expr2_15B_0.100A_4H_1G.fasta.ngmlr.sam.png HTTP/1.1" 200 -
+127.0.0.1 - - [17/Oct/2026 22:24:46] "GET /report/expr2_15B_0.100A_4H_1G/plot/expr2_15B_0.100A_4H_1G_0/expr2_15B_0.100A_4H_1G_0_aggregate.png HTTP/1.1" 200 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [18/Oct/2026 11:38:45] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:38:45] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:38:48] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:39:24] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:39:32] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:39:32] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:39:41] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:39:41] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:39:48] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:39:48] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:39:50] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:39:50] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [18/Oct/2026 11:40:43] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:40:43] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:40:45] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:40:54] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [18/Oct/2026 11:50:56] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:50:56] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:50:57] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:00] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:51:12] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:12] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:51:12] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:51:12] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:51:12] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:51:17] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:17] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:22] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:22] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:27] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:27] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:33] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:33] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:38] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:43] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:43] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:47] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:47] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:53] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:53] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:58] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:51:58] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:52:02] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:52:03] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:52:07] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:52:08] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:52:12] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:52:13] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:52:17] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:52:18] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [18/Oct/2026 11:53:22] "GET /check_status?runid=2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:53:23] "GET /report/2026_10_18_08_50_56 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:53:31] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:53:31] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:53:45] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:53:45] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:53:48] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:53:54] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:55:15] "GET /report/2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:15] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:55:15] "[36mGET /static/css/jquery.dataTables.min.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:55:15] "[36mGET /static/js/jquery-3.7.1.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:55:15] "[36mGET /static/js/jquery.dataTables.min.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:55:20] "GET /check_status?runid=2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:20] "GET /report/2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:25] "GET /check_status?runid=2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:25] "GET /report/2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:30] "GET /check_status?runid=2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:30] "GET /report/2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:36] "GET /check_status?runid=2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:38] "GET /report/2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:46] "GET /check_status?runid=2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:47] "GET /check_status?runid=2026_10_18_08_53_45 HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:55:50] "GET /check_status?runid=2026_10_18_08_53_45 HTTP/1.1" 200 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [18/Oct/2026 11:57:12] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:57:12] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 11:57:13] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 11:57:16] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.205.214.10:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [18/Oct/2026 13:22:29] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 13:22:29] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 13:22:37] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 13:22:37] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [18/Oct/2026 13:22:39] "POST /submitted HTTP/1.1" 200 -
+127.0.0.1 - - [18/Oct/2026 13:22:45] "[36mGET /static/css/app.css HTTP/1.1[0m" 304 -

@@ -220,7 +220,6 @@ if __name__ == "__main__":
         nr=NameResolver("/opt/rica_s/scripts/misc/spp.tar.gz")
 
         for tsv in tsvs:
-            # if("05B_0.001A_1H_0_aggregate" in tsv):
-            #     print("here")
+            
             fix_names(tsv,nr)
             merge_repeats(tsv)

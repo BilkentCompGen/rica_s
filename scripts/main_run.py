@@ -27,6 +27,9 @@ from scripts.misc.mpl_common import (RICA_CMAP, barh_figure,
                                      save_image, species_label)
 from time import sleep
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -279,29 +282,31 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
     try:
         logger.info(f"[i]> getting metadata for {inputfile}")
 
-        # pod5 data
-        with p5.Reader(inputfile) as reader:
-            with open(summaryfile, "a") as sf:
-                sf.write("\n--- " + inputfile + " \n")
+        def get_pod5_metadata():
+            # pod5 data
+            with p5.Reader(inputfile) as reader:
+                with open(summaryfile, "a") as sf:
+                    sf.write("\n--- " + inputfile + " \n")
 
-                try:
-                    # Grab the very first read in the file
-                    first_read = next(reader.reads())
+                    try:
+                        # Grab the very first read in the file
+                        first_read = next(reader.reads())
 
-                    # Extract the RunInfo object
-                    info = first_read.run_info
+                        # Extract the RunInfo object
+                        info = first_read.run_info
 
-                    sf.write(f"Sample Rate: {info.sample_rate}\n")
-                    sf.write(f"Sequencing Kit: {info.sequencing_kit}\n")
-                    sf.write(f"Experiment Name: {info.experiment_name}\n")
+                        sf.write(f"Sample Rate: {info.sample_rate}\n")
+                        sf.write(f"Sequencing Kit: {info.sequencing_kit}\n")
+                        sf.write(f"Experiment Name: {info.experiment_name}\n")
 
-                    # pore_type is stored in a separate Pore object on the read
-                    sf.write(f"Pore Type: {first_read.pore.pore_type}\n")
+                        # pore_type is stored in a separate Pore object on the read
+                        sf.write(f"Pore Type: {first_read.pore.pore_type}\n")
 
-                except StopIteration:
-                    # Failsafe in case the pod5 file is completely empty
-                    sf.write("Error: No reads found in this POD5 file.\n")
-
+                    except StopIteration:
+                        # Failsafe in case the pod5 file is completely empty
+                        sf.write("Error: No reads found in this POD5 file.\n")
+        executor = ThreadPoolExecutor(max_workers=1)
+        executor.submit(get_pod5_metadata)
 
     except Exception as e:
         os.system("echo killed > "+statusfile)
@@ -309,9 +314,9 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         exit(-1)
 
 
-##############################################################################
-##############################################################################
-##############################################################################
+# ##############################################################################
+# ##############################################################################
+# ##############################################################################
     try:
         # 0. Basecall
         logger.info(f"AllBasecall {runid} {inputfile}")
@@ -326,65 +331,71 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 
 
 
-##############################################################################
-##############################################################################
-##############################################################################
+# ##############################################################################
+# ##############################################################################
+# ##############################################################################
 
 
 
     try:
         logger.info("[i]> fetching fastqs metadata")
-        # fastq data
-        lengths = []
-        q_scores = []
-        channels = set()
-        run_ids = set()
 
-        # Iterate through the FASTQ file exactly once
-        for record in SeqIO.parse(inputfile_bc, "fastq"):
 
-            seq_len = len(record.seq)
-            lengths.append(seq_len)
+        def get_fastq_metadata():
+            # fastq data
+            lengths = []
+            q_scores = []
+            channels = set()
+            run_ids = set()
 
-            read_phreds = record.letter_annotations["phred_quality"]
-            if read_phreds:
-                q_scores.append(statistics.mean(read_phreds))
+            # Iterate through the FASTQ file exactly once
+            for record in SeqIO.parse(inputfile_bc, "fastq"):
 
-            parts = record.description.split()
-            for item in parts[1:]:
-                if item.startswith("ch="):
-                    channels.add(item.split("=")[1])
-                elif item.startswith("runid="):
-                    run_ids.add(item.split("=")[1])
+                seq_len = len(record.seq)
+                lengths.append(seq_len)
 
-        # Calculate N50
-        lengths.sort(reverse=True)
-        total_yield = sum(lengths)
-        n50 = 0
-        running_sum = 0
+                read_phreds = record.letter_annotations["phred_quality"]
+                if read_phreds:
+                    q_scores.append(statistics.mean(read_phreds))
 
-        for length in lengths:
-            running_sum += length
-            if running_sum >= total_yield / 2:
-                n50 = length
-                break
+                parts = record.description.split()
+                for item in parts[1:]:
+                    if item.startswith("ch="):
+                        channels.add(item.split("=")[1])
+                    elif item.startswith("runid="):
+                        run_ids.add(item.split("=")[1])
 
-        # Compile the final statistics dictionary
-        metrics = {
-            "Total Reads": len(lengths),
-            "Total Yield (bp)": total_yield,
-            "Max Read Length (bp)": max(lengths) if lengths else 0,
-            "Read Length N50 (bp)": n50,
-            "Overall Mean Q-Score": round(statistics.mean(q_scores), 2) if q_scores else 0,
-            "Active MinION Channels": len(channels),
-            "Run IDs Detected": list(run_ids)
-        }
-        # Using "a" to append. Change to "w" if you want to overwrite the file each time.
-        with open(summaryfile, "a") as f:
-            f.write("\n--- "+inputfile_bc+"\n")
-            for key, value in metrics.items():
-                f.write(f"{key}: {value}\n")
+            # Calculate N50
+            lengths.sort(reverse=True)
+            total_yield = sum(lengths)
+            n50 = 0
+            running_sum = 0
 
+            for length in lengths:
+                running_sum += length
+                if running_sum >= total_yield / 2:
+                    n50 = length
+                    break
+
+            # Compile the final statistics dictionary
+            metrics = {
+                "Total Reads": len(lengths),
+                "Total Yield (bp)": total_yield,
+                "Max Read Length (bp)": max(lengths) if lengths else 0,
+                "Read Length N50 (bp)": n50,
+                "Overall Mean Q-Score": round(statistics.mean(q_scores), 2) if q_scores else 0,
+                "Active MinION Channels": len(channels),
+                "Run IDs Detected": list(run_ids)
+            }
+            # Using "a" to append. Change to "w" if you want to overwrite the file each time.
+            with open(summaryfile, "a") as f:
+                f.write("\n--- "+inputfile_bc+"\n")
+                for key, value in metrics.items():
+                    f.write(f"{key}: {value}\n")
+        
+        
+        executor = ThreadPoolExecutor(max_workers=1)
+        executor.submit(get_fastq_metadata)
 
     except Exception as e:
         os.system("echo killed > "+statusfile)
@@ -393,9 +404,9 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 
 
 
-##############################################################################
-##############################################################################
-##############################################################################
+# ##############################################################################
+# ##############################################################################
+# ##############################################################################
 
     try:
         # 1. Filter
@@ -411,65 +422,71 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 
 
 
-##############################################################################
-##############################################################################
-##############################################################################
+# ##############################################################################
+# ##############################################################################
+# ##############################################################################
 
 
     try:
         logger.info("[i]> fetching fasta metadata")
 
-        lengths = []
-        channels = set()
-        run_ids = set()
+        def get_fasta_metadata():
+                
+            lengths = []
+            channels = set()
+            run_ids = set()
 
-        # Iterate through the FASTA file exactly once
-        for record in SeqIO.parse(inputfile_cleaned, "fasta"):
+            # Iterate through the FASTA file exactly once
+            for record in SeqIO.parse(inputfile_cleaned, "fasta"):
 
-            # 1. Sequence & Length Metrics
-            seq_len = len(record.seq)
-            lengths.append(seq_len)
+                # 1. Sequence & Length Metrics
+                seq_len = len(record.seq)
+                lengths.append(seq_len)
 
-            # 2. Hardware & Run Metadata
-            # (Only applies if the FASTA retained ONT headers from a FASTQ conversion)
-            parts = record.description.split()
-            for item in parts[1:]:
-                if item.startswith("ch="):
-                    channels.add(item.split("=")[1])
-                elif item.startswith("runid="):
-                    run_ids.add(item.split("=")[1])
+                # 2. Hardware & Run Metadata
+                # (Only applies if the FASTA retained ONT headers from a FASTQ conversion)
+                parts = record.description.split()
+                for item in parts[1:]:
+                    if item.startswith("ch="):
+                        channels.add(item.split("=")[1])
+                    elif item.startswith("runid="):
+                        run_ids.add(item.split("=")[1])
 
-        # Calculate N50
-        lengths.sort(reverse=True)
-        total_yield = sum(lengths)
-        n50 = 0
-        running_sum = 0
+            # Calculate N50
+            lengths.sort(reverse=True)
+            total_yield = sum(lengths)
+            n50 = 0
+            running_sum = 0
 
-        for length in lengths:
-            running_sum += length
-            if running_sum >= total_yield / 2:
-                n50 = length
-                break
+            for length in lengths:
+                running_sum += length
+                if running_sum >= total_yield / 2:
+                    n50 = length
+                    break
 
-        # Compile the final statistics dictionary
-        metrics = {
-            "Total Sequences": len(lengths),
-            "Total Yield (bp)": total_yield,
-            "Max Sequence Length (bp)": max(lengths) if lengths else 0,
-            "Sequence Length N50 (bp)": n50,
-        }
+            # Compile the final statistics dictionary
+            metrics = {
+                "Total Sequences": len(lengths),
+                "Total Yield (bp)": total_yield,
+                "Max Sequence Length (bp)": max(lengths) if lengths else 0,
+                "Sequence Length N50 (bp)": n50,
+            }
 
-        # Only add hardware metrics if they were actually found in the FASTA header
-        if channels:
-            metrics["Active MinION Channels"] = len(channels)
-        if run_ids:
-            metrics["Run IDs Detected"] = list(run_ids)
+            # Only add hardware metrics if they were actually found in the FASTA header
+            if channels:
+                metrics["Active MinION Channels"] = len(channels)
+            if run_ids:
+                metrics["Run IDs Detected"] = list(run_ids)
 
-        # Using "a" to append. Change to "w" if you want to overwrite.
-        with open(summaryfile, "a") as f:
-            f.write("\n--- "+inputfile_cleaned+"\n")
-            for key, value in metrics.items():
-                f.write(f"{key}: {value}\n")
+            # Using "a" to append. Change to "w" if you want to overwrite.
+            with open(summaryfile, "a") as f:
+                f.write("\n--- "+inputfile_cleaned+"\n")
+                for key, value in metrics.items():
+                    f.write(f"{key}: {value}\n")
+
+
+        executor = ThreadPoolExecutor(max_workers=1)
+        executor.submit(get_fasta_metadata)
 
     except Exception as e:
         os.system("echo killed > "+statusfile)
@@ -482,7 +499,9 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 ##############################################################################
 ##############################################################################
 
-
+    if inputfile_raw == "dummy.pod5":
+        inputfile_cleaned = os.path.dirname(inputfile_raw) + "/" + runid[0:-2] + ".fasta"
+    
     try:
         # Uncomment the following when ready to execute full pipeline end-to-end:
         logger.info(f"AllClassify {runid} {inputfile_cleaned}")
@@ -501,41 +520,46 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
     try:
         logger.info("[i]> fetching tsv metadata")
 
-        # Initialize the main dictionary
-        summarydata = {}
+        def get_tsv_metadata():
+                
+            # Initialize the main dictionary
+            summarydata = {}
 
-        # Locate all TSV files in the target directory
-        search_pattern = os.path.join(outdir, "*.tsv")
-        tsv_files = glob.glob(search_pattern)
+            # Locate all TSV files in the target directory
+            search_pattern = os.path.join(outdir, "*.tsv")
+            tsv_files = glob.glob(search_pattern)
 
-        # No TSVs is not a reason to abandon the run: profiling, plotting and
-        # reporting still have work to do, and bailing out here would leave the
-        # .status file stuck at "started" forever.
-        if not tsv_files:
-            logger.info(f"No .tsv files found in directory: {outdir}")
-        else:
-            # Process each file
-            for filepath in tsv_files:
-                filename = os.path.basename(filepath)
+            # No TSVs is not a reason to abandon the run: profiling, plotting and
+            # reporting still have work to do, and bailing out here would leave the
+            # .status file stuck at "started" forever.
+            if not tsv_files:
+                logger.info(f"No .tsv files found in directory: {outdir}")
+            else:
+                # Process each file
+                for filepath in tsv_files:
+                    filename = os.path.basename(filepath)
 
-                try:
-                    with open(filepath, mode='r', encoding='utf-8') as f:
-                        # DictReader automatically uses the first row as dictionary keys
-                        reader = csv.reader(f, delimiter='\t')
-                        for row in reader:
-                            if row[0] in summarydata.keys():
-                                summarydata[row[0]] += int(row[1])
-                            else:
-                                summarydata[row[0]] = int(row[1])
-                except Exception as e:
-                    logger.error(f"Error reading {filename}: {e}")
+                    try:
+                        with open(filepath, mode='r', encoding='utf-8') as f:
+                            # DictReader automatically uses the first row as dictionary keys
+                            reader = csv.reader(f, delimiter='\t')
+                            for row in reader:
+                                if row[0] in summarydata.keys():
+                                    summarydata[row[0]] += int(row[1])
+                                else:
+                                    summarydata[row[0]] = int(row[1])
+                    except Exception as e:
+                        logger.error(f"Error reading {filename}: {e}")
 
-            # Dump the accumulated dictionary to a JSON file
-            with open(summaryfile, "a") as f:
-                f.write("\n--- tsv\n")
-                f.write("Tools used: " + str(len(tsv_files))+"\n")
-                f.write("Pathogens detected: "+str(len(summarydata))+"\n")
+                # Dump the accumulated dictionary to a JSON file
+                with open(summaryfile, "a") as f:
+                    f.write("\n--- tsv\n")
+                    f.write("Tools used: " + str(len(tsv_files))+"\n")
+                    f.write("Pathogens detected: "+str(len(summarydata))+"\n")
 
+
+        executor = ThreadPoolExecutor(max_workers=1)
+        executor.submit(get_tsv_metadata)
 
     except Exception as e:
         os.system("echo killed > "+statusfile)
@@ -804,13 +828,26 @@ if __name__ == "__main__":
             run_test(rp, ri, rd, ip)
 
     elif sys.argv[1] == "do_main_run":
-        basepath=Path(sys.argv[2])
+        # basepath=Path(sys.argv[2])
         # run_infos = list(basepath.rglob("*.info"))
-        
-        # for run_info in run_infos:
+        infos = [
+            "/opt/rica_s/output/expr2_05B_0.100A_4H_1G/expr2_05B_0.100A_4H_1G.info",
+            "/opt/rica_s/output/expr2_05B_0.100A_4H_3G/expr2_05B_0.100A_4H_3G.info",
+            "/opt/rica_s/output/expr2_10B_0.100A_4H_1G/expr2_10B_0.100A_4H_1G.info",
+            "/opt/rica_s/output/expr2_10B_0.100A_4H_3G/expr2_10B_0.100A_4H_3G.info",
+            "/opt/rica_s/output/expr2_15B_0.100A_4H_1G/expr2_15B_0.100A_4H_1G.info",
+            "/opt/rica_s/output/expr2_15B_0.100A_4H_3G/expr2_15B_0.100A_4H_3G.info"
+        ]
+        print("starting batch runs")
+        print(infos)
+        for info in infos:
+            start_run(info)
+        print("finished batch runs")
 
-        #     start_run(run_info)
-        start_run("/opt/rica_s/output/05B_0.001A_2H/05B_0.001A_2H.info")
+        # start_run("/opt/rica_s/output/05B_0.001A_2H/05B_0.001A_2H.info")
+
+    # elif sys.argv[1] == "expr2":
+    #     all_run(sys.argv[2], sys.argv[3],sys.argv[2],tools=)
 
 
         

@@ -1,0 +1,24 @@
+# Pathogen ground truth for scripts/evaluate_run.py (tab-separated, one file per run).
+# Excerpt from run expr2_05B_0.100A_4H_3G; a real file lists every read of the run.
+#
+# read_id : read name exactly as it appears in the run's FASTA/FASTQ (first word of the header)
+# species : true species of the read, as "Genus species" (strain/subsp. parts are ignored).
+#           A genus alone (e.g. "Enterobacter") accepts any species of that genus as correct.
+#           Use "-" for a read that carries no pathogen (AMR spike, human, plasmid, ...):
+#           any species called on it counts as a false positive.
+# Reads not listed are left out of the evaluation. Lines starting with "#" are ignored.
+read_id	species
+seq_1	Klebsiella pneumoniae
+seq_3	Klebsiella pneumoniae
+seq_39	Escherichia coli
+seq_40	Escherichia coli
+seq_2	Acinetobacter baumannii
+seq_6	Acinetobacter baumannii
+seq_5	Pseudomonas aeruginosa
+seq_15	Pseudomonas aeruginosa
+seq_7	Capnocytophaga canimorsus
+seq_9	Capnocytophaga canimorsus
+seq_330	-
+seq_399	-
+seq_2257	-
+seq_2665	-

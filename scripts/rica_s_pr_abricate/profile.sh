@@ -32,9 +32,10 @@ micromamba activate
 echo -e "#FILE\tSEQUENCE\tSTART\tEND\tSTRAND\tGENE\tCOVERAGE\tCOVERAGE_MAP\tGAPS\t%COVERAGE\t%IDENTITY\tDATABASE\tACCESSION\tPRODUCT\tRESISTANCE" > $outdir/$outputfile
 
 # 2. Run the loop to hit every database and append the raw data (without extra headers)
-for db in resfinder victors vfdb upec_expec_vf ecoli_vf argannot megares plasmidfinder card ncbi bacmet2 ecoh; do
+# for db in resfinder victors vfdb upec_expec_vf ecoli_vf argannot megares plasmidfinder card ncbi bacmet2 ecoh; do
+for db in resfinder argannot megares plasmidfinder card ncbi; do
     # echo "=== $db ===" >> out.tsv
-    /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" abricate --db $db $inputfile | tail -n +2 >> $outdir/$outputfile
+    /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" abricate --db $db $inputfile --minid 95 --mincov 95 | tail -n +2 >> $outdir/$outputfile
 done
 
 
