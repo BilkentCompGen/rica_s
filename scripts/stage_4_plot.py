@@ -19,7 +19,7 @@ def all_plot(runid, parent=None):
     # Merge TSVs (Replaces AWK)
     logger.info("[i]> merging TSVs...")
     total = defaultdict(int)
-    for file in glob.glob(os.path.join(outdir, "*.tsv")):
+    for file in glob.glob(f"{outdir}/*.tsv"):
         with open(file, "r") as f:
             for line in f:
                 parts = line.strip().split('\t')
@@ -29,22 +29,22 @@ def all_plot(runid, parent=None):
                     except ValueError:
                         pass
                         
-    merged_tsv = os.path.join(outdir, f"{runid}_aggregate.tsv")
+    merged_tsv = f"{outdir}/{runid}_aggregate.tsv"
     with open(merged_tsv, "w") as f:
         for ref, count in sorted(total.items(), key=lambda x: x[1], reverse=True):
             f.write(f"{ref}\t{count}\n")
     logger.info("[i]> done.")
     
     logger.info("[i]> generating plots...")
-    hist_script = os.path.join(PROJECT_HOME, "scripts", "misc", "histogram.py")
+    hist_script = f"{PROJECT_HOME}/scripts/misc/histogram.py"
     
-    for file in glob.glob(os.path.join(outdir, "*.tsv")):
+    for file in glob.glob(f"{outdir}/*.tsv"):
         subprocess.run(["python3", hist_script, file])
     
     logger.info("[i]> done.")
     
     logger.info("[i]> generating EPS...")
-    for pdf in glob.glob(os.path.join(outdir, "*.pdf")):
+    for pdf in glob.glob(f"{outdir}/*.pdf"):
         subprocess.run(["pdftops", pdf, f"{pdf}.eps"])
     logger.info("[i]> done.")
     
@@ -61,7 +61,7 @@ def all_plot(runid, parent=None):
 if __name__ == "__main__":
     
     if sys.argv[1] == "replot":
-        search_pattern = os.path.join(sys.argv[2], "**", "*.tsv")
+        search_pattern = f"{sys.argv[2]}/**/*.tsv"
         tsvs = glob.glob(search_pattern, recursive=True)
 
         total = defaultdict(int)
@@ -75,22 +75,22 @@ if __name__ == "__main__":
                         except ValueError:
                             pass
                             
-        merged_tsv = os.path.join(sys.argv[2], f"{runid}_aggregate.tsv")
+        merged_tsv = f"{sys.argv[2]}/{runid}_aggregate.tsv"
         with open(merged_tsv, "w") as f:
             for ref, count in sorted(total.items(), key=lambda x: x[1], reverse=True):
                 f.write(f"{ref}\t{count}\n")
         logger.info("[i]> done.")
         
         logger.info("[i]> generating plots...")
-        hist_script = os.path.join(PROJECT_HOME, "scripts", "misc", "histogram.py")
+        hist_script = f"{PROJECT_HOME}/scripts/misc/histogram.py"
         
-        for file in glob.glob(os.path.join(sys.argv[2], "*.tsv")):
+        for file in glob.glob(f"{sys.argv[2]}/*.tsv"):
             subprocess.run(["python3", hist_script, file])
         
         logger.info("[i]> done.")
         
         logger.info("[i]> generating EPS...")
-        for pdf in glob.glob(os.path.join(sys.argv[2], "*.pdf")):
+        for pdf in glob.glob(f"{sys.argv[2]}/*.pdf"):
             subprocess.run(["pdftops", pdf, f"{pdf}.eps"])
         logger.info("[i]> done.")
         

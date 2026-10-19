@@ -14,7 +14,6 @@
         margin-top: 10px;
     }
 
-    /* Directory picker modal */
     .modal-backdrop {
         display: none;
         position: fixed;
@@ -119,9 +118,6 @@
     <details class="advanced" {% if error %}open{% endif %}>
         <summary>Advanced options</summary>
 
-        <!-- Marks this POST as coming from a form that has the tool section. A
-             submission without it (an old cached page) means "run everything",
-             which is not the same as an empty selection. -->
         <input type="hidden" name="tools_submitted" value="1">
 
         {% if not docker_ok %}
@@ -163,7 +159,6 @@
 {% endblock %}
 
 {% block scripts %}
-<!-- Directory picker -->
 <div class="modal-backdrop" id="modal_backdrop">
     <div id="file_modal">
         <h3>Select Directory</h3>
@@ -187,15 +182,12 @@
     const pathDisplay = document.getElementById('current_path_display');
     let serverPath = '/';
 
-    // Default the run id to a filesystem-safe timestamp, unless the server
-    // already supplied one (re-render after a rejected submission).
     const runidField = document.getElementById('tb_runid');
     if (!runidField.value) {
         runidField.value =
             new Date().toISOString().replace(/\..+/, '').replace(/[^0-9]/g, '_');
     }
 
-    // Mirrors the server-side check, which is the real enforcement.
     document.getElementById('run_params').addEventListener('submit', (ev) => {
         const picked = document.querySelectorAll('input[name="tools"]:checked');
         if (picked.length === 0) {

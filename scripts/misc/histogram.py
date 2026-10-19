@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-
-
 import argparse
 import os
 import pandas as pd
@@ -33,11 +31,9 @@ def main():
         print("Empty TSV")
         fig = no_data_figure()
     else:
-        # Grab the top 20 highest counts. Horizontal bars are drawn bottom to
-        # top, so ascending puts the biggest one at the top of the chart.
+        # Grab the top 20 highest counts.
         top20_df = df.nlargest(20, 'Count').sort_values(by='Count', ascending=True)
 
-        # Merge the Reference and Count into a single formatted tick label.
         labels = [species_label(name, count) for name, count
                   in zip(top20_df['Reference'], top20_df['Count'])]
 
@@ -46,7 +42,6 @@ def main():
     base_name, _ = os.path.splitext(args.input_tsv)
 
     try:
-        # PDF is deliberately left out here; only plot_df writes one.
         written = save_figure(fig, base_name, formats=("html", "png", "svg"))
         print(f"[*] Files saved: {' '.join(written)}")
     except ValueError as e:
@@ -54,12 +49,6 @@ def main():
 
 
 def plot_df(df, outfile):
-    """Plot an already-prepared frame.
-
-    The caller is expected to have added a "y_label" column and sorted the
-    rows ascending by count; the count itself is read positionally from the
-    second column, as it always was.
-    """
     if len(df.index) == 0:
         print("Empty TSV")
         fig = no_data_figure()

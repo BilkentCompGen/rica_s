@@ -1,10 +1,9 @@
 #! /usr/bin/python
-
 import numpy as np
 
 try:
     from scripts.misc.mpl_common import save_image
-except ImportError:  # run directly, outside the scripts package
+except ImportError:
     from mpl_common import save_image
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator, MultipleLocator
@@ -5146,23 +5145,19 @@ ax.set_facecolor("white")
 
 ax.hist(rl,
         bins=np.arange(data_min, data_max + step_size, step_size),
-        rwidth=0.8,              # was bargap=0.2
+        rwidth=0.8,
         edgecolor="#000",
         linewidth=0.5,
         alpha=.85)
 
-# Read lengths run to six figures, which collide at this canvas size;
-# Plotly thinned the ticks automatically, so cap them here too.
 ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
 
-# Major grid, then a finer minor grid on both axes.
 ax.grid(True, which="major", color="LightGray", linewidth=0.2)
 ax.xaxis.set_minor_locator(MultipleLocator(25000))
 ax.yaxis.set_minor_locator(MultipleLocator(100))
 ax.grid(True, which="minor", color="whitesmoke", linewidth=0.2)
 ax.set_axisbelow(True)
 
-# mirror=True drew the axis line on all four sides.
 for spine in ax.spines.values():
     spine.set_visible(True)
     spine.set_color("black")

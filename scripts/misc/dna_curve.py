@@ -1,5 +1,4 @@
 #! /usr/bin/python3
-
 import os
 
 import numpy as np
@@ -9,7 +8,7 @@ import pathlib
 
 try:
     from scripts.misc.mpl_common import save_figure
-except ImportError:  # run directly, outside the scripts package
+except ImportError:
     from mpl_common import save_figure
 import matplotlib.pyplot as plt
 
@@ -85,9 +84,6 @@ def generate_dv_curve_coords(sequence):
 #     return x, y
 
 def plot_dna_curves(file_path, file_format="fasta", method="dv"):
-    """
-    Generates a chart tracking the sequence walk, as HTML/PNG/SVG.
-    """
     # 1. Read the sequence file
     sequence, seq_id = parse_sequence(file_path, file_format)
     print(f"Loaded sequence '{seq_id}' with length: {len(sequence)} bp")
@@ -102,21 +98,17 @@ def plot_dna_curves(file_path, file_format="fasta", method="dv"):
     # else:
     #     raise ValueError("Invalid method selection. Use 'dv' or 'dn'.")
         
-    # 3. Draw the walk. The per-point hover readout the Plotly version carried
-    # has no equivalent here; the start and end stay marked instead.
     fig, ax = plt.subplots(figsize=(10, 7), dpi=100)
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
 
     ax.plot(x, y, linewidth=2, color='#1f77b4', label=method.upper())
 
-    # 4. Add start/end landmarks
     ax.plot([x[0]], [y[0]], marker='o', markersize=10, color='green',
             linestyle='none', label="Start (5')")
     ax.plot([x[-1]], [y[-1]], marker='o', markersize=10, color='red',
             linestyle='none', label="End (3')")
 
-    # 5. Apply formatting, matching the old "plotly_white" template
     ax.set_title(title, fontsize=16)
     ax.set_xlabel("Cumulative X Vector Walk")
     ax.set_ylabel("Cumulative Y Vector Walk")
@@ -126,7 +118,6 @@ def plot_dna_curves(file_path, file_format="fasta", method="dv"):
         ax.spines[side].set_visible(False)
     ax.legend()
 
-    # 6. Write the chart next to the sequence it came from
     base_name, _ = os.path.splitext(file_path)
     written = save_figure(fig, base_name, formats=("html", "png", "svg"))
     print(f"[*] Files saved: {' '.join(written)}")

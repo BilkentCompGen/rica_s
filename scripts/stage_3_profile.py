@@ -14,18 +14,15 @@ def all_profile(runid, inputfile, parent=None, tools=None):
 
     outdir = run_outdir(runid, parent)
     os.makedirs(outdir, exist_ok=True)
-    logfile = os.path.join(outdir, f"{runid}.log")
+    logfile = f"{outdir}/{runid}.log"
 
-    # tools is None for runs started before the selector existed, and from the
-    # CLI; that means "run everything", which is the original behavior.
     containers = selected_tools("pr", tools)
     logger.info(f"[i]> profiling tools: {', '.join(containers) or 'none'}")
 
     client = docker.from_env()
 
     for container_name in containers:
-        script_path = os.path.join(
-            PROJECT_HOME, "scripts", container_name, "profile.sh")
+        script_path = f"{PROJECT_HOME}/scripts/{container_name}/profile.sh"
         try:
             container = client.containers.get(container_name)
             logger.info(f"[i]> {container.name} ===")
@@ -42,8 +39,6 @@ def all_profile(runid, inputfile, parent=None, tools=None):
                     print(text_chunk, end="")
                     log.write(text_chunk)
                     log.flush()
-        # logger, not log: log is bound inside the with-block above, so it is
-        # unbound here on the first container and closed on any later one.
         except docker.errors.NotFound:
             logger.error(f"[e]> container {container_name} not found; skipping.")
         except Exception:

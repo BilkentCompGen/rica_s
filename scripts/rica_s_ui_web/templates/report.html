@@ -8,7 +8,6 @@
 <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
 
 <style>
-    /* Tabs */
     .tab {
         overflow: hidden;
         border-bottom: 1px solid #ccc;
@@ -70,7 +69,6 @@
         margin: 40px 0;
     }
 
-    /* PDF export: flatten the tabs into one continuous document. */
     @media print {
 
         body,
@@ -238,8 +236,6 @@
         document.getElementById(tabName).style.display = "block";
         evt.currentTarget.classList.add("active");
 
-        // DataTables sizes columns from the visible width, which is zero while
-        // the panel is hidden.
         if (tabName === 'CSVTab') {
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
         }
@@ -253,13 +249,10 @@
         const doc = new DOMParser().parseFromString(
             await (await fetch(location.href)).text(), "text/html");
 
-        // DataTables holds references into the markup, so tear it down before
-        // the panels are replaced.
         $('.data-table').each(function () {
             if ($.fn.DataTable.isDataTable(this)) $(this).DataTable().destroy();
         });
 
-        // Only the panel contents are swapped, so the open tab stays open.
         for (const id of PANELS) {
             document.getElementById(id).innerHTML = doc.getElementById(id).innerHTML;
         }
@@ -274,14 +267,11 @@
         initTables();
         document.getElementById("defaultOpen").click();
 
-        // A finished run produces nothing further, so only a live run polls.
         if (status === "finished" || status === "killed") return;
 
         const poll = setInterval(async () => {
             const data = await (await fetch(STATUS_URL)).json();
 
-            // The status endpoint is a few dozen bytes; the page itself is only
-            // re-fetched once the run has actually written something new.
             if (data.is_running !== status || data.revision !== revision) {
                 status = data.is_running;
                 revision = data.revision;

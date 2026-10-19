@@ -13,9 +13,9 @@ def all_filter(runid, inputfile, parent=None):
 
     outdir = run_outdir(runid, parent)
     os.makedirs(outdir, exist_ok=True)
-    logfile = os.path.join(outdir, f"{runid}.log")
+    logfile = f"{outdir}/{runid}.log"
     
-    script_path = os.path.join(PROJECT_HOME, "scripts", "rica_s_id_minimap2", "filterHumanDna.sh")
+    script_path = f"{PROJECT_HOME}/scripts/rica_s_id_minimap2/filterHumanDna.sh"
     
     client = docker.from_env()
     

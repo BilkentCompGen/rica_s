@@ -1,12 +1,4 @@
-"""Evaluate one run's classification (stage 2) and AMR profiling (stage 3) results.
-
-The run's outputs are found under output/<RUNID>/<RUNID>_N/ and scored per read
-against user-supplied truth tables (one file per run, tab-separated, with header):
-
-  pathogens.tsv   read_id  species         one row per read; species '-' = no pathogen
-  amr.tsv         read_id  gene  [aliases] one row per (read, gene); aliases '|'-separated
-
-Usage (from /opt/rica_s):
+"""Usage (from /opt/rica_s):
   python -m scripts.evaluate_run RUNID [--pathogens P.tsv] [--amr A.tsv] [--min-reads 1] [--outdir DIR]
 
 
@@ -52,46 +44,38 @@ from scripts.tool_registry import display_name
 
 logger = logging.getLogger(__name__)
 
-SPP_TARBALL = os.path.join(PROJECT_HOME, "scripts", "misc", "spp.tar.gz")
-REF_NAMES_CSV = os.path.join(PROJECT_HOME, "reference_genomes", "output_names.csv")
-EVAL_ROOT = os.path.join(PROJECT_HOME, "evaluation")
-STATIC_DIR = os.path.join(PROJECT_HOME, "scripts", "rica_s_ui_web", "static")
+SPP_TARBALL = f"{PROJECT_HOME}/scripts/misc/spp.tar.gz"
+REF_NAMES_CSV = f"{PROJECT_HOME}/reference_genomes/output_names.csv"
+EVAL_ROOT = f"{PROJECT_HOME}/evaluation"
+STATIC_DIR = f"{PROJECT_HOME}/scripts/rica_s_ui_web/static"
 
-NONE = "none"                  # truth: read carries no pathogen
-UNCLASSIFIED = "unclassified"  # prediction: tool made no call
-UNRESOLVED = "unresolved"      # prediction: call whose id has no species name
-ABOVE_RANK = "above_rank"      # prediction: call made above the rank being scored
+NONE = "none"
+UNCLASSIFIED = "unclassified"
+UNRESOLVED = "unresolved"
+ABOVE_RANK = "above_rank"
 NO_CALL = (UNCLASSIFIED, UNRESOLVED, ABOVE_RANK)
 
-# Names that are not species or genera, e.g. kraken2 calls at family level and up
 HIGHER_TAXA = {"cellular organisms", "root", "Bacteria", "Archaea", "Eukaryota"}
 HIGHER_SUFFIXES = ("aceae", "ales", "ineae", "idae", "ota", "bacteria", "etes")
 
 
-# --------------------------------------------------------------------------- #
-# Helpers
-# --------------------------------------------------------------------------- #
-
 def prf(tp, fp, fn):
-    """Precision, recall and F1 from counts. Undefined values are NaN."""
     precision = tp / (tp + fp) if (tp + fp) else np.nan
     recall = tp / (tp + fn) if (tp + fn) else np.nan
     if tp:
         f1 = 2 * precision * recall / (precision + recall)
     else:
-        f1 = 0.0 if (fp or fn) else np.nan  # nothing right but something to get right
+        f1 = 0.0 if (fp or fn) else np.nan
     return precision, recall, f1
 
 
 def binomial(name):
-    """First two words of a taxon name (drops subsp./strain parts)."""
     if not isinstance(name, str) or not name.strip():
         return None
     return " ".join(name.replace("[", "").replace("]", "").split()[:2])
 
 
 def taxon_rank(name):
-    """'species', 'genus' or 'higher', guessed from the shape of the name."""
     words = name.split()
     if name in HIGHER_TAXA or (len(words) == 1 and name.endswith(HIGHER_SUFFIXES)):
         return "higher"
@@ -99,7 +83,6 @@ def taxon_rank(name):
 
 
 def normalize_gene(name):
-    """(Tmt)dfrA5, dfrA5_4 and dfrA5 all become 'dfra5'."""
     s = re.sub(r"^\([^)]*\)", "", str(name).strip())
     s = re.sub(r"_\d+$", "", s)
     return re.sub(r"[()\-_'\s]", "", s).lower()
@@ -113,16 +96,11 @@ def describe(values, prefix):
 
 
 def subrun_files(runid, pattern):
-    """Every file matching pattern in any sub-run directory, skipping empty ones."""
     paths = []
     for _, _, path in subrun_dirs(runid):
-        paths.extend(p for p in sorted(glob.glob(os.path.join(path, pattern))) if os.path.getsize(p))
+        paths.extend(p for p in sorted(glob.glob(f"{path}/{pattern}")) if os.path.getsize(p))
     return paths
 
-
-# --------------------------------------------------------------------------- #
-# Truth
-# --------------------------------------------------------------------------- #
 
 def read_truth_tsv(path, required):
     df = pd.read_csv(path, sep="\t", comment="#", dtype=str, keep_default_na=False)
@@ -136,7 +114,6 @@ def read_truth_tsv(path, required):
 
 
 def load_pathogen_truth(path):
-    """Series read_id -> true label ('none' for reads without a pathogen)."""
     df = read_truth_tsv(path, ["read_id", "species"])
     labels = df["species"].where(~df["species"].isin(["", "-", NONE]), NONE)
     labels = labels.map(lambda s: s if s == NONE else binomial(s))
@@ -144,7 +121,6 @@ def load_pathogen_truth(path):
 
 
 def load_amr_truth(path):
-    """(DataFrame read_id, gene) of true pairs, and normalized alias -> gene map."""
     df = read_truth_tsv(path, ["read_id", "gene"])
     if "aliases" not in df.columns:
         df["aliases"] = ""
@@ -158,13 +134,6 @@ def load_amr_truth(path):
 
 
 def predicted_at_rank(pred, rank, truth_genera):
-    """Map a predicted name onto the label space of one rank.
-
-    A call above the scored rank ("Enterobacteriaceae" at genus, "Klebsiella"
-    at species) is not a wrong taxon, only a less specific one, so it becomes
-    ABOVE_RANK and counts as no call. A genus-only truth label ("Enterobacter")
-    absorbs every prediction inside that genus at species rank.
-    """
     if pred in NO_CALL:
         return pred
     found = taxon_rank(pred)
@@ -176,13 +145,9 @@ def predicted_at_rank(pred, rank, truth_genera):
     return pred if found == "species" else ABOVE_RANK
 
 
-# --------------------------------------------------------------------------- #
-# Stage 2: per-read predictions
-# --------------------------------------------------------------------------- #
-
 def parse_blast(path):
     df = pd.read_csv(path, sep="\t", header=None, usecols=[0, 1], dtype=str)
-    df = df.drop_duplicates(0, keep="first")  # hits are sorted best first per read
+    df = df.drop_duplicates(0, keep="first")
     return dict(zip(df[0], df[1].map(extract_identifier)))
 
 
@@ -206,7 +171,6 @@ def parse_sam(path):
             if line.startswith("@"):
                 continue
             cols = line.split("\t", 4)
-            # 4 unmapped, 256 secondary, 2048 supplementary
             if int(cols[1]) & 2308 or cols[2] == "*":
                 out.setdefault(cols[0], None)
             else:
@@ -231,7 +195,6 @@ def parse_kraken(path):
     return out
 
 
-# container name -> (raw per-read file pattern, parser)
 CLASSIFIERS = {
     "rica_s_id_blast": ("*.blastout.tab.6", parse_blast),
     "rica_s_id_bwa": ("*.bwa.sam", parse_sam),
@@ -244,7 +207,6 @@ CLASSIFIERS = {
 
 
 class Resolver:
-    """Bulk accession/taxid -> binomial lookup over the NameResolver table."""
 
     def __init__(self):
         logger.info("[i]> loading name resolver table")
@@ -256,7 +218,6 @@ class Resolver:
             self.ref = dict(zip(ref["Accession_Number"], ref["Species_Name"]))
 
     def resolve(self, raw):
-        """Series read_id -> species, 'unclassified' or 'unresolved'."""
         ids = pd.Series(raw, dtype=object)
         names = ids.map(self.table)
         fallback = ids.map(self.ref).fillna(ids.str.split(".").str[0].map(self.ref))
@@ -267,7 +228,6 @@ class Resolver:
 
 
 def stage2_predictions(runid, resolver):
-    """{container: Series read_id -> predicted species} for every tool with output."""
     preds = {}
     for tool, (pattern, parser) in CLASSIFIERS.items():
         paths = subrun_files(runid, pattern)
@@ -280,12 +240,7 @@ def stage2_predictions(runid, resolver):
     return preds
 
 
-# --------------------------------------------------------------------------- #
-# Stage 2: metrics
-# --------------------------------------------------------------------------- #
-
 def trim_confusion(confusion, top=15):
-    """Keep truth columns and no-call columns plus the top other columns; fold the rest."""
     keep = [c for c in confusion.columns if c in confusion.index or c in NO_CALL]
     rest = confusion.drop(columns=keep)
     top_cols = rest.sum().sort_values(ascending=False).head(top).index.tolist()
@@ -305,7 +260,6 @@ def stage2_metrics(tool, truth, pred, rank, min_reads):
     df["pred"] = df["pred"].map(lambda p: predicted_at_rank(p, rank, truth_genera))
 
     has_truth = df["truth"] != NONE
-    # an unresolved id is still a call (and a wrong one); above-rank is not
     classified = ~df["pred"].isin([UNCLASSIFIED, ABOVE_RANK])
     correct = has_truth & (df["pred"] == df["truth"])
     n = len(df)
@@ -335,7 +289,6 @@ def stage2_metrics(tool, truth, pred, rank, min_reads):
         "unclassified_pct": 100 * (~classified).sum() / n,
         "above_rank_pct": 100 * (df["pred"] == ABOVE_RANK).sum() / n,
         "unresolved_pct": 100 * (df["pred"] == UNRESOLVED).sum() / n,
-        # a read without a pathogen is correct when the tool makes no call on it
         "accuracy": (correct.sum() + (~has_truth & ~classified).sum()) / n,
         "precision": p, "recall": r, "f1": f,
         "macro_precision": in_truth["precision"].mean(),
@@ -388,10 +341,6 @@ def evaluate_stage2(runid, truth, min_reads):
             "presence": pd.DataFrame(presence), "confusions": confusions}
 
 
-# --------------------------------------------------------------------------- #
-# Stage 3: per-read gene hits
-# --------------------------------------------------------------------------- #
-
 HIT_COLUMNS = ["tool", "database", "read_id", "gene_raw", "identity", "coverage"]
 
 
@@ -399,7 +348,7 @@ def abricate_hits(runid):
     frames = []
     for path in subrun_files(runid, "*.abricate.csv"):
         df = pd.read_csv(path, sep="\t", dtype=str)
-        frames.append(df[df["#FILE"] != "#FILE"])  # repeated headers from concatenated dbs
+        frames.append(df[df["#FILE"] != "#FILE"])
     if not frames:
         return pd.DataFrame(columns=HIT_COLUMNS)
     df = pd.concat(frames, ignore_index=True)
@@ -412,9 +361,8 @@ def abricate_hits(runid):
 
 
 def leasyarg_hits(runid):
-    """L-easyARG filtered ARG alignments (PAF; target ends in '|<gene>')."""
     rows = []
-    for path in subrun_files(runid, os.path.join("ARG", "*_ARG_filter.txt")):
+    for path in subrun_files(runid, f"ARG/*_ARG_filter.txt"):
         with open(path) as fh:
             for line in fh:
                 cols = line.rstrip("\n").split("\t")
@@ -426,10 +374,6 @@ def leasyarg_hits(runid):
                              100 * (tend - tstart) / max(tlen, 1)))
     return pd.DataFrame(rows, columns=HIT_COLUMNS)
 
-
-# --------------------------------------------------------------------------- #
-# Stage 3: metrics
-# --------------------------------------------------------------------------- #
 
 def stage3_metrics(tool, database, hits, truth_pairs, min_reads):
     true_set = set(zip(truth_pairs["read_id"], truth_pairs["gene"]))
@@ -490,10 +434,6 @@ def evaluate_stage3(runid, truth_pairs, alias, min_reads):
             "descr": pd.DataFrame(descr)}
 
 
-# --------------------------------------------------------------------------- #
-# Output
-# --------------------------------------------------------------------------- #
-
 def truth_summary(pathogens, amr):
     rows = []
     if pathogens is not None:
@@ -515,8 +455,7 @@ def html_table(df):
 
 
 def inline_asset(rel):
-    """Contents of a web UI static file, so the report works offline as one file."""
-    path = os.path.join(STATIC_DIR, rel)
+    path = f"{STATIC_DIR}/{rel}"
     try:
         with open(path, encoding="utf-8") as fh:
             return fh.read()
@@ -525,9 +464,6 @@ def inline_asset(rel):
         return ""
 
 
-# Pagination, sorting and one filter box per column on every .data-table. The
-# filter row sits under the header (orderCellsTop keeps sorting on the top
-# row), and each box suggests that column's distinct values.
 TABLE_JS = """
 if (window.jQuery && $.fn.DataTable) {
   $('table.data-table').each(function (n) {
@@ -646,10 +582,6 @@ def print_summary(s2, s3):
         print(s3["overall"][cols].round(3).to_string(index=False))
 
 
-# --------------------------------------------------------------------------- #
-# CLI
-# --------------------------------------------------------------------------- #
-
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="python -m scripts.evaluate_run",
                                      description=__doc__.split("\n")[0])
@@ -669,12 +601,12 @@ def main(argv=None):
     if not subrun_dirs(args.runid):
         sys.exit(f"[x]> no sub-runs found in {run_outdir(args.runid)}")
 
-    info_path = os.path.join(run_outdir(args.runid), f"{args.runid}.info")
+    info_path = f"{run_outdir(args.runid)}/{args.runid}.info"
     if os.path.exists(info_path):
         selected = run_info_tools(read_run_info(info_path))
         logger.info(f"[i]> run tools: {', '.join(map(display_name, selected)) if selected is not None else 'all'}")
 
-    outdir = args.outdir or os.path.join(EVAL_ROOT, args.runid)
+    outdir = args.outdir or f"{EVAL_ROOT}/{args.runid}"
     os.makedirs(outdir, exist_ok=True)
 
     pathogens = load_pathogen_truth(args.pathogens) if args.pathogens else None
@@ -684,22 +616,22 @@ def main(argv=None):
     s3 = evaluate_stage3(args.runid, amr_pairs, alias, args.min_reads) if amr_pairs is not None else None
 
     truth_df = truth_summary(pathogens, amr_pairs)
-    truth_df.to_csv(os.path.join(outdir, "truth_summary.csv"), index=False)
+    truth_df.to_csv(f"{outdir}/truth_summary.csv", index=False)
     if s2:
-        s2["overall"].to_csv(os.path.join(outdir, "stage2_overall.csv"), index=False)
-        s2["per_label"].to_csv(os.path.join(outdir, "stage2_per_species.csv"), index=False)
-        s2["presence"].to_csv(os.path.join(outdir, "stage2_presence.csv"), index=False)
+        s2["overall"].to_csv(f"{outdir}/stage2_overall.csv", index=False)
+        s2["per_label"].to_csv(f"{outdir}/stage2_per_species.csv", index=False)
+        s2["presence"].to_csv(f"{outdir}/stage2_presence.csv", index=False)
         for tool, conf in s2["confusions"].items():
-            conf.to_csv(os.path.join(outdir, f"stage2_confusion_{tool}.csv"))
+            conf.to_csv(f"{outdir}/stage2_confusion_{tool}.csv")
     if s3:
-        s3["overall"].to_csv(os.path.join(outdir, "stage3_overall.csv"), index=False)
-        s3["per_gene"].to_csv(os.path.join(outdir, "stage3_per_gene.csv"), index=False)
-        s3["descr"].to_csv(os.path.join(outdir, "stage3_descriptive.csv"), index=False)
+        s3["overall"].to_csv(f"{outdir}/stage3_overall.csv", index=False)
+        s3["per_gene"].to_csv(f"{outdir}/stage3_per_gene.csv", index=False)
+        s3["descr"].to_csv(f"{outdir}/stage3_descriptive.csv", index=False)
 
     meta = {"run": args.runid, "pathogen truth": args.pathogens or "-", "amr truth": args.amr or "-",
             "min_reads": args.min_reads,
             "generated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-    report = os.path.join(outdir, "report.html")
+    report = f"{outdir}/report.html"
     write_report(report, meta, truth_df, s2, s3)
 
     print_summary(s2, s3)

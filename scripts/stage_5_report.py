@@ -20,9 +20,9 @@ def all_report(runid, parent=None):
 
     # Consolidate the base directory logic
     output_dir = run_outdir(runid, parent)
-    LOG_FILE = os.path.join(output_dir, f"{runid}.log")
-    AMR_CSV_PATTERN = os.path.join(output_dir, "*.abricate.csv")
-    OUTPUT_HTML = os.path.join(output_dir, f"{runid}_final_report.html")
+    LOG_FILE = f"{output_dir}/{runid}.log"
+    AMR_CSV_PATTERN = f"{output_dir}/*.abricate.csv"
+    OUTPUT_HTML = f"{output_dir}/{runid}_final_report.html"
 
     # 1. Process the Log File (txt)
     try:
@@ -61,7 +61,7 @@ def all_report(runid, parent=None):
     pathogen_content = ""
     
     # FIX: Get all HTML files but EXCLUDE the output report itself to prevent infinite loops
-    all_html_files = glob.glob(os.path.join(output_dir, "*.html"))
+    all_html_files = glob.glob(f"{output_dir}/*.html")
     html_files = [f for f in all_html_files if os.path.abspath(f) != os.path.abspath(OUTPUT_HTML)]
     
     if not html_files:

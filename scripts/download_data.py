@@ -4,12 +4,12 @@ from config import DL_DIR, BASE_URL
 
 def fetch_tar(urlpath, dest):
     tarname = os.path.basename(urlpath)
-    tmp_dir = os.path.join(DL_DIR, "tmp")
+    tmp_dir = f"{DL_DIR}/tmp"
     os.makedirs(dest, exist_ok=True)
     os.makedirs(tmp_dir, exist_ok=True)
     
     subprocess.run(["wget", "-nc", "-P", tmp_dir, f"{BASE_URL}/{urlpath}"], check=True)
-    tar_path = os.path.join(tmp_dir, tarname)
+    tar_path = f"{tmp_dir}/{tarname}"
     subprocess.run(["tar", "xf", tar_path, "-C", dest], check=True)
     os.remove(tar_path)
 
@@ -31,6 +31,6 @@ if __name__ == "__main__":
     ]
     for url, desc in tools:
         print(f"=== {desc} ===")
-        fetch_tar(url, os.path.join(DL_DIR, "tools"))
+        fetch_tar(url, f"{DL_DIR}/tools")
         
     print("=== finished ===")

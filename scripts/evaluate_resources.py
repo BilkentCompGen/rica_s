@@ -1,23 +1,4 @@
-"""Time and memory usage per tool and per stage, recovered from the run logs.
-
-Two kinds of log are read under output/<DIR>/:
-
-  <DIR>.log              pipeline log (python logging, timestamped). Gives the
-                         wall-clock span of every stage and of every tool
-                         container ("[i]> tool ===" until the next log line).
-                         Several runs may be appended to one file, and while the
-                         web UI is up, a run can land in ANOTHER directory's log,
-                         so runs are attributed by their "run ID:" line, never by
-                         the file they were found in.
-  <DIR>_N/<DIR>_N.log    tool output. Every tool is wrapped in /usr/bin/time, which
-                         prints "T> <elapsed>" and "M> <max RSS> KB". Entries carry
-                         no tool name, so each one is labeled from the tool output
-                         that precedes it.
-
-Results go to evaluation/<DIR>/resources_* (existing files there are left alone),
-plus a cross-directory overview in evaluation/resources_overview/.
-
-Usage (from /opt/rica_s):
+"""Usage (from /opt/rica_s):
   python3 -m scripts.evaluate_resources [DIR ...]
 """
 
@@ -36,8 +17,8 @@ import pandas as pd
 from scripts.config import PROJECT_HOME, OUTPUT_ROOT
 from scripts.tool_registry import display_name
 
-EVAL_ROOT = os.path.join(PROJECT_HOME, "evaluation")
-OVERVIEW_DIR = os.path.join(EVAL_ROOT, "resources_overview")
+EVAL_ROOT = f"{PROJECT_HOME}/evaluation"
+OVERVIEW_DIR = f"{EVAL_ROOT}/resources_overview"
 
 STAGES = ["Basecalling", "Filtering", "Classification", "Profiling", "Plotting", "Reporting"]
 METADATA = "Metadata"
@@ -45,7 +26,6 @@ POST = "Post-run merge"
 OTHER = "Other overhead"
 IDLE = "Idle (no pipeline work)"
 
-# Reference categorical palette, fixed order, one slot per stage (never cycled).
 STAGE_COLORS = {
     "Basecalling": "#2a78d6",
     "Filtering": "#eb6834",
@@ -86,12 +66,7 @@ def fmt_gb(gb):
     return "n/a" if gb is None or pd.isna(gb) else f"{gb:.2f} GB"
 
 
-# --------------------------------------------------------------------------- #
-# Pipeline logs
-# --------------------------------------------------------------------------- #
-
 def read_pipeline_runs(log_paths):
-    """Every run found in the given pipeline logs, deduplicated."""
     runs = []
     for path in log_paths:
         block = None
@@ -106,7 +81,6 @@ def read_pipeline_runs(log_paths):
                     _store(runs, block)
                 if block is not None:
                     block["lines"].append((when, msg))
-    # The same run can be logged to more than one file by concurrent handlers.
     unique = {}
     for b in map(_summarize, runs):
         if b.get("run_id"):
@@ -148,8 +122,6 @@ def _summarize(block):
             tools.append({"container": ms.group(1), "stage": open_stage, "start": when, "end": None})
         mo = re.match(r"\[i\]> === (rica_s_\S+)$", msg)
         if mo and tools and tools[-1]["container"] == mo.group(1):
-            # The logger is silent while the container output is streamed, so the
-            # next line of any kind marks the moment the tool finished.
             tools[-1]["end"] = lines[i + 1][0] if i + 1 < len(lines) else None
 
     last = lines[-1][0]
@@ -166,7 +138,6 @@ def _summarize(block):
     else:
         end, post_end = last, None
 
-    # Gaps the log cannot explain: no stage, tool or metadata step was running.
     covered = [(st["start"], st["end"]) for st in stages.values()] + \
               [(m["start"], m["start"] + datetime.timedelta(seconds=m["time_s"])) for m in metadata]
     stop = end_i if end_i is not None else len(lines) - 1
@@ -174,9 +145,6 @@ def _summarize(block):
     for (a, msg), (b, _) in zip(lines[:stop], lines[1:stop + 1]):
         mid = a + (b - a) / 2
         if (b - a).total_seconds() > 30 and not any(s <= mid <= e for s, e in covered):
-            # main_run does nothing between the report and "End of sepsis detection",
-            # so a gap there is idle time; elsewhere it is work nobody logged (older
-            # versions computed FASTQ statistics after basecalling without a message).
             kind = "idle" if msg.endswith("End of reporting stage") else "unlogged"
             gaps.append({"after": msg, "start": a, "time_s": (b - a).total_seconds(), "kind": kind})
 
@@ -198,10 +166,6 @@ def _stage_name(word):
     return word.capitalize()
 
 
-# --------------------------------------------------------------------------- #
-# Tool logs (/usr/bin/time)
-# --------------------------------------------------------------------------- #
-
 def parse_elapsed(text):
     parts = [float(p) for p in text.split(":")]
     seconds = 0.0
@@ -211,7 +175,6 @@ def parse_elapsed(text):
 
 
 def label_chunk(chunk):
-    """(container, stage, sub-label) for the tool whose output is in chunk."""
     db = re.search(r"Using (?:nucl|prot) database (\S+):", chunk)
     if db:
         return "rica_s_pr_abricate", "Profiling", db.group(1)
@@ -233,14 +196,12 @@ def label_chunk(chunk):
         return "rica_s_id_minimap2", "Classification", None
     if "ngmlr" in chunk:
         return "rica_s_id_ngmlr", "Classification", None
-    # BLAST prints nothing of its own: an otherwise empty chunk is BLAST.
     return "rica_s_id_blast", "Classification", None
 
 
 def read_tool_measurements(path):
     with open(path, errors="replace") as fh:
         text = ANSI_RE.sub("", fh.read())
-    # One "RICA_S" banner per run; keep the last run that measured anything.
     segments = [s for s in text.split("RICA_S") if TIME_RE.search(s)]
     if not segments:
         return []
@@ -260,10 +221,6 @@ def read_tool_measurements(path):
     return rows
 
 
-# --------------------------------------------------------------------------- #
-# Per-directory tables
-# --------------------------------------------------------------------------- #
-
 def tool_label(container, stage):
     name = display_name(container)
     if container == "rica_s_bc_dorado":
@@ -274,12 +231,10 @@ def tool_label(container, stage):
 
 
 def pick_primary(runs):
-    """The run that actually executed the most tools; ties go to the latest."""
     return max(runs, key=lambda r: (len(r["tools"]), len(r["stages"]), r["begin"])) if runs else None
 
 
 def build_tables(run, measurements):
-    # Stage table from the pipeline log.
     stage_rows = []
     if run:
         for st, span in sorted(run["stages"].items(), key=lambda kv: kv[1]["start"]):
@@ -287,13 +242,11 @@ def build_tables(run, measurements):
                                "time_s": (span["end"] - span["start"]).total_seconds(),
                                "incomplete": span["incomplete"]})
     if run and run["metadata"]:
-        # Metadata extraction runs between stages; summed into one pseudo-stage.
         meta = run["metadata"]
         stage_rows.append({"stage": METADATA, "start": meta[0]["start"], "end": None,
                            "time_s": sum(m["time_s"] for m in meta), "incomplete": False})
     stages = pd.DataFrame(stage_rows, columns=["stage", "start", "end", "time_s", "incomplete"])
 
-    # Tool table: wall time from the pipeline log, /usr/bin/time from the tool log.
     wall = {}
     if run:
         for t in run["tools"]:
@@ -318,8 +271,6 @@ def build_tables(run, measurements):
         })
     tools = pd.DataFrame(tool_rows, columns=["stage", "tool", "container", "wall_s", "time_s",
                                              "peak_rss_gb", "exit_status", "timed_calls"])
-    # The pipeline log's wall time includes container start-up and the script's
-    # own pre/post-processing; /usr/bin/time covers only the wrapped command.
     tools["used_s"] = tools["wall_s"].where(tools["wall_s"].notna(), tools["time_s"])
 
     if not stages.empty:
@@ -327,7 +278,6 @@ def build_tables(run, measurements):
         stages["peak_rss_gb"] = stages["stage"].map(peak)
         stages["n_tools"] = stages["stage"].map(tools.groupby("stage").size()).fillna(0).astype(int)
     elif not tools.empty:
-        # No pipeline log for this run: derive stages from the timed tools alone.
         g = tools.groupby("stage", sort=False)
         stages = pd.DataFrame({"stage": list(g.groups), "start": None, "end": None,
                                "time_s": g["used_s"].sum().values, "incomplete": False,
@@ -338,10 +288,6 @@ def build_tables(run, measurements):
         columns={"sub": "database", "rss_gb": "peak_rss_gb", "exit": "exit_status"})
     return stages, tools, dbs
 
-
-# --------------------------------------------------------------------------- #
-# Plots
-# --------------------------------------------------------------------------- #
 
 def _style(ax):
     ax.set_facecolor(SURFACE)
@@ -391,17 +337,17 @@ def plot_dir(name, outdir, stages, tools, total_s):
         st = stages.assign(label=stages["stage"])
         sub = f"Total run time {fmt_s(total_s)}" if total_s else "Sum of timed tools (no pipeline log)"
         if hbar(st, "time_s", fmt_s, f"{name} - time per stage", sub, "wall-clock time (s)",
-                os.path.join(outdir, "resources_time_per_stage.png"), legend=False):
+                f"{outdir}/resources_time_per_stage.png", legend=False):
             made.append("resources_time_per_stage.png")
     if not tools.empty:
         tl = tools.assign(label=tools["tool"])
         if hbar(tl, "used_s", fmt_s, f"{name} - time per tool",
                 "Wall-clock time of each tool container (pipeline log; /usr/bin/time if absent)",
-                "time (s)", os.path.join(outdir, "resources_time_per_tool.png")):
+                "time (s)", f"{outdir}/resources_time_per_tool.png"):
             made.append("resources_time_per_tool.png")
         if hbar(tl, "peak_rss_gb", lambda v: f"{v:.2f} GB", f"{name} - peak memory per tool",
                 "Max resident set size of the largest process (/usr/bin/time %M); GPU memory not included",
-                "peak RSS (GB)", os.path.join(outdir, "resources_memory_per_tool.png")):
+                "peak RSS (GB)", f"{outdir}/resources_memory_per_tool.png"):
             made.append("resources_memory_per_tool.png")
     return made
 
@@ -411,9 +357,7 @@ def plot_overview(summary, path_time, path_mem):
     if df.empty:
         return []
     made = []
-    # Post-run merging happens after "End of sepsis detection", outside the total.
     stage_cols = [s for s in STAGES + [METADATA, OTHER, IDLE] if s in df.columns and df[s].fillna(0).sum() > 0]
-    # Runs that only re-plotted would add rows of ~45 s and nothing else.
     td = df[df["total_s"].notna() & (df["n_tools"] > 0)].sort_values("total_s")
     if not td.empty:
         fig, ax = plt.subplots(figsize=(10, 0.42 * len(td) + 2), facecolor=SURFACE)
@@ -444,10 +388,6 @@ def plot_overview(summary, path_time, path_mem):
         made.append(os.path.basename(path_mem))
     return made
 
-
-# --------------------------------------------------------------------------- #
-# Report
-# --------------------------------------------------------------------------- #
 
 def md_table(df, cols, headers):
     out = ["| " + " | ".join(headers) + " |", "|" + "|".join("---" for _ in headers) + "|"]
@@ -572,17 +512,15 @@ def write_report(name, outdir, logs, runs, run, stages, tools, dbs, plots, other
     return "\n".join(L)
 
 
-# --------------------------------------------------------------------------- #
-
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("dirs", nargs="*", help="output directories to report (default: all)")
     args = ap.parse_args(argv)
 
-    all_dirs = sorted(d for d in os.listdir(OUTPUT_ROOT) if os.path.isdir(os.path.join(OUTPUT_ROOT, d)))
+    all_dirs = sorted(d for d in os.listdir(OUTPUT_ROOT) if os.path.isdir(f"{OUTPUT_ROOT}/{d}"))
     dirs = args.dirs or all_dirs
 
-    pipeline_logs = sorted(glob.glob(os.path.join(OUTPUT_ROOT, "*", "*.log")))
+    pipeline_logs = sorted(glob.glob(f"{OUTPUT_ROOT}/*/*.log"))
     all_runs = read_pipeline_runs(pipeline_logs)
     by_dir = {}
     for r in all_runs:
@@ -590,15 +528,15 @@ def main(argv=None):
 
     summary_rows, all_tools = [], []
     for name in dirs:
-        base = os.path.join(OUTPUT_ROOT, name)
-        logs = sorted(glob.glob(os.path.join(base, "*.log")) + glob.glob(os.path.join(base, "*", "*.log")))
+        base = f"{OUTPUT_ROOT}/{name}"
+        logs = sorted(glob.glob(f"{base}/*.log") + glob.glob(f"{base}/*/*.log"))
         tool_logs = [p for p in logs if os.path.dirname(p) != base]
         runs = sorted(by_dir.get(name, []), key=lambda r: r["begin"])
         run = pick_primary(runs)
         measurements = [m for p in tool_logs for m in read_tool_measurements(p)]
         stages, tools, dbs = build_tables(run, measurements)
 
-        outdir = os.path.join(EVAL_ROOT, name)
+        outdir = f"{EVAL_ROOT}/{name}"
         os.makedirs(outdir, exist_ok=True)
         plots = plot_dir(name, outdir, stages, tools, run["total_s"] if run else None)
 
@@ -608,15 +546,15 @@ def main(argv=None):
         other_files = sorted({r["source"] for r in runs} - set(logs))
 
         if run_rows:
-            pd.DataFrame(run_rows).to_csv(os.path.join(outdir, "resources_runs.tsv"), sep="\t", index=False, float_format="%.3f")
+            pd.DataFrame(run_rows).to_csv(f"{outdir}/resources_runs.tsv", sep="\t", index=False, float_format="%.3f")
         if not stages.empty:
-            stages.to_csv(os.path.join(outdir, "resources_stages.tsv"), sep="\t", index=False, float_format="%.3f")
+            stages.to_csv(f"{outdir}/resources_stages.tsv", sep="\t", index=False, float_format="%.3f")
         if not tools.empty:
-            tools.to_csv(os.path.join(outdir, "resources_tools.tsv"), sep="\t", index=False, float_format="%.3f")
+            tools.to_csv(f"{outdir}/resources_tools.tsv", sep="\t", index=False, float_format="%.3f")
             all_tools.append(tools.assign(directory=name))
         if not dbs.empty:
-            dbs.to_csv(os.path.join(outdir, "resources_abricate_db.tsv"), sep="\t", index=False, float_format="%.3f")
-        with open(os.path.join(outdir, "resources_report.md"), "w") as fh:
+            dbs.to_csv(f"{outdir}/resources_abricate_db.tsv", sep="\t", index=False, float_format="%.3f")
+        with open(f"{outdir}/resources_report.md", "w") as fh:
             fh.write(write_report(name, outdir, logs, run_rows, run, stages, tools, dbs, plots, other_files))
 
         row = {"directory": name, "run_id": run["run_id"] if run else None,
@@ -643,11 +581,11 @@ def main(argv=None):
                [c for c in STAGES + [METADATA, POST, OTHER, IDLE] if any(c in r for r in summary_rows)] + \
                ["peak_rss_gb", "peak_tool", "peak_stage"]
         summary = pd.DataFrame(summary_rows).reindex(columns=cols)
-        summary.to_csv(os.path.join(OVERVIEW_DIR, "resources_summary.tsv"), sep="\t", index=False, float_format="%.3f")
+        summary.to_csv(f"{OVERVIEW_DIR}/resources_summary.tsv", sep="\t", index=False, float_format="%.3f")
         if all_tools:
-            pd.concat(all_tools).to_csv(os.path.join(OVERVIEW_DIR, "resources_tools_all.tsv"), sep="\t", index=False, float_format="%.3f")
-        made = plot_overview(summary, os.path.join(OVERVIEW_DIR, "resources_time_per_directory.png"),
-                             os.path.join(OVERVIEW_DIR, "resources_memory_per_directory.png"))
+            pd.concat(all_tools).to_csv(f"{OVERVIEW_DIR}/resources_tools_all.tsv", sep="\t", index=False, float_format="%.3f")
+        made = plot_overview(summary, f"{OVERVIEW_DIR}/resources_time_per_directory.png",
+                             f"{OVERVIEW_DIR}/resources_memory_per_directory.png")
         print("overview:", ", ".join(made))
     return 0
 

@@ -47,7 +47,6 @@ def parse_summary_file(filepath: Path):
 
 
 def read_status(run_dir: Path, unit_id: str):
-    """Raw status string for one run directory, or None when absent."""
     status_file = run_dir / f"{unit_id}.status"
     if status_file.exists():
         return status_file.read_text(encoding='utf-8').strip()
@@ -55,11 +54,6 @@ def read_status(run_dir: Path, unit_id: str):
 
 
 def read_log(run_dir: Path, unit_id: str):
-    """Log text for one run directory.
-
-    Logs are tool stdout, so a partially written multi-byte sequence in a live
-    log must not take the whole page down.
-    """
     log_file = run_dir / f"{unit_id}.log"
     if log_file.exists():
         return log_file.read_text(encoding='utf-8', errors='replace')
@@ -67,13 +61,6 @@ def read_log(run_dir: Path, unit_id: str):
 
 
 def run_units(runid: str):
-    """Directories holding artifacts for a run id, as ordered (unit_id, dir) pairs.
-
-    A nested run contributes its sub-runs. A flat run directory from before the
-    nesting change contributes itself, which is what the artifact probe detects.
-    Each directory is only ever globbed non-recursively, so a parent scan never
-    picks up a sub-run's files.
-    """
     base = Path(run_outdir(runid))
     if not base.is_dir():
         return []
@@ -88,16 +75,10 @@ def run_units(runid: str):
 
 
 def find_unit_dir(runid: str, unit_id: str):
-    """The directory of one run unit, or None when unit_id is not part of runid."""
     return dict(run_units(runid)).get(unit_id)
 
 
 def run_revision(runid: str):
-    """Cheap fingerprint of a run's artifacts, as "<file count>:<newest mtime>".
-
-    The report polls this so it can tell that a live run produced something new
-    without re-rendering and re-diffing the whole page on every tick.
-    """
     count = 0
     newest = 0.0
     for _unit_id, run_dir in run_units(runid):
@@ -109,15 +90,12 @@ def run_revision(runid: str):
 
 
 def run_status(runid: str):
-    """Roll the sub-run statuses of a run up into one of the four UI strings."""
     base = Path(run_outdir(runid))
     if not base.is_dir():
         return "no run ID"
 
     subs = subrun_dirs(runid)
     if not subs:
-        # Submitted but the listener has not created a sub-run directory yet.
-        # Reporting "no run ID" here would show a just-accepted run as an error.
         return read_status(base, runid) or (
             "started" if (base / f"{runid}.info").exists() else "no run ID")
 
@@ -128,9 +106,6 @@ def run_status(runid: str):
     if "killed" in statuses:
         return "killed"
 
-    # Sub-runs execute sequentially, so "every status found says finished" is
-    # true in the gap between one sub-run finishing and the next one starting.
-    # Compare against the pod5 count to avoid reporting a run done early.
     info = base / f"{runid}.info"
     try:
         expected = len(parse_run_info(info)[2]) if info.exists() else None
@@ -148,21 +123,12 @@ AMR_COLUMNS = [
     'RESISTANCE', 'DATABASE', 'ACCESSION', '#FILE', 'SEQUENCE'
 ]
 
-# These columns pack several values into one cell. The report renders each part
-# on its own line, so the separator is split here rather than substituted for
-# markup, which keeps the values escaped.
 AMR_SEPARATORS = {'RESISTANCE': ';', 'PRODUCT': ':'}
 
 
 def process_csv_data(output_dir: Path, id_prefix: str = "csvDataTable", label: str = None):
-    """AMR tables from one run unit, as rows for the report to render.
-
-    id_prefix keeps table ids unique across an aggregated report; DataTables
-    derives its wrapper element ids from the table id, so duplicates collide.
-    """
     tables = []
 
-    # Sorted: Path.glob yields directory order, which is not stable across requests.
     for index, file_path in enumerate(sorted(output_dir.glob("*.abricate.csv"))):
         table = {
             'filename': f"{label} / {file_path.name}" if label else file_path.name,
@@ -194,27 +160,16 @@ def process_csv_data(output_dir: Path, id_prefix: str = "csvDataTable", label: s
 
 
 def split_cell(value: str, separator: str = None):
-    """One cell as the list of lines it renders as."""
     return value.split(separator) if separator else [value]
 
 
 def process_pathogen_plots(runid: str, unit_id: str, output_dir: Path):
-    """Pathogen plots for one run unit, as an image URL plus the full-size page.
-
-    Each plot is written twice: a PNG, and a standalone page with the same
-    figure inlined as SVG. The report shows the PNG and links to the page,
-    which opens the chart at any zoom without the PNG's raster limits.
-    """
     plots = []
 
-    # The run's own final report is built from this page, so skip it to avoid
-    # nesting the report inside itself.
     for page in sorted(output_dir.glob("*.html")):
         if "final_report." in page.name:
             continue
 
-        # "<plot>.html" is always accompanied by "<plot>.png"; with_suffix keeps
-        # that pairing right even for names that already end in ".png".
         png = page.with_suffix(".png")
 
         plots.append({
@@ -229,19 +184,16 @@ def process_pathogen_plots(runid: str, unit_id: str, output_dir: Path):
 
 
 def host_root():
-    """The mount point the host filesystem is exposed under, normalized."""
     return os.path.normpath(c.get("HOST_ROOT", "/"))
 
 
 def to_real_path(display_path: str):
-    """Map a host path as shown in the UI onto the mounted copy in this container."""
     clean = os.path.normpath("/" + (display_path or "/").lstrip("/"))
     root = host_root()
     return clean if root == "/" else os.path.normpath(root + clean)
 
 
 def to_display_path(real_path: str):
-    """Strip the mount prefix so the UI shows the path as it exists on the host."""
     real_path = os.path.normpath(real_path)
     root = host_root()
 
@@ -309,11 +261,6 @@ def api_check_status():
 
 @app.route('/report/<runid>')
 def generate_report(runid):
-    """One page aggregating every sub-run of a run.
-
-    Sections are labelled with the sub-run they came from by prefixing the
-    strings the template already prints, so report.html needs no changes here.
-    """
     units = run_units(runid)
 
     summary_data = []
@@ -322,20 +269,16 @@ def generate_report(runid):
     log_parts = []
 
     for index, (unit_id, run_dir) in enumerate(units):
-        # 1. Summary sections, tagged with their sub-run
         for section in parse_summary_file(run_dir / f"{unit_id}.summary"):
             section['header'] = f"[{unit_id}] {section['header']}"
             section['subrun'] = unit_id
             summary_data.append(section)
 
-        # 2. AMR tables. The id prefix is per unit so DataTables ids stay unique.
         csv_data += process_csv_data(
             run_dir, id_prefix=f"csvDataTable_u{index}", label=unit_id)
 
-        # 3. Pathogen plots, as lazily fetched URLs
         pathogen_data += process_pathogen_plots(runid, unit_id, run_dir)
 
-        # 4. Log
         log_parts.append(f"===== sub-run {unit_id} =====\n"
                          + read_log(run_dir, unit_id))
 
@@ -355,12 +298,10 @@ def generate_report(runid):
 
 @app.route('/report/<runid>/plot/<unit_id>/<filename>')
 def get_run_plot(runid, unit_id, filename):
-    """Serves one plot image, or its interactive page, from a run unit."""
     run_dir = find_unit_dir(runid, unit_id)
     if run_dir is None:
         abort(404)
 
-    # Only ever serve a plot file from directly inside the unit directory.
     if filename != os.path.basename(filename) or not filename.endswith((".png", ".html")):
         abort(404)
     if "final_report." in filename:
@@ -379,14 +320,9 @@ def submitted_page():
     run_dir = Path(run_outdir(runid))
     info_path = run_dir / f"{runid}.info"
 
-    # Only trust the selection when the POST came from a form that actually has
-    # the tool section. A submission without the marker (an old cached page)
-    # must keep meaning "run everything", never "run nothing".
     tools_line = ""
     if request.form.get('tools_submitted') == '1':
         installed = set(all_tools())
-        # Intersected with what is installed before it is written: these names
-        # reach containers.get() and a script path join further down the line.
         selected = [t for t in request.form.getlist('tools') if t in installed]
         if not selected:
             groups, docker_ok = tool_groups()
@@ -399,15 +335,10 @@ def submitted_page():
     try:
         run_dir.mkdir(parents=True, exist_ok=True)
 
-        # This list decides how many sub-runs there are, so join it directly
-        # rather than scrubbing a repr of the list.
         pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
         logger.info(f"searching pod5s in {readpath}")
         logger.info(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
 
-        # Globbed before the file is opened, and written in one call: the
-        # listener starts the run as soon as .info is created, so it must never
-        # observe the file without its pod5 line.
         info_path.write_text(
             f"runid\t{runid}\n"
             f"readpath\t{readpath}\n"

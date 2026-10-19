@@ -1,5 +1,4 @@
 #! /usr/bin/python3
-
 import os
 import sys
 import datetime
@@ -124,21 +123,17 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
 
         if col_name in merged_df.columns and col_count in merged_df.columns:
             merged_df = merged_df.nlargest(50, col_count)
-            # 1. Format the Y-axis labels: species name italic, count bold
             merged_df['y_label'] = [
                 species_label(name, count) for name, count
                 in zip(merged_df[col_name], merged_df[col_count])]
 
             # 2. Sort the DataFrame so the largest values appear at the top
-            # Horizontal bars are drawn bottom to top, so we sort ascending
             merged_df = merged_df.sort_values(by=col_count, ascending=True)
 
-            # 3. Create the horizontal bar chart, at the 800x600 the previous
-            # layout pinned and the 3x scale it was exported at.
             fig = barh_figure(
                 merged_df['y_label'],
                 merged_df[col_count],
-                cmap=RICA_CMAP,   # dark purple -> blue -> dark red
+                cmap=RICA_CMAP,
                 figsize=(8, 6),
                 dpi=300,
                 ytick_size=13,
@@ -157,7 +152,7 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
         logger.exception("An error occurred while plotting the data.")
 
     from scripts.misc.histogram import plot_df
-    # hist_script = os.path.join(c["PROJECT_HOME"], "scripts", "misc", "histogram.py")
+    # hist_script = f"{c['PROJECT_HOME']}/scripts/misc/histogram.py"
     # subprocess.run(["python3", hist_script, file])
     plot_df(merged_df, output_image_path)
 
@@ -225,8 +220,6 @@ def start_run(run_info):
     
     fields = read_run_info(run_info)
     runid, inputfile_path, inputfile_names = run_info_tuple(fields)
-    # One selection for the whole run: it is a property of the run, not of the
-    # individual pod5. None means the .info predates the selector: run everything.
     tools = run_info_tools(fields)
 
     logging.basicConfig(
@@ -281,7 +274,7 @@ def start_run(run_info):
     logger.info(datetime.datetime.now())
 
     for i, f in enumerate(inputfile_names):
-        all_run(f"{runid}_{i}", os.path.join(inputfile_path, f), parent=runid,
+        all_run(f"{runid}_{i}", f"{inputfile_path}/{f}", parent=runid,
                 tools=tools)
 
     # load tsv of subruns of _id_ and merge in a pandas df
@@ -382,8 +375,7 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         # 0. Basecall
         logger.info(f"AllBasecall {runid} {inputfile}")
         all_basecall(runid, inputfile, parent)
-        inputfile_bc = os.path.join(
-            outdir, f"{os.path.basename(inputfile)}.fastq")
+        inputfile_bc = f"{outdir}/{os.path.basename(inputfile)}.fastq"
         # input("Continue? Press Enter.")
     except Exception as e:
         os.system("echo killed > "+statusfile)
@@ -473,8 +465,7 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
         # 1. Filter
         logger.info(f"AllFilter {runid} {inputfile_bc}")
         all_filter(runid, inputfile_bc, parent)
-        inputfile_cleaned = os.path.join(
-            outdir, f"{os.path.basename(inputfile_bc)}.cleaned.fasta")
+        inputfile_cleaned = f"{outdir}/{os.path.basename(inputfile_bc)}.cleaned.fasta"
         # input("Continue? Press Enter.")
     except Exception as e:
         os.system("echo killed > "+statusfile)
@@ -587,12 +578,9 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
             summarydata = {}
 
             # Locate all TSV files in the target directory
-            search_pattern = os.path.join(outdir, "*.tsv")
+            search_pattern = f"{outdir}/*.tsv"
             tsv_files = glob.glob(search_pattern)
 
-            # No TSVs is not a reason to abandon the run: profiling, plotting and
-            # reporting still have work to do, and bailing out here would leave the
-            # .status file stuck at "started" forever.
             if not tsv_files:
                 logger.info(f"No .tsv files found in directory: {outdir}")
             else:
