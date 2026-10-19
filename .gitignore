@@ -15,3 +15,8 @@ backup/
 
 
 spp.csv
+# local results, analyses and logs (not versioned)
+analysis/
+evaluation/
+_4later/
+flask_server.log

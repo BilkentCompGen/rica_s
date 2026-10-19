@@ -47,28 +47,6 @@ def start_services(path_to_watch=c["OUT_DIR"]):
 if __name__ == "__main__":
     print(f"[i]> rica_s starting ===\n")
 
-    print(f"[i]> === Starting containers")
-    try:
-
-        command = [
-            f"{c['PROJECT_HOME']}/builder/docker_control.sh", "restart"
-        ]
-
-        process = subprocess.Popen(
-            command,
-            cwd=f"{c['PROJECT_HOME']}/builder/",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
-        )
-        print(process.stdout.read())
-        process.wait()
-    except Exception as e:
-        print(f"An exception ocurred while starting the containers: {e}")
-        exit(-1)
-
-    print(f"[i]> Containers started ===")
 
     print(f"[i]> Awaiting jobs ===")
     start_services()

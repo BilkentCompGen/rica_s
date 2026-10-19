@@ -34,53 +34,6 @@ from concurrent.futures import ThreadPoolExecutor
 logger = logging.getLogger(__name__)
 
 
-def start_run(run_info):
-    logger.info("=======")
-    with open(run_info, "r") as f:
-        logger.info(f.read())
-    logger.info("=======")
-    
-    fields = read_run_info(run_info)
-    runid, inputfile_path, inputfile_names = run_info_tuple(fields)
-    # One selection for the whole run: it is a property of the run, not of the
-    # individual pod5. None means the .info predates the selector: run everything.
-    tools = run_info_tools(fields)
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - [%(name)s:%(lineno)d] - %(message)s",
-        handlers=[
-            logging.FileHandler(f"{c["OUT_DIR"]}/{runid}/{runid}.log"),
-            logging.StreamHandler()
-        ]
-    )
-
-
-    time.sleep(1)
-    if not runid or not inputfile_names:
-        logger.error(
-            f"[!]> unusable run info {run_info}: runid={runid!r}, files={inputfile_names}")
-        return
-
-    statusfile = f"{c["OUT_DIR"]}/{runid}/{runid}.status"
-    os.system("echo started > "+statusfile)
-
-    for i, f in enumerate(inputfile_names):
-        all_run(f"{runid}_{i}", os.path.join(inputfile_path, f), parent=runid,
-                tools=tools)
-
-    # load tsv of subruns of _id_ and merge in a pandas df
-    # add them in one df
-    # generate plot
-    merge_and_plot_subruns(runid, c["OUT_DIR"]+"/"+runid, c["OUT_DIR"]+"/"+runid+"/_bigfile.png")
-
-    # load tsv of subruns of _pr_
-    # add them in 1
-    # display
-
-    # Example usage:
-    merge_abricate_tsvs(runid, c["OUT_DIR"]+"/"+runid)
-
 
 ############################
 
@@ -213,6 +166,27 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
 
 
 
+def write_runinfo(readpath, runid, run_dir, info_path):
+
+    tools_line = "tools\trica_s_id_blast,rica_s_id_bwa,rica_s_id_clark,rica_s_id_cuclark,rica_s_id_kraken2,rica_s_id_minimap2,rica_s_id_ngmlr,rica_s_pr_abricate\n"
+
+    try:
+        run_dir.mkdir(parents=True, exist_ok=True)
+        pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
+        logger.info(f"searching pod5s in {readpath}")
+        logger.info(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
+        info_path.write_text(
+            f"runid\t{runid}\n"
+            f"readpath\t{readpath}\n"
+            f"pod5\t{','.join(pod5_filenames)}\n"
+            + tools_line
+        )
+        logger.info(f"Success: wrote {info_path}")
+
+    except Exception:
+        logger.info(f"CRITICAL ERROR: {e}.")
+    
+    return
 
 
 
@@ -237,6 +211,94 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
 
 
 
+
+
+
+
+
+
+def start_run(run_info):
+    logger.info("=======")
+    with open(run_info, "r") as f:
+        logger.info(f.read())
+    logger.info("=======")
+    
+    fields = read_run_info(run_info)
+    runid, inputfile_path, inputfile_names = run_info_tuple(fields)
+    # One selection for the whole run: it is a property of the run, not of the
+    # individual pod5. None means the .info predates the selector: run everything.
+    tools = run_info_tools(fields)
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - [%(name)s:%(lineno)d] - %(message)s",
+        handlers=[
+            logging.FileHandler(f"{c["OUT_DIR"]}/{runid}/{runid}.log"),
+            logging.StreamHandler()
+        ]
+    )
+
+
+    time.sleep(1)
+    if not runid or not inputfile_names:
+        logger.error(
+            f"[!]> unusable run info {run_info}: runid={runid!r}, files={inputfile_names}")
+        return
+
+    statusfile = f"{c["OUT_DIR"]}/{runid}/{runid}.status"
+    os.system("echo started > "+statusfile)
+
+
+
+
+
+
+    print(f"[i]> === Starting containers")
+    try:
+
+        command = [
+            f"{c['PROJECT_HOME']}/builder/docker_control.sh", "restart"
+        ]
+
+        process = subprocess.Popen(
+            command,
+            cwd=f"{c['PROJECT_HOME']}/builder/",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
+        print(process.stdout.read())
+        process.wait()
+    except Exception as e:
+        print(f"An exception ocurred while starting the containers: {e}")
+        exit(-1)
+
+    print(f"[i]> Containers started ===")
+
+
+    logger.info("[i]> Begin of sepsis detection")
+    logger.info(datetime.datetime.now())
+
+    for i, f in enumerate(inputfile_names):
+        all_run(f"{runid}_{i}", os.path.join(inputfile_path, f), parent=runid,
+                tools=tools)
+
+    # load tsv of subruns of _id_ and merge in a pandas df
+    # add them in one df
+    # generate plot
+    merge_and_plot_subruns(runid, c["OUT_DIR"]+"/"+runid, c["OUT_DIR"]+"/"+runid+"/_bigfile.png")
+
+    # load tsv of subruns of _pr_
+    # add them in 1
+    # display
+
+    # Example usage:
+    merge_abricate_tsvs(runid, c["OUT_DIR"]+"/"+runid)
+    
+    
+    logger.info(datetime.datetime.now())
+    logger.info("[i]> End of sepsis detection")
 
 
 
@@ -250,8 +312,7 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 
     try:
 
-        logger.info("[i]> Begin of sepsis detection")
-        logger.info(datetime.datetime.now())
+
 
         inputfile = os.path.realpath(inputfile_raw)
         outdir = run_outdir(runid, parent)
@@ -499,7 +560,7 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 ##############################################################################
 ##############################################################################
 
-    if inputfile_raw == "dummy.pod5":
+    if "dummy.pod5" in inputfile_raw:
         inputfile_cleaned = os.path.dirname(inputfile_raw) + "/" + runid[0:-2] + ".fasta"
     
     try:
@@ -621,8 +682,7 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 ##############################################################################
 ##############################################################################
     try:
-        logger.info(datetime.datetime.now())
-        logger.info("[i]> End of sepsis detection")
+
         os.system("echo finished > "+statusfile)
     except Exception as e:
         os.system("echo killed > "+statusfile)
@@ -674,160 +734,14 @@ def all_run(runid, inputfile_raw, parent=None, tools=None):
 
 
 
-def write_runinfo(readpath, runid, run_dir, info_path):
+############################################################################
+############################################################################
+############################################################################
 
-    tools_line = "tools\trica_s_id_blast,rica_s_id_bwa,rica_s_id_clark,rica_s_id_cuclark,rica_s_id_kraken2,rica_s_id_minimap2,rica_s_id_ngmlr,rica_s_pr_abricate\n"
-
-    try:
-        run_dir.mkdir(parents=True, exist_ok=True)
-        pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
-        logger.info(f"searching pod5s in {readpath}")
-        logger.info(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
-        info_path.write_text(
-            f"runid\t{runid}\n"
-            f"readpath\t{readpath}\n"
-            f"pod5\t{','.join(pod5_filenames)}\n"
-            + tools_line
-        )
-        logger.info(f"Success: wrote {info_path}")
-
-    except Exception:
-        logger.info(f"CRITICAL ERROR: {e}.")
-    
-    return
-
-##################################################
-# tests:
-
-
-def write_runinfo(readpath, runid, run_dir, info_path):
-
-    tools_line = "tools\trica_s_id_blast,rica_s_id_bwa,rica_s_id_clark,rica_s_id_cuclark,rica_s_id_kraken2,rica_s_id_minimap2,rica_s_id_ngmlr,rica_s_pr_abricate\n"
-
-    try:
-        run_dir.mkdir(parents=True, exist_ok=True)
-        pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
-        logger.info(f"searching pod5s in {readpath}")
-        logger.info(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
-        info_path.write_text(
-            f"runid\t{runid}\n"
-            f"readpath\t{readpath}\n"
-            f"pod5\t{','.join(pod5_filenames)}\n"
-            + tools_line
-        )
-        logger.info(f"Success: wrote {info_path}")
-
-    except Exception:
-        logger.info(f"CRITICAL ERROR: {e}.")
-    
-    return
-
-def run_test(rp, ri, rd, ip):
-    write_runinfo(rp, ri, rd, ip)
-    # input("ready.")
-
-    logger.info(f"[i]> === Starting containers")
-    try:
-
-        command = [
-            f"{c['PROJECT_HOME']}/builder/docker_control.sh", "restart"
-        ]
-
-        process = subprocess.Popen(
-            command,
-            cwd=f"{c['PROJECT_HOME']}/builder/",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
-        )
-        logger.info(process.stdout.read())
-        process.wait()
-    except Exception as e:
-        logger.info(f"An exception ocurred while starting the containers: {e}")
-        exit(-1)
-
-    logger.info(f"[i]> Containers started ===")
-    sleep(1)
-    start_run(ip)
-
-
-
-###################
 if __name__ == "__main__":
-    if sys.argv[1] == "one_run":
+    
 
-
-        rps=[
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.001A_1H/", #done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.010A_2H/", #done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.001A_2H/", #done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.010A_1H/", #done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.001A_2H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.100A_2H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.010A_2H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.100A_1H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.100A_2H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.010A_1H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.100A_1H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.001A_1H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.010A_2H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.100A_1H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.001A_1H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.010A_1H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.001A_2H/",#done
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.001A_4H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.010A_4H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/05B_0.100A_4H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.001A_4H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.010A_4H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.100A_2H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/10B_0.100A_4H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.001A_4H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.010A_2H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.010A_4H",
-            # "/opt/rica_s/input/donut/ricardo/opt/Icarust_docker/output/pod5/15B_0.100A_4H"
-        ]
-
-
-        ris=[
-            # "05B_0.001A_1H",#done
-            # "15B_0.010A_2H",#done
-            # "15B_0.001A_2H",#done
-            # "05B_0.010A_1H",#done
-            # "10B_0.001A_2H",#done
-            # "15B_0.100A_2H",#done
-            # "10B_0.010A_2H",#done
-            # "05B_0.100A_1H",#done
-            # "05B_0.100A_2H",#done
-            # "10B_0.010A_1H",#done
-            # "15B_0.100A_1H",#done
-            # "10B_0.001A_1H",#done
-            # "05B_0.010A_2H",#done
-            # "10B_0.100A_1H",#done
-            # "15B_0.001A_1H",#done
-            # "15B_0.010A_1H",#done
-            # "05B_0.001A_2H",#done
-            # "05B_0.001A_4H",
-            # "05B_0.010A_4H",
-            # "05B_0.100A_4H",
-            # "10B_0.001A_4H",
-            # "10B_0.010A_4H",
-            # "10B_0.100A_2H",
-            # "10B_0.100A_4H",
-            # "15B_0.001A_4H",
-            # "15B_0.010A_2H",
-            # "15B_0.010A_4H",
-            # "15B_0.100A_4H",
-        ]
-        for i in range(len(rps)):
-            rp = rps[i]
-            ri = ris[i]
-            rd = Path(run_outdir(ri))
-            ip = rd / f"{ri}.info"
-            run_test(rp, ri, rd, ip)
-
-    elif sys.argv[1] == "do_main_run":
+    if sys.argv[1] == "do_main_run":
         # basepath=Path(sys.argv[2])
         # run_infos = list(basepath.rglob("*.info"))
         infos = [
@@ -838,18 +752,36 @@ if __name__ == "__main__":
             "/opt/rica_s/output/expr2_15B_0.100A_4H_1G/expr2_15B_0.100A_4H_1G.info",
             "/opt/rica_s/output/expr2_15B_0.100A_4H_3G/expr2_15B_0.100A_4H_3G.info"
         ]
+
+
+        l1 = [
+            # "/opt/rica_s/output/05B_0.001A_1H/05B_0.001A_1H.info",
+            # "/opt/rica_s/output/05B_0.010A_1H/05B_0.010A_1H.info",
+            # "/opt/rica_s/output/05B_0.100A_1H/05B_0.100A_1H.info", 
+            # "/opt/rica_s/output/10B_0.001A_1H/10B_0.001A_1H.info",
+            # "/opt/rica_s/output/10B_0.010A_1H/10B_0.010A_1H.info",
+            # "/opt/rica_s/output/10B_0.100A_1H/10B_0.100A_1H.info",
+            # "/opt/rica_s/output/15B_0.001A_1H/15B_0.001A_1H.info",
+            # "/opt/rica_s/output/15B_0.010A_1H/15B_0.010A_1H.info",
+            # "/opt/rica_s/output/15B_0.100A_1H/15B_0.100A_1H.info",
+            
+
+            "/opt/rica_s/output/05B_0.001A_2H/05B_0.001A_2H.info",
+            "/opt/rica_s/output/05B_0.010A_2H/05B_0.010A_2H.info",
+            "/opt/rica_s/output/05B_0.100A_2H/05B_0.100A_2H.info", 
+            "/opt/rica_s/output/10B_0.001A_2H/10B_0.001A_2H.info",
+            "/opt/rica_s/output/10B_0.010A_2H/10B_0.010A_2H.info",
+            "/opt/rica_s/output/10B_0.100A_2H/10B_0.100A_2H.info",
+            "/opt/rica_s/output/15B_0.001A_2H/15B_0.001A_2H.info",
+            "/opt/rica_s/output/15B_0.010A_2H/15B_0.010A_2H.info",
+            "/opt/rica_s/output/15B_0.100A_2H/15B_0.100A_2H.info"
+        ]
+
+
         print("starting batch runs")
-        print(infos)
-        for info in infos:
+        print(l1)
+        for info in l1:
             start_run(info)
         print("finished batch runs")
 
-        # start_run("/opt/rica_s/output/05B_0.001A_2H/05B_0.001A_2H.info")
-
-    # elif sys.argv[1] == "expr2":
-    #     all_run(sys.argv[2], sys.argv[3],sys.argv[2],tools=)
-
-
-        
-        
         
