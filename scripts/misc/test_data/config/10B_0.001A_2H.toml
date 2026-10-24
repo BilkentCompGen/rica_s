@@ -1,0 +1,22 @@
+output_path = "/output"
+random_seed = 42
+
+target_yield = 100000000000
+
+pore_type = "R10"
+nucleotide_type = "DNA"
+
+[parameters]
+sample_name = "10B_0.001A_2H"
+experiment_name = "10B_0.001A_2H"
+flowcell_name = "fc"
+device_id = "ir"
+position = "po"
+sample_rate = 4000
+experiment_duration_set = 120
+
+[[sample]]
+name = "10B_0.001A_2H"
+input_genome = "/input/10B_0.001A.fasta"
+mean_read_length = 3000
+weight = 1

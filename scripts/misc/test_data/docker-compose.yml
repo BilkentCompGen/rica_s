@@ -1,0 +1,18 @@
+services:
+  icarust:
+    image: adoni5/icarust:latest
+    init: true
+    entrypoint: ["icarust", "-c", "/config/config.ini"]
+    build:
+      dockerfile: ./Dockerfile
+    environment:
+      - RUST_BACKTRACE=0
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+    volumes:
+      - ./config:/config
+      - ./output/:/output
+      - ./input/:/input
+
+

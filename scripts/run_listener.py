@@ -2,6 +2,7 @@
 from flask import Flask
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+import os
 import sys
 import threading
 import waitress
@@ -13,8 +14,19 @@ import logging
 import subprocess
 
 class NewFileHandler(FileSystemEventHandler):
+    def __init__(self):
+        super().__init__()
+        # watchdog can report a file in a freshly created dir twice
+        # (real inotify event + simulated one), so remember what ran
+        self.started = set()
+
     def on_created(self, event):
-        if not event.is_directory and '.info' in event.src_path:
+        if not event.is_directory and event.src_path.endswith('.info'):
+            path = os.path.realpath(event.src_path)
+            if path in self.started:
+                print(f"[i]> Ignoring duplicate event for {path}")
+                return
+            self.started.add(path)
             print(f"[i]> New file detected: {event.src_path}")
             print(f"[i]> === Starting run at {event.src_path}")
             mr.start_run(event.src_path)
