@@ -343,9 +343,3 @@ It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders
 - **Permission errors writing `output/`** — ensure the host `/opt/rica_s` is writable by your user, since it's bind‑mounted read‑write into the containers.
 - **Web UI can't reach Docker** — `orch.py`/`start.py` connect to the Docker daemon over TCP; adjust the socket/URL and the orchestrator's hardcoded paths to match your environment.
 -->
-## Authors and acknowledgements 
-
-
-Developed by **Ricardo Roman‑Brenes** (Bilkent University, Alkan Lab).
-
-The pipeline builds on excellent open‑source tools: **minimap2**, **kraken2**, **krakenuniq**, **BLAST**, **BWA**, **NGMLR**, **CLARK / CU‑CLARK**, **ganon**, **ABRicate** (and its bundled databases: ResFinder, CARD, NCBI AMRFinder, VFDB, MEGARes, ARG‑ANNOT, PlasmidFinder, and others), and the **PBSIM3** / **TKSM** long‑read simulators.
