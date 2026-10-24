@@ -2,7 +2,7 @@
 16s/
 amr/
 datasets/
-output/
+output/*/
 reads/
 reference_genomes/
 tools/
@@ -21,6 +21,10 @@ docs/
 
 # compiled python files
 *.pyc
-
-
+*.tar
+*.fasta
+*.pod5
+*.fastq
+*.mmi
+*.fa
 spp.csv
