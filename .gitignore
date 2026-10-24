@@ -9,6 +9,8 @@ tools/
 input/
 tmp/
 backup/
+.vscode/
+
 # local results, analyses and logs (not versioned)
 analysis/
 evaluation/
