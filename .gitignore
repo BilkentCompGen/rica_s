@@ -9,14 +9,18 @@ tools/
 input/
 tmp/
 backup/
+# local results, analyses and logs (not versioned)
+analysis/
+evaluation/
+_4later/
+flask_server.log
+docs/
+
+
+
 
 # compiled python files
 *.pyc
 
 
 spp.csv
-# local results, analyses and logs (not versioned)
-analysis/
-evaluation/
-_4later/
-flask_server.log

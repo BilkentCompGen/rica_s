@@ -15,8 +15,9 @@ def fetch_tar(urlpath, dest):
 
 if __name__ == "__main__":
     print("=== downloading data ===")
-    print("=== datasets ===")
-    fetch_tar("datasets.tar", DL_DIR)
+    print("=== test data ===")
+    fetch_tar("test_data.tar", f"{DL_DIR}/scripts/misc/test_data/input")
+    
     
     print("=== db/index ===")
     tools = [
@@ -29,6 +30,8 @@ if __name__ == "__main__":
         ("tools/rica_s_id_clark.tar", "clark"),
         ("tools/rica_s_id_cuclark.tar", "cuclark")
     ]
+
+
     for url, desc in tools:
         print(f"=== {desc} ===")
         fetch_tar(url, f"{DL_DIR}/tools")
