@@ -98,8 +98,7 @@ Each stage appends its stdout/stderr to a per‑sub‑run log at `output/<runid>
   - Docker-compose v2
   - NVIDIA Container Toolkit (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 - Python 3
-  - Pandas
-  - matplotlib
+  - the packages in `requirements.txt` (`pip install -r requirements.txt`)
 
 
 <!--
@@ -124,18 +123,20 @@ The containers mount the project at `/opt/rica_s`, so cloning there keeps host a
    If you must clone elsewhere, either symlink it to `/opt/rica_s` or change every mention of `/opt/rica_s` to your custom path.
 
 2. **Download reference data and databases** 
-These populate the git‑ignored `datasets/` and `tools/` directories. Other data is available if needed. It can be downloaded from: `http://donut.cs.bilkent.edu.tr/rica_s/` or by modifying the `data` and `tools` variables of `DownloadData.sh`
+Each item is a `.tar` fetched once (`wget -nc`) from `http://donut.cs.bilkent.edu.tr/rica_s/` and extracted in place: the test data goes to `scripts/misc/test_data/input/` and each tool's database/index goes to `tools/rica_s_<stage>_<tool>/` (git‑ignored). Other data is available on the same server; to fetch more or fewer tools, edit the `tools` list in `scripts/download_data.py`.
 
    ```bash
-   $ scripts/DownloadData.sh
+   $ python3 scripts/download_data.py
    ```
 
-3. **Start the docker comtainers:**
+3. **Build and start the docker containers:**
 
    ```bash
-   $ cd /opt/rica_s/builder
-   $ ./start_all.sh
+   $ builder/docker_control.sh create    # first time: build images, create and start containers
+   $ builder/docker_control.sh start     # later: start the existing containers
    ```
+
+   `docker_control.sh` also accepts `stop`, `restart`, `remove`, `status` and `logs`.
 
 4. **Confirm the containers are running:**
 
@@ -214,12 +215,32 @@ Every classifier reads its reference/DB from `tools/rica_s_id_<tool>/` — there
 -->
 ## Running the pipeline
 
-Each stage driver takes a **run id** and an **absolute path to the input reads** (the path must resolve inside the containers, i.e. under `/opt/rica_s/...`). Run the three stages in order.
+Start the service from the project root. It serves the web UI on port 5000 and watches `output/` for new runs:
 
 ```bash
 $ cd /opt/rica_s
-$ scripts/AllRun.sh <runid> </path/to/input/data.fasta>
+$ python3 -m scripts.run_listener
 ```
+
+Open `http://localhost:5000`, choose the folder that holds the `.pod5` files (it must be under `/opt/rica_s/...` so the containers can see it), enter a **run id**, select the classification and profiling tools, and submit. The UI writes the manifest `output/<runid>/<runid>.info`; the listener picks it up and runs the stages in order: basecalling → human‑read filtering → classification → profiling → plotting → reporting (`scripts/stage_0_basecall.py` … `scripts/stage_5_report.py`). Progress is shown at `/status`, and the report at `/report/<runid>`.
+
+A run can also be started without the UI by writing the manifest yourself while the listener is running (tab‑separated; the `tools` line is optional and defaults to every installed tool):
+
+```
+runid	<runid>
+readpath	/opt/rica_s/<path/to/pod5/folder>
+pod5	<file1>.pod5,<file2>.pod5
+tools	rica_s_id_kraken2,rica_s_id_minimap2,rica_s_pr_abricate
+```
+
+### Evaluation
+
+```bash
+$ python3 -m scripts.evaluate_run <runid> --pathogens P.tsv --amr A.tsv --outdir evaluation/<runid>   # accuracy vs. ground truth
+$ scripts/misc/run_resources.sh [output/<runid> ...]                                                  # time and memory per stage/tool
+```
+
+`scripts/misc/pathogens_truth.example.tsv` and `scripts/misc/amr_truth.example.tsv` show the expected ground‑truth formats. Results are written under `evaluation/`. `python3 -m scripts.run_experiments [RUNID ...]` reruns the batch of runs listed in `scripts/main_run.py` and evaluates each of them.
 
 <!--
 ## Stage and tool reference
@@ -307,10 +328,10 @@ It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders
 
 ## Notes and conventions
 
-- **Naming.** Services, script directories, and containers all follow `rica_s_<stage>_<tool>`. The stage drivers discover work by globbing `rica_s_id_*` / `rica_s_pr_*`, so adding a new tool is as simple as adding its compose file, a script directory with a `classify.sh`/`profile.sh`, and bringing the container up.
+- **Naming.** Services, script directories, and containers all follow `rica_s_<stage>_<tool>`. `scripts/tool_registry.py` discovers tools by listing the `scripts/rica_s_id_*` / `scripts/rica_s_pr_*` directories, so adding a new tool is as simple as adding its compose file, a script directory with a `classify.sh`/`profile.sh`, and bringing the container up (optionally, give it a display name in `DISPLAY_NAMES`).
 - **Paths.** Inside containers the project is always `/opt/rica_s`; input read paths passed to the drivers must be absolute and container‑visible.
 - **Compose structure.** `builder/rica_s-compose.yml` doesn't define services inline — it `extends` each per‑service file under `builder/<stage>/`. Images are pulled from `alkanlab/*` on Docker Hub; the `build.dockerfile_inline` blocks add common CLI tools (`samtools`, `seqtk`, `seqkit`, …) on top.
-- **Git‑ignored data.** `16s/`, `amr/`, `datasets/`, `output/`, `reads/`, `reference_genomes/`, and `tools/` are excluded from version control (see `.gitignore`). They're populated by the download step and by pipeline runs.
+- **Git‑ignored data.** `tools/`, `input/`, `output/`, `evaluation/`, `datasets/`, `reference_genomes/` and the downloaded test data are excluded from version control (see `.gitignore`). They're populated by the download step, pipeline runs, and evaluation.
 - **Reproducibility.** Every classifier wraps its main command in `/usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB"`, so per‑run resource usage (wall time, peak memory) is captured in the log for benchmarking.
 - **Not for clinical use.** This is a research pipeline. Identifications and treatment mappings are for investigation and benchmarking, not diagnosis.
 <!-- 
