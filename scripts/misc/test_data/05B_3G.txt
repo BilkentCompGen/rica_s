@@ -1,8 +1,8 @@
-/opt/rica_s/datasets/_1/amr_dfrA5.fasta	0.01
-/opt/rica_s/reference_genomes/split/Acinetobacter_baumannii.fasta	20
-/opt/rica_s/reference_genomes/split/Capnocytophaga_canimorsus.fasta	20
-/opt/rica_s/reference_genomes/split/Klebsiella_pneumoniae.fasta	20
-/opt/rica_s/reference_genomes/split/Escherichia_coli.fasta	19.97
-/opt/rica_s/datasets/_1/amr_floR2.fasta	0.01
-/opt/rica_s/datasets/_1/amr_EreA.fasta	0.01
-/opt/rica_s/reference_genomes/split/Pseudomonas_aeruginosa.fasta	20
+input/amr_dfrA5.fasta	0.01
+input/Acinetobacter_baumannii.fasta	20
+input/Capnocytophaga_canimorsus.fasta	20
+input/Klebsiella_pneumoniae.fasta	20
+input/Escherichia_coli.fasta	19.97
+input/amr_floR2.fasta	0.01
+input/amr_EreA.fasta	0.01
+input/Pseudomonas_aeruginosa.fasta	20
