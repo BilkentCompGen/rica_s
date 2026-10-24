@@ -13,11 +13,11 @@ import subprocess
 import logging
 import subprocess
 
+
 class NewFileHandler(FileSystemEventHandler):
     def __init__(self):
         super().__init__()
-        # watchdog can report a file in a freshly created dir twice
-        # (real inotify event + simulated one), so remember what ran
+
         self.started = set()
 
     def on_created(self, event):
@@ -44,6 +44,7 @@ def start_services(path_to_watch=c["OUT_DIR"]):
 
     try:
         print("[i]> Starting Flask in the main thread")
+        print("[i]> go to: http://localhost:5000")
         ui.start_web_ui()
 
     except Exception as e:
@@ -59,8 +60,7 @@ def start_services(path_to_watch=c["OUT_DIR"]):
 if __name__ == "__main__":
     print(f"[i]> rica_s starting ===\n")
 
-
     print(f"[i]> Awaiting jobs ===")
     start_services()
-    
+
     print(f"[i]> rica_s stopped ===")

@@ -98,7 +98,7 @@ Each stage appends its stdout/stderr to a per‑sub‑run log at `output/<runid>
   - Docker-compose v2
   - NVIDIA Container Toolkit (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 - Python 3
-  - the packages in `requirements.txt` (`pip install -r requirements.txt`)
+  - the packages in `requirements.txt` (installed by `init.sh`, see [Installation](#installation))
 
 
 <!--
@@ -122,21 +122,21 @@ The containers mount the project at `/opt/rica_s`, so cloning there keeps host a
    ```
    If you must clone elsewhere, either symlink it to `/opt/rica_s` or change every mention of `/opt/rica_s` to your custom path.
 
-2. **Download reference data and databases** 
+2. **Run `init.sh` (once, before running anything else).**
+It installs the Python packages in `requirements.txt` and builds the images, then creates and starts the docker containers (`builder/docker_control.sh create`). It asks for confirmation first; press Enter to continue or Ctrl+C to cancel.
+
+   ```bash
+   $ ./init.sh
+   ```
+
+   Run it only once. Later, manage the existing containers with `builder/docker_control.sh`, which accepts `start`, `stop`, `restart`, `remove`, `status` and `logs` (e.g. `builder/docker_control.sh start` after a reboot).
+
+3. **Download reference data and databases** 
 Each item is a `.tar` fetched once (`wget -nc`) from `http://donut.cs.bilkent.edu.tr/rica_s/` and extracted in place: the test data goes to `scripts/misc/test_data/input/` and each tool's database/index goes to `tools/rica_s_<stage>_<tool>/` (git‑ignored). Other data is available on the same server; to fetch more or fewer tools, edit the `tools` list in `scripts/download_data.py`.
 
    ```bash
    $ python3 scripts/download_data.py
    ```
-
-3. **Build and start the docker containers:**
-
-   ```bash
-   $ builder/docker_control.sh create    # first time: build images, create and start containers
-   $ builder/docker_control.sh start     # later: start the existing containers
-   ```
-
-   `docker_control.sh` also accepts `stop`, `restart`, `remove`, `status` and `logs`.
 
 4. **Confirm the containers are running:**
 
@@ -215,11 +215,11 @@ Every classifier reads its reference/DB from `tools/rica_s_id_<tool>/` — there
 -->
 ## Running the pipeline
 
-Start the service from the project root. It serves the web UI on port 5000 and watches `output/` for new runs:
+Make sure `init.sh` has been run once (see [Installation](#installation)), then start the system from the project root with `start.sh`. It serves the web UI on port 5000 and watches `output/` for new runs:
 
 ```bash
 $ cd /opt/rica_s
-$ python3 -m scripts.run_listener
+$ ./start.sh
 ```
 
 Open `http://localhost:5000`, choose the folder that holds the `.pod5` files (it must be under `/opt/rica_s/...` so the containers can see it), enter a **run id**, select the classification and profiling tools, and submit. The UI writes the manifest `output/<runid>/<runid>.info`; the listener picks it up and runs the stages in order: basecalling → human‑read filtering → classification → profiling → plotting → reporting (`scripts/stage_0_basecall.py` … `scripts/stage_5_report.py`). Progress is shown at `/status`, and the report at `/report/<runid>`.

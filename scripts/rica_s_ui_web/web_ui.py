@@ -337,7 +337,8 @@ def submitted_page():
 
         pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
         logger.info(f"searching pod5s in {readpath}")
-        logger.info(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
+        logger.info(
+            f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
 
         info_path.write_text(
             f"runid\t{runid}\n"
@@ -348,7 +349,8 @@ def submitted_page():
         print(f"Success: wrote {info_path}")
 
     except PermissionError:
-        logger.info(f"CRITICAL ERROR: Permission denied. Cannot write to {run_dir}.")
+        logger.info(
+            f"CRITICAL ERROR: Permission denied. Cannot write to {run_dir}.")
     except OSError as e:
         logger.info(f"CRITICAL ERROR: An OS error occurred: {e}")
 
