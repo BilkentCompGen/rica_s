@@ -7,8 +7,8 @@ services:
 
     hostname: rica_s_pr_l-easyarg
 
-    # image: alkanlab/rica_s_pr_l-easyarg:v1
-    image: ubuntu:stonking
+    # image: ubuntu:stonking
+    image: alkanlab/rica_s_pr_l-easyarg:v1.0
     working_dir: /
 
     ipc: private

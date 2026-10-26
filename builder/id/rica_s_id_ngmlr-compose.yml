@@ -4,7 +4,7 @@ services:
     entrypoint:
       - /bin/bash
     hostname: rica_s_id_ngmlr
-    image: alkanlab/rica_s_id_ngmlr:v1.2
+    image: alkanlab/rica_s_id_ngmlr:v1.3
     working_dir: /
 
     ipc: private

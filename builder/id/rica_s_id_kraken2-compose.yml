@@ -7,7 +7,7 @@ services:
 
     hostname: rica_s_id_kraken2
 
-    image: alkanlab/rica_s_id_kraken2:v1.2
+    image: alkanlab/rica_s_id_kraken2:v1.3
     working_dir: /
 
     ipc: private
