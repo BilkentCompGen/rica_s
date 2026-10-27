@@ -130,21 +130,21 @@
             {% if group.tools %}
             <ul class="tool-list">
                 {% for tool in group.tools %}
-                <li class="tool-item{% if not tool.running %} is-off{% endif %}">
+                <li class="tool-item{% if not tool.available %} is-off{% endif %}">
                     <label for="tool_{{ tool.name }}">
                         <input type="checkbox" id="tool_{{ tool.name }}" name="tools"
                             value="{{ tool.name }}"
-                            {% if tool.running %}checked{% else %}disabled{% endif %}>
+                            {% if tool.available %}checked{% else %}disabled{% endif %}>
                         <span class="tool-name">{{ tool.display }}</span>
-                        {% if not tool.running %}
-                        <span class="tool-state">not running</span>
+                        {% if not tool.available %}
+                        <span class="tool-state">{{ tool.state }}</span>
                         {% endif %}
                     </label>
                 </li>
                 {% endfor %}
             </ul>
             {% else %}
-            <p class="tool-note">No tools installed.</p>
+            <p class="tool-note">No containers found.</p>
             {% endif %}
         </fieldset>
         {% endfor %}
