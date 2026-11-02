@@ -4,14 +4,16 @@ inputfile="$1"
 outputfile=$(basename $inputfile)
 outdir="$2"
 
-clarkdb=/opt/rica_s/tools/rica_s_id_clark
+# project root: passed in by the stage driver (config.py), else derived from this script's location
+RICA_S_HOME="${RICA_S_HOME:-$(cd "$(dirname "$0")/../.." && pwd)}"
+clarkdb=$RICA_S_HOME/tools/rica_s_id_clark
 
 
 
 
 set_targets.sh $clarkdb custom 
 /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" classify_metagenome.sh -O $inputfile -R $outdir/$outputfile.clark.csv -n 8 -m 0 --long
-#/opt/CLARK/exe/CLARK -T /opt/rica_s/tools/rica_s_id_clark/targets.txt -D /opt/rica_s/tools/rica_s_id_clark/custom_0/ -O /opt/rica_s/input/pathogens_25.fasta -R ./caca -m 0 --long
+#/opt/CLARK/exe/CLARK -T $RICA_S_HOME/tools/rica_s_id_clark/targets.txt -D $RICA_S_HOME/tools/rica_s_id_clark/custom_0/ -O $RICA_S_HOME/input/pathogens_25.fasta -R ./caca -m 0 --long
 
 
 

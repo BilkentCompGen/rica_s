@@ -4,7 +4,9 @@ inputfile="$1"
 outputfile=$(basename $inputfile)
 outdir="$2"
 
-cuclarkdb=/opt/rica_s/tools/rica_s_id_cuclark/
+# project root: passed in by the stage driver (config.py), else derived from this script's location
+RICA_S_HOME="${RICA_S_HOME:-$(cd "$(dirname "$0")/../.." && pwd)}"
+cuclarkdb=$RICA_S_HOME/tools/rica_s_id_cuclark/
 
 
 

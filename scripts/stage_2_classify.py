@@ -4,7 +4,7 @@ import subprocess
 import datetime
 import docker
 import pandas as pd
-from scripts.config import PROJECT_HOME, run_outdir, c
+from scripts.config import RICA_S_HOME, run_outdir, c
 from scripts.misc.name_resolver import NameResolver
 from scripts.tool_registry import selected_tools
 import logging
@@ -155,7 +155,7 @@ def all_classify(runid, inputfile, parent=None, tools=None):
     client = docker.from_env()
 
     for container_name in containers:
-        script_path = f"{PROJECT_HOME}/scripts/{container_name}/classify.sh"
+        script_path = f"{RICA_S_HOME}/scripts/{container_name}/classify.sh"
         try:
             container = client.containers.get(container_name)
             # Setting the environment variables identical to the previous CLI command
@@ -163,7 +163,8 @@ def all_classify(runid, inputfile, parent=None, tools=None):
                 "TERM": "xterm",
                 "COLUMNS": "80",
                 "LINES": "24",
-                "MALLOC_ARENA_MAX": "2"
+                "MALLOC_ARENA_MAX": "2",
+                "RICA_S_HOME": RICA_S_HOME
             }
             logger.info(f"[i]> {container.name} ===")
 
@@ -192,7 +193,7 @@ def all_classify(runid, inputfile, parent=None, tools=None):
 
     logger.info("[i]> Fixing TSVs")
     tsv_files = glob.glob(f"{outdir}/*.tsv")
-    nr=NameResolver("/opt/rica_s/scripts/misc/spp.tar.gz")
+    nr=NameResolver(f"{RICA_S_HOME}/scripts/misc/spp.tar.gz")
 
     for tsv in tsv_files:
         fix_names(tsv,nr)
@@ -212,7 +213,7 @@ if __name__ == "__main__":
     if sys.argv[1] == "fix_names":
         search_pattern = f"{sys.argv[2]}/**/*.tsv"
         tsvs = glob.glob(search_pattern, recursive=True)
-        nr=NameResolver("/opt/rica_s/scripts/misc/spp.tar.gz")
+        nr=NameResolver(f"{RICA_S_HOME}/scripts/misc/spp.tar.gz")
 
         for tsv in tsvs:
             

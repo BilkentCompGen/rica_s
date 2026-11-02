@@ -7,11 +7,16 @@ import logging
 # from ..config import c
 
 from scripts.config import c, run_outdir, subrun_dirs, parse_run_info
-from scripts.tool_registry import tool_groups, all_tools
+from scripts.tool_registry import tool_groups, all_tools, display_name, DISPLAY_NAMES, KIND_PREFIX
 
 
 logger = logging.getLogger(__name__)
 app = Flask(__name__)
+
+
+@app.context_processor
+def inject_rica_s_home():
+    return {"rica_s_home": c["RICA_S_HOME"]}
 
 
 def parse_summary_file(filepath: Path):
@@ -72,6 +77,16 @@ def run_units(runid: str):
 
     units = [(runid, base)] if has_own else []
     return units + [(name, Path(path)) for _index, name, path in subrun_dirs(runid)]
+
+
+def unit_read_files(runid: str):
+    # sub-run <runid>_<i> processes the i-th pod5 file of the manifest
+    info = Path(run_outdir(runid)) / f"{runid}.info"
+    try:
+        names = parse_run_info(info)[2] if info.exists() else []
+    except Exception:
+        names = []
+    return {f"{runid}_{i}": name for i, name in enumerate(names)}
 
 
 def find_unit_dir(runid: str, unit_id: str):
@@ -163,7 +178,20 @@ def split_cell(value: str, separator: str = None):
     return value.split(separator) if separator else [value]
 
 
-def process_pathogen_plots(runid: str, unit_id: str, output_dir: Path):
+# number of distinct sub-run colors defined in report.html (.tone-0 ... .tone-5)
+SUBRUN_TONES = 6
+
+
+def plot_tool(filename: str):
+    # per-tool plots are named <reads>.<tool output>.html, e.g. x.fasta.kraken2.report.html
+    prefix = KIND_PREFIX["id"]
+    for name in DISPLAY_NAMES:
+        if name.startswith(prefix) and f".{name[len(prefix):]}" in filename:
+            return display_name(name)
+    return filename
+
+
+def process_pathogen_plots(runid: str, unit_id: str, output_dir: Path, run_wide: bool = False):
     plots = []
 
     for page in sorted(output_dir.glob("*.html")):
@@ -171,10 +199,14 @@ def process_pathogen_plots(runid: str, unit_id: str, output_dir: Path):
             continue
 
         png = page.with_suffix(".png")
+        aggregate = run_wide or page.stem == f"{unit_id}_aggregate"
 
         plots.append({
             'filename': f"{unit_id} / {page.name}",
             'subrun': unit_id,
+            'kind': 'aggregate' if aggregate else 'detail',
+            'title': plot_tool(page.name) if not aggregate else (
+                "All sub-runs combined" if run_wide else "All tools combined"),
             'url': url_for('get_run_plot', runid=runid, unit_id=unit_id, filename=page.name),
             'png': url_for('get_run_plot', runid=runid, unit_id=unit_id, filename=png.name)
             # if png.exists() else None,
@@ -262,6 +294,21 @@ def api_check_status():
 @app.route('/report/<runid>')
 def generate_report(runid):
     units = run_units(runid)
+    has_subruns = any(unit_id != runid for unit_id, _dir in units)
+    read_files = unit_read_files(runid)
+
+    unit_info = []
+    tone = 0
+    for unit_id, _dir in units:
+        run_wide = has_subruns and unit_id == runid
+        unit_info.append({
+            'id': unit_id,
+            'read': read_files.get(unit_id),
+            'run_wide': run_wide,
+            'tone': None if run_wide else tone % SUBRUN_TONES,
+        })
+        if not run_wide:
+            tone += 1
 
     summary_data = []
     csv_data = []
@@ -277,7 +324,8 @@ def generate_report(runid):
         csv_data += process_csv_data(
             run_dir, id_prefix=f"csvDataTable_u{index}", label=unit_id)
 
-        pathogen_data += process_pathogen_plots(runid, unit_id, run_dir)
+        pathogen_data += process_pathogen_plots(
+            runid, unit_id, run_dir, run_wide=has_subruns and unit_id == runid)
 
         log_parts.append(f"===== sub-run {unit_id} =====\n"
                          + read_log(run_dir, unit_id))
@@ -289,6 +337,7 @@ def generate_report(runid):
         status=run_status(runid),
         revision=run_revision(runid),
         subruns=[unit_id for unit_id, _dir in units],
+        units=unit_info,
         summary_data=summary_data,
         log_text="\n\n".join(log_parts) if log_parts else "no log found",
         csv_data=csv_data,

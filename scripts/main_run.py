@@ -3,7 +3,7 @@ import os
 import sys
 import datetime
 import time
-from scripts.config import (PROJECT_HOME, run_outdir, parse_run_info,
+from scripts.config import (RICA_S_HOME, run_outdir, parse_run_info,
                             read_run_info, run_info_tuple, run_info_tools, c)
 from scripts.stage_0_basecall import all_basecall
 from scripts.stage_1_filter import all_filter
@@ -152,7 +152,7 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
         logger.exception("An error occurred while plotting the data.")
 
     from scripts.misc.histogram import plot_df
-    # hist_script = f"{c['PROJECT_HOME']}/scripts/misc/histogram.py"
+    # hist_script = f"{c['RICA_S_HOME']}/scripts/misc/histogram.py"
     # subprocess.run(["python3", hist_script, file])
     plot_df(merged_df, output_image_path)
 
@@ -250,12 +250,13 @@ def start_run(run_info):
     try:
 
         command = [
-            f"{c['PROJECT_HOME']}/builder/docker_control.sh", "restart"
+            f"{c['RICA_S_HOME']}/builder/docker_control.sh", "restart"
         ]
 
         process = subprocess.Popen(
             command,
-            cwd=f"{c['PROJECT_HOME']}/builder/",
+            cwd=f"{c['RICA_S_HOME']}/builder/",
+            env={**os.environ, "RICA_S_HOME": c['RICA_S_HOME']},
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
@@ -733,36 +734,36 @@ if __name__ == "__main__":
         # basepath=Path(sys.argv[2])
         # run_infos = list(basepath.rglob("*.info"))
         infos = [
-            "/opt/rica_s/output/expr2_05B_0.100A_4H_1G/expr2_05B_0.100A_4H_1G.info",
-            "/opt/rica_s/output/expr2_05B_0.100A_4H_3G/expr2_05B_0.100A_4H_3G.info",
-            "/opt/rica_s/output/expr2_10B_0.100A_4H_1G/expr2_10B_0.100A_4H_1G.info",
-            "/opt/rica_s/output/expr2_10B_0.100A_4H_3G/expr2_10B_0.100A_4H_3G.info",
-            "/opt/rica_s/output/expr2_15B_0.100A_4H_1G/expr2_15B_0.100A_4H_1G.info",
-            "/opt/rica_s/output/expr2_15B_0.100A_4H_3G/expr2_15B_0.100A_4H_3G.info"
+            f"{c['OUT_DIR']}/expr2_05B_0.100A_4H_1G/expr2_05B_0.100A_4H_1G.info",
+            f"{c['OUT_DIR']}/expr2_05B_0.100A_4H_3G/expr2_05B_0.100A_4H_3G.info",
+            f"{c['OUT_DIR']}/expr2_10B_0.100A_4H_1G/expr2_10B_0.100A_4H_1G.info",
+            f"{c['OUT_DIR']}/expr2_10B_0.100A_4H_3G/expr2_10B_0.100A_4H_3G.info",
+            f"{c['OUT_DIR']}/expr2_15B_0.100A_4H_1G/expr2_15B_0.100A_4H_1G.info",
+            f"{c['OUT_DIR']}/expr2_15B_0.100A_4H_3G/expr2_15B_0.100A_4H_3G.info"
         ]
 
 
         l1 = [
-            # "/opt/rica_s/output/05B_0.001A_1H/05B_0.001A_1H.info",
-            # "/opt/rica_s/output/05B_0.010A_1H/05B_0.010A_1H.info",
-            # "/opt/rica_s/output/05B_0.100A_1H/05B_0.100A_1H.info", 
-            # "/opt/rica_s/output/10B_0.001A_1H/10B_0.001A_1H.info",
-            # "/opt/rica_s/output/10B_0.010A_1H/10B_0.010A_1H.info",
-            # "/opt/rica_s/output/10B_0.100A_1H/10B_0.100A_1H.info",
-            # "/opt/rica_s/output/15B_0.001A_1H/15B_0.001A_1H.info",
-            # "/opt/rica_s/output/15B_0.010A_1H/15B_0.010A_1H.info",
-            # "/opt/rica_s/output/15B_0.100A_1H/15B_0.100A_1H.info",
+            # f"{c['OUT_DIR']}/05B_0.001A_1H/05B_0.001A_1H.info",
+            # f"{c['OUT_DIR']}/05B_0.010A_1H/05B_0.010A_1H.info",
+            # f"{c['OUT_DIR']}/05B_0.100A_1H/05B_0.100A_1H.info", 
+            # f"{c['OUT_DIR']}/10B_0.001A_1H/10B_0.001A_1H.info",
+            # f"{c['OUT_DIR']}/10B_0.010A_1H/10B_0.010A_1H.info",
+            # f"{c['OUT_DIR']}/10B_0.100A_1H/10B_0.100A_1H.info",
+            # f"{c['OUT_DIR']}/15B_0.001A_1H/15B_0.001A_1H.info",
+            # f"{c['OUT_DIR']}/15B_0.010A_1H/15B_0.010A_1H.info",
+            # f"{c['OUT_DIR']}/15B_0.100A_1H/15B_0.100A_1H.info",
             
 
-            "/opt/rica_s/output/05B_0.001A_2H/05B_0.001A_2H.info",
-            "/opt/rica_s/output/05B_0.010A_2H/05B_0.010A_2H.info",
-            "/opt/rica_s/output/05B_0.100A_2H/05B_0.100A_2H.info", 
-            "/opt/rica_s/output/10B_0.001A_2H/10B_0.001A_2H.info",
-            "/opt/rica_s/output/10B_0.010A_2H/10B_0.010A_2H.info",
-            "/opt/rica_s/output/10B_0.100A_2H/10B_0.100A_2H.info",
-            "/opt/rica_s/output/15B_0.001A_2H/15B_0.001A_2H.info",
-            "/opt/rica_s/output/15B_0.010A_2H/15B_0.010A_2H.info",
-            "/opt/rica_s/output/15B_0.100A_2H/15B_0.100A_2H.info"
+            f"{c['OUT_DIR']}/05B_0.001A_2H/05B_0.001A_2H.info",
+            f"{c['OUT_DIR']}/05B_0.010A_2H/05B_0.010A_2H.info",
+            f"{c['OUT_DIR']}/05B_0.100A_2H/05B_0.100A_2H.info", 
+            f"{c['OUT_DIR']}/10B_0.001A_2H/10B_0.001A_2H.info",
+            f"{c['OUT_DIR']}/10B_0.010A_2H/10B_0.010A_2H.info",
+            f"{c['OUT_DIR']}/10B_0.100A_2H/10B_0.100A_2H.info",
+            f"{c['OUT_DIR']}/15B_0.001A_2H/15B_0.001A_2H.info",
+            f"{c['OUT_DIR']}/15B_0.010A_2H/15B_0.010A_2H.info",
+            f"{c['OUT_DIR']}/15B_0.100A_2H/15B_0.100A_2H.info"
         ]
 
 

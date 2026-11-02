@@ -24,7 +24,7 @@ services:
     tty: true
 
     volumes:
-      - /opt/rica_s:/opt/rica_s
+      - ${RICA_S_HOME:?run via builder/docker_control.sh or set RICA_S_HOME}:${RICA_S_HOME}
       - /:/host_root/
 
     environment:
@@ -36,7 +36,7 @@ services:
       context: .
       dockerfile_inline: |
         FROM ubuntu:stonking
-        WORKDIR /opt/rica_s/tools/rica_s_ui_web
+        WORKDIR ${RICA_S_HOME}/tools/rica_s_ui_web
         COPY . .
         RUN apt update && apt install -y nano less git wget samtools seqtk seqkit python3 python3-pip
         RUN python3 -m pip install flask docker pyaml pandas --break-system-packages

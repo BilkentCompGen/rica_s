@@ -1,4 +1,4 @@
-"""Usage (from /opt/rica_s):
+"""Usage (from the project root):
   python -m scripts.evaluate_run RUNID [--pathogens P.tsv] [--amr A.tsv] [--min-reads 1] [--outdir DIR]
 
 
@@ -37,17 +37,17 @@ import sys
 import numpy as np
 import pandas as pd
 
-from scripts.config import PROJECT_HOME, run_outdir, subrun_dirs, read_run_info, run_info_tools
+from scripts.config import RICA_S_HOME, run_outdir, subrun_dirs, read_run_info, run_info_tools
 from scripts.misc.name_resolver import NameResolver
 from scripts.stage_2_classify import extract_identifier
 from scripts.tool_registry import display_name
 
 logger = logging.getLogger(__name__)
 
-SPP_TARBALL = f"{PROJECT_HOME}/scripts/misc/spp.tar.gz"
-REF_NAMES_CSV = f"{PROJECT_HOME}/reference_genomes/output_names.csv"
-EVAL_ROOT = f"{PROJECT_HOME}/evaluation"
-STATIC_DIR = f"{PROJECT_HOME}/scripts/rica_s_ui_web/static"
+SPP_TARBALL = f"{RICA_S_HOME}/scripts/misc/spp.tar.gz"
+REF_NAMES_CSV = f"{RICA_S_HOME}/reference_genomes/output_names.csv"
+EVAL_ROOT = f"{RICA_S_HOME}/evaluation"
+STATIC_DIR = f"{RICA_S_HOME}/scripts/rica_s_ui_web/static"
 
 NONE = "none"
 UNCLASSIFIED = "unclassified"

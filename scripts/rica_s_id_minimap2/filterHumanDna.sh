@@ -1,7 +1,9 @@
 #! /bin/bash
 inputfile="$1"
 outdir="$2"
-indexfile="/opt/rica_s/tools/rica_s_id_minimap2/human_v38.mmi"
+# project root: passed in by the stage driver (config.py), else derived from this script's location
+RICA_S_HOME="${RICA_S_HOME:-$(cd "$(dirname "$0")/../.." && pwd)}"
+indexfile="$RICA_S_HOME/tools/rica_s_id_minimap2/human_v38.mmi"
 
 # 2. Extract just the filename without the path
 filename=$(basename "$inputfile")

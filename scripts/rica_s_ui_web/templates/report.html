@@ -63,10 +63,175 @@
         border-radius: 6px;
     }
 
-    hr.divider {
+    /* sub-run colors: the same tone marks a sub-run in every tab and section */
+    .tone-run { --tone: var(--accent); --tone-soft: #e6ecfa; }
+    .tone-0 { --tone: #0f766e; --tone-soft: #e0f2ef; }
+    .tone-1 { --tone: #7c3aed; --tone-soft: #efe8fd; }
+    .tone-2 { --tone: #b45309; --tone-soft: #fbeedd; }
+    .tone-3 { --tone: #be123c; --tone-soft: #fbe5ea; }
+    .tone-4 { --tone: #0369a1; --tone-soft: #e0eff8; }
+    .tone-5 { --tone: #4d7c0f; --tone-soft: #ecf4df; }
+
+    .unit-chip {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 999px;
+        background: var(--tone);
+        color: #fff;
+        font-family: monospace;
+        font-size: 13px;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+
+    .unit-read,
+    .unit-count {
+        font-family: monospace;
+        font-size: 13px;
+        font-weight: normal;
+        color: #64748b;
+        vertical-align: middle;
+    }
+
+    .unit-count {
+        float: right;
+    }
+
+    .jump-bar {
+        position: sticky;
+        top: -20px;
+        z-index: 2;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin: -20px -20px 20px;
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.95);
+        border-bottom: 1px solid var(--line-soft);
+    }
+
+    .jump-label {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    a.jump-link {
+        font-size: 13px;
+    }
+
+    a.jump-link:hover {
+        text-decoration: none;
+        filter: brightness(1.15);
+    }
+
+    .report-group {
+        margin-bottom: 40px;
+    }
+
+    .group-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 4px 12px;
+        padding-bottom: 10px;
+        margin-bottom: 16px;
+        border-bottom: 2px solid var(--line-soft);
+    }
+
+    .group-head .group-note {
+        flex-basis: 100%;
+        margin: 0;
+        font-size: 14px;
+        color: #64748b;
+    }
+
+    .group-badge {
+        padding: 3px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #fff;
+        background: #64748b;
+    }
+
+    .group-aggregate .group-badge {
+        background: var(--accent);
+    }
+
+    .group-aggregate {
+        padding: 16px 20px 4px;
+        background: #f4f7fd;
+        border: 1px solid #d5def3;
+        border-radius: 8px;
+    }
+
+    .unit-block {
+        margin-bottom: 28px;
+        padding-left: 14px;
+        border-left: 5px solid var(--tone);
+    }
+
+    .unit-head {
+        margin: 0 0 12px;
+        padding: 8px 12px;
+        font-size: 16px;
+        background: var(--tone-soft);
+        border-radius: 0 6px 6px 0;
+    }
+
+    .plot-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .plot-card {
+        margin: 0;
+        padding: 10px;
+        background: #fff;
+        border: 1px solid var(--line-soft);
+        border-top: 4px solid var(--tone);
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .plot-card.wide {
+        grid-column: 1 / -1;
+    }
+
+    .plot-card figcaption {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 8px;
+        margin-bottom: 8px;
+        text-align: left;
+    }
+
+    .plot-title {
+        font-weight: bold;
+        color: var(--ink);
+    }
+
+    .no-data {
+        padding: 18px;
+        border: 2px dashed var(--line);
+        border-radius: 6px;
+        background: var(--panel);
+        color: #64748b;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        text-align: center;
+        font-size:3em;
+    }
+
+    .plot-card img.plot {
+        max-width: 100%;
         border: 0;
-        border-top: 1px solid #eee;
-        margin: 40px 0;
     }
 
     @media print {
@@ -115,6 +280,17 @@
         img.plot {
             max-width: 100% !important;
         }
+
+        .jump-bar {
+            display: none !important;
+        }
+
+        .plot-card,
+        .unit-head {
+            break-inside: avoid;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
     }
 </style>
 {% endblock %}
@@ -128,84 +304,156 @@
 <div class="tab">
     <button class="tablinks" id="defaultOpen" onclick="openTab(event, 'SummaryTab')">Data Summary</button>
     <button class="tablinks" onclick="openTab(event, 'PathogenTab')">Pathogen Presence</button>
-    <button class="tablinks" onclick="openTab(event, 'CSVTab')">CSV Data</button>
+    <button class="tablinks" onclick="openTab(event, 'CSVTab')">AMR detection</button>
     <button class="tablinks" onclick="openTab(event, 'LogTab')">System Log</button>
 </div>
 
-<div id="SummaryTab" class="tabcontent">
-    {% for section in summary_data %}
-    <div class="section">
-        {% if loop.first or section.header .split(' ')[0] != summary_data[loop.index0 - 1].header.split(' ')[0] %}
+{% macro unit_label(unit) -%}
+<span class="unit-chip {{ 'tone-run' if unit.run_wide else 'tone-' ~ unit.tone }}">{{ 'whole run' if unit.run_wide else unit.id }}</span>
+{%- if unit.read %} <span class="unit-read">{{ unit.read }}</span>{% endif %}
+{%- endmacro %}
 
-        <h2 class="subrun-header"> <b>Read file: {{ section.header }}</b></h2>
-
-        {% endif %}
-        <h3 class="summary-header">{{ section.header }}</h3>
-        <table class="summary-table">
-            {% for key, value in section.rows.items() %}
-            <tr>
-                <td>{{ key }}</td>
-                <td>{{ value }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+{% macro plot_card(item, unit, wide=False) %}
+<figure class="plot-card {{ 'tone-run' if unit.run_wide else 'tone-' ~ unit.tone }}{{ ' wide' if wide }}">
+    <figcaption>
+        {{ unit_label(unit) }}
+        <span class="plot-title">{{ item.title }}</span>
+    </figcaption>
+    {% if item.png %}
+    <a href="{{ item.url }}" target="_blank" rel="noopener" title="Open interactive plot: {{ item.filename }}">
+        <img class="plot" src="{{ item.png if item.png.endswith('.png') else item.png ~ '.png' }}" loading="lazy"
+            alt="{{ item.filename }}">
+    </a>
     {% else %}
-    <p>No summary data found for this run.</p>
+    <p><a href="{{ item.url }}" target="_blank" rel="noopener">Open interactive plot</a></p>
+    {% endif %}
+</figure>
+{% endmacro %}
+
+<div id="SummaryTab" class="tabcontent">
+    {% for unit in units %}
+    {% set sections = summary_data | selectattr('subrun', 'equalto', unit.id) | list %}
+    {% if sections %}
+    <div class="unit-block {{ 'tone-run' if unit.run_wide else 'tone-' ~ unit.tone }}">
+        <h2 class="unit-head">{{ unit_label(unit) }}</h2>
+        {% for section in sections %}
+        <div class="section">
+            <h3 class="summary-header">{{ section.header }}</h3>
+            <table class="summary-table">
+                {% for key, value in section.rows.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endfor %}
+    {% if not summary_data %}
+    <p>No summary data found for this run.</p>
+    {% endif %}
 </div>
 
 <div id="PathogenTab" class="tabcontent">
-    {% for item in pathogen_data %}
-    <div class="section text-center">
-        {% if loop.first or item.filename.split('/')[0] != pathogen_data[loop.index0 - 1].filename.split('/')[0] %}
+    {% set aggregates = pathogen_data | selectattr('kind', 'equalto', 'aggregate') | list %}
+    {% set details = pathogen_data | selectattr('kind', 'equalto', 'detail') | list %}
+    {% set unit_by_id = {} %}
+    {% for unit in units %}{% set _ = unit_by_id.update({unit.id: unit}) %}{% endfor %}
 
-        <h2 class="subrun-header"> <b>Sub-run: {{ item.filename }}</b></h2>
+    {% if pathogen_data %}
+    <nav class="jump-bar">
+        <span class="jump-label">Jump to</span>
+        {% if aggregates %}<a href="#plots-aggregate" class="jump-link">Σ Aggregate</a>{% endif %}
+        {% for unit in units if not unit.run_wide and details | selectattr('subrun', 'equalto', unit.id) | first %}
+        <a href="#plots-{{ unit.id }}" class="jump-link unit-chip tone-{{ unit.tone }}">{{ unit.id }}</a>
+        {% endfor %}
+    </nav>
+    {% endif %}
 
+    {% if aggregates %}
+    <section id="plots-aggregate" class="report-group group-aggregate">
+        <header class="group-head">
+            <span class="group-badge">Σ Aggregate</span>
+            <h2>Combined results</h2>
+            <p class="group-note">Read counts summed over all classification tools{{ ' and sub-runs' if units | selectattr('run_wide') | first }}.</p>
+        </header>
+        <div class="plot-grid">
+            {% for item in aggregates %}
+            {% set unit = unit_by_id[item.subrun] %}
+            {{ plot_card(item, unit, wide=unit.run_wide) }}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if details %}
+    <section class="report-group group-detail">
+        <header class="group-head">
+            <span class="group-badge">Detail</span>
+            <h2>Per sub-run, per tool</h2>
+            <p class="group-note">One plot per classification tool, grouped by sub-run (one sub-run per read file).</p>
+        </header>
+        {% for unit in units %}
+        {% set unit_plots = details | selectattr('subrun', 'equalto', unit.id) | list %}
+        {% if unit_plots %}
+        <div id="plots-{{ unit.id }}" class="unit-block {{ 'tone-run' if unit.run_wide else 'tone-' ~ unit.tone }}">
+            <h3 class="unit-head">{{ unit_label(unit) }} <span class="unit-count">{{ unit_plots | length }} plot{{ 's' if unit_plots | length != 1 }}</span></h3>
+            <div class="plot-grid">
+                {% for item in unit_plots %}
+                {{ plot_card(item, unit) }}
+                {% endfor %}
+            </div>
+        </div>
         {% endif %}
-        <h3 class="summary-header">Source: {{ item.filename }}</h3>
-        <br>
-        {% if item.png %}
-        <a href="{{ item.url }}" target="_blank" rel="noopener">
-            <img class="plot" src="{{ item.png if item.png.endswith('.png') else item.png ~ '.png' }}" loading="lazy"
-                alt="{{ item.filename }}">
-        </a>
-        {% else %}
-        <p><a href="{{ item.url }}" target="_blank" rel="noopener">Open interactive plot</a></p>
-        {% endif %}
-    </div>
-    <hr class="divider">
-    {% else %}
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if not pathogen_data %}
     <p>No HTML files found in the specified directory.</p>
-    {% endfor %}
+    {% endif %}
 </div>
 
 <div id="CSVTab" class="tabcontent">
-    {% for table in csv_data %}
-    <div class="section">
-        <h3>Source: {{ table.filename }}</h3>
-        {% if table.error %}
-        <p>Error loading file: {{ table.error }}</p>
-        {% else %}
-        <table id="{{ table.table_id }}" class="display compact data-table">
-            <thead>
-                <tr>{% for column in table.columns %}<th>{{ column }}</th>{% endfor %}</tr>
-            </thead>
-            <tbody>
-                {% for row in table.rows %}
-                <tr>
-                    {% for cell in row %}
-                    <td>{% for line in cell %}{{ line }}{{ "<br>" | safe if not loop.last }}{% endfor %}</td>
+    {% for unit in units %}
+    {% set tables = csv_data | selectattr('subrun', 'equalto', unit.id) | list %}
+    {% if tables %}
+    <div class="unit-block {{ 'tone-run' if unit.run_wide else 'tone-' ~ unit.tone }}">
+        <h2 class="unit-head">{{ unit_label(unit) }}</h2>
+        {% for table in tables %}
+        <div class="section">
+            <h3>Source: {{ table.filename }}</h3>
+            {% if table.error %}
+            <p>Error loading file: {{ table.error }}</p>
+            {% elif not table.rows %}
+            <div class="no-data">NO DATA</div>
+            {% else %}
+            <table id="{{ table.table_id }}" class="display compact data-table">
+                <thead>
+                    <tr>{% for column in table.columns %}<th>{{ column }}</th>{% endfor %}</tr>
+                </thead>
+                <tbody>
+                    {% for row in table.rows %}
+                    <tr>
+                        {% for cell in row %}
+                        <td>{% for line in cell %}{{ line }}{{ "<br>" | safe if not loop.last }}{% endfor %}</td>
+                        {% endfor %}
+                    </tr>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endif %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+        {% endfor %}
     </div>
-    {% else %}
-    <p>No CSV files found matching the pattern.</p>
+    {% endif %}
     {% endfor %}
+    {% if not csv_data %}
+    <p>No CSV files found matching the pattern.</p>
+    {% endif %}
 </div>
 
 <div id="LogTab" class="tabcontent">

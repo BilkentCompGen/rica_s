@@ -81,7 +81,7 @@ Each stage appends its stdout/stderr to a per‑sub‑run log at `output/<runid>
              report / UI
 ```
 
-> **Note on `/opt/rica_s`.** Inside every container the project is mounted at **`/opt/rica_s`** (see the `volumes:` entries in the compose files: `/opt/rica_s:/opt/rica_s`). The stage scripts therefore assume the repo lives at `/opt/rica_s` on the host. See [Installation](#installation).
+> **Note on the project path.** The project root is not hardcoded: `scripts/config.py` derives `c["RICA_S_HOME"]` from its own location, and `builder/docker_control.sh` exports the same `RICA_S_HOME` so that every container mounts the project at the same path as on the host (`${RICA_S_HOME}:${RICA_S_HOME}` in the compose files). The repo can therefore live in any directory; the examples below use `/opt/rica_s`. See [Installation](#installation).
  -->
 
 
@@ -112,15 +112,15 @@ Each stage appends its stdout/stderr to a per‑sub‑run log at `output/<runid>
 -->
 ## Installation
 
-1. **Clone the repository to `/opt/rica_s`.** 
-The containers mount the project at `/opt/rica_s`, so cloning there keeps host and container paths identical.
+1. **Clone the repository** (any directory works; `/opt/rica_s` is used as the example). 
+The containers mount the project at the same path as on the host, so host and container paths stay identical.
 
    ```bash
    $ sudo git clone https://github.com/BilkentCompGen/rica_s /opt/rica_s
    $ sudo chown -R "$USER" /opt/rica_s
    $ cd /opt/rica_s
    ```
-   If you must clone elsewhere, either symlink it to `/opt/rica_s` or change every mention of `/opt/rica_s` to your custom path.
+   Always manage the containers through `builder/docker_control.sh` (it sets `RICA_S_HOME`); to call `docker compose` directly, first `export RICA_S_HOME="$PWD"` from the project root.
 
 2. **Run `init.sh` (once, before running anything else).**
 It installs the Python packages in `requirements.txt` and builds the images, then creates and starts the docker containers (`builder/docker_control.sh create`). It asks for confirmation first; press Enter to continue or Ctrl+C to cancel.
@@ -222,13 +222,13 @@ $ cd /opt/rica_s
 $ ./start.sh
 ```
 
-Open `http://localhost:5000`, choose the folder that holds the `.pod5` files (it must be under `/opt/rica_s/...` so the containers can see it), enter a **run id**, select the classification and profiling tools, and submit. The UI writes the manifest `output/<runid>/<runid>.info`; the listener picks it up and runs the stages in order: basecalling → human‑read filtering → classification → profiling → plotting → reporting (`scripts/stage_0_basecall.py` … `scripts/stage_5_report.py`). Progress is shown at `/status`, and the report at `/report/<runid>`.
+Open `http://localhost:5000`, choose the folder that holds the `.pod5` files (it must be under the project root so the containers can see it), enter a **run id**, select the classification and profiling tools, and submit. The UI writes the manifest `output/<runid>/<runid>.info`; the listener picks it up and runs the stages in order: basecalling → human‑read filtering → classification → profiling → plotting → reporting (`scripts/stage_0_basecall.py` … `scripts/stage_5_report.py`). Progress is shown at `/status`, and the report at `/report/<runid>`.
 
 A run can also be started without the UI by writing the manifest yourself while the listener is running (tab‑separated; the `tools` line is optional and defaults to every installed tool):
 
 ```
 runid	<runid>
-readpath	/opt/rica_s/<path/to/pod5/folder>
+readpath	<project root>/<path/to/pod5/folder>
 pod5	<file1>.pod5,<file2>.pod5
 tools	rica_s_id_kraken2,rica_s_id_minimap2,rica_s_pr_abricate
 ```
@@ -285,7 +285,7 @@ python scripts/rica_s_pr_abricate/get_common_treatment.py "Escherichia coli"
 
 ## Output files
 
-For a given run, all the output files are collected at `/opt/rica_s/output/<runid>/`. The run directory itself holds only the manifest; every artifact belongs to a sub-run, one per input `.pod5` file:
+For a given run, all the output files are collected at `<project root>/output/<runid>/`. The run directory itself holds only the manifest; every artifact belongs to a sub-run, one per input `.pod5` file:
 
 ```
 output/<runid>/
@@ -329,7 +329,7 @@ It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders
 ## Notes and conventions
 
 - **Naming.** Services, script directories, and containers all follow `rica_s_<stage>_<tool>`. `scripts/tool_registry.py` discovers tools by listing the `scripts/rica_s_id_*` / `scripts/rica_s_pr_*` directories, so adding a new tool is as simple as adding its compose file, a script directory with a `classify.sh`/`profile.sh`, and bringing the container up (optionally, give it a display name in `DISPLAY_NAMES`).
-- **Paths.** Inside containers the project is always `/opt/rica_s`; input read paths passed to the drivers must be absolute and container‑visible.
+- **Paths.** Inside containers the project is mounted at the same path as on the host (`RICA_S_HOME`); input read paths passed to the drivers must be absolute and container‑visible.
 - **Compose structure.** `builder/rica_s-compose.yml` doesn't define services inline — it `extends` each per‑service file under `builder/<stage>/`. Images are pulled from `alkanlab/*` on Docker Hub; the `build.dockerfile_inline` blocks add common CLI tools (`samtools`, `seqtk`, `seqkit`, …) on top.
 - **Git‑ignored data.** `tools/`, `input/`, `output/`, `evaluation/`, `datasets/`, `reference_genomes/` and the downloaded test data are excluded from version control (see `.gitignore`). They're populated by the download step, pipeline runs, and evaluation.
 - **Reproducibility.** Every classifier wraps its main command in `/usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB"`, so per‑run resource usage (wall time, peak memory) is captured in the log for benchmarking.
@@ -340,6 +340,6 @@ It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders
 - **`docker exec` fails / container not found** — confirm the stack is up (`docker ps | grep rica_s`) and that the container name matches the script directory name under `scripts/`.
 - **A classifier can't find its database** — you likely skipped the download step; verify the expected DB exists under `tools/rica_s_id_<tool>/` (every classifier, including the alignment‑based minimap2/bwa/ngmlr, reads from its own `tools/` directory). `DownloadData.sh` extracts each tool's tar there automatically.
 - **Nothing happens for a stage** — the drivers only act on containers that are actually running; bring up the relevant services first.
-- **Permission errors writing `output/`** — ensure the host `/opt/rica_s` is writable by your user, since it's bind‑mounted read‑write into the containers.
+- **Permission errors writing `output/`** — ensure the project root on the host is writable by your user, since it's bind‑mounted read‑write into the containers.
 - **Web UI can't reach Docker** — `orch.py`/`start.py` connect to the Docker daemon over TCP; adjust the socket/URL and the orchestrator's hardcoded paths to match your environment.
 -->

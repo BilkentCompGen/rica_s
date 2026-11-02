@@ -5,7 +5,7 @@
 
 set -euo pipefail
 
-PROJECT_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-cd "$PROJECT_HOME"
+RICA_S_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$RICA_S_HOME"
 
 python3 -m scripts.evaluate_resources "$@"
