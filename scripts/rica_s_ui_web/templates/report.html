@@ -56,6 +56,12 @@
         margin-top: 15px;
     }
 
+    .table-count {
+        margin: 0;
+        color: #666;
+        font-size: 0.9em;
+    }
+
     img.plot {
         max-width: 90%;
         height: auto;
@@ -64,13 +70,40 @@
     }
 
     /* sub-run colors: the same tone marks a sub-run in every tab and section */
-    .tone-run { --tone: var(--accent); --tone-soft: #e6ecfa; }
-    .tone-0 { --tone: #0f766e; --tone-soft: #e0f2ef; }
-    .tone-1 { --tone: #7c3aed; --tone-soft: #efe8fd; }
-    .tone-2 { --tone: #b45309; --tone-soft: #fbeedd; }
-    .tone-3 { --tone: #be123c; --tone-soft: #fbe5ea; }
-    .tone-4 { --tone: #0369a1; --tone-soft: #e0eff8; }
-    .tone-5 { --tone: #4d7c0f; --tone-soft: #ecf4df; }
+    .tone-run {
+        --tone: var(--accent);
+        --tone-soft: #e6ecfa;
+    }
+
+    .tone-0 {
+        --tone: #0f766e;
+        --tone-soft: #e0f2ef;
+    }
+
+    .tone-1 {
+        --tone: #7c3aed;
+        --tone-soft: #efe8fd;
+    }
+
+    .tone-2 {
+        --tone: #b45309;
+        --tone-soft: #fbeedd;
+    }
+
+    .tone-3 {
+        --tone: #be123c;
+        --tone-soft: #fbe5ea;
+    }
+
+    .tone-4 {
+        --tone: #0369a1;
+        --tone-soft: #e0eff8;
+    }
+
+    .tone-5 {
+        --tone: #4d7c0f;
+        --tone-soft: #ecf4df;
+    }
 
     .unit-chip {
         display: inline-block;
@@ -226,7 +259,7 @@
         font-weight: bold;
         letter-spacing: 0.1em;
         text-align: center;
-        font-size:3em;
+        font-size: 3em;
     }
 
     .plot-card img.plot {
@@ -249,8 +282,14 @@
         }
 
         .tab,
-        #btn_print {
+        #btn_print,
+        .summary-toggle {
             display: none !important;
+        }
+
+        /* the PDF always shows every summary table, collapsed or not */
+        .summary-section.collapsed .summary-table {
+            display: table !important;
         }
 
         .tabcontent {
@@ -297,7 +336,7 @@
 
 {% block content %}
 <div class="page-head">
-    <h1>Analysis Dashboard: [{{ runid }}]</h1>
+    <h1>📓 Report for <{{ runid }}></h1>
     <button class="primary" id="btn_print" onclick="window.print()">🖨️ Export PDF</button>
 </div>
 
@@ -309,7 +348,8 @@
 </div>
 
 {% macro unit_label(unit) -%}
-<span class="unit-chip {{ 'tone-run' if unit.run_wide else 'tone-' ~ unit.tone }}">{{ 'whole run' if unit.run_wide else unit.id }}</span>
+<span class="unit-chip {{ 'tone-run' if unit.run_wide else 'tone-' ~ unit.tone }}">{{ 'whole run' if unit.run_wide else
+    unit.id }}</span>
 {%- if unit.read %} <span class="unit-read">{{ unit.read }}</span>{% endif %}
 {%- endmacro %}
 
@@ -337,14 +377,46 @@
     <div class="unit-block {{ 'tone-run' if unit.run_wide else 'tone-' ~ unit.tone }}">
         <h2 class="unit-head">{{ unit_label(unit) }}</h2>
         {% for section in sections %}
-        <div class="section">
-            <h3 class="summary-header">{{ section.header }}</h3>
+        <div class="section summary-section" data-key="{{ section.header }}">
+            <h3 class="summary-header">
+                <span class="summary-title">{{ section.header }}</span>
+                <button type="button" class="summary-toggle" aria-expanded="true">Hide</button>
+            </h3>
             <table class="summary-table">
                 {% for key, value in section.rows.items() %}
                 <tr>
                     <td>{{ key }}</td>
                     <td>{{ value }}</td>
                 </tr>
+                {% endfor %}
+                {% for group in section.groups or [] %}
+                <tr class="summary-group">
+                    <td colspan="2">{{ group.title }}</td>
+                </tr>
+                {% if group.bar %}
+                <tr class="time-bar-row">
+                    <td colspan="2">
+                        <div class="time-bar" role="img"
+                             aria-label="{{ group.title }}: {% for seg in group.bar %}{{ seg.label }} {{ seg.minutes }} ({{ seg.pct }}%){{ ', ' if not loop.last }}{% endfor %}">
+                            {% for seg in group.bar %}
+                            <div class="time-seg" style="flex-grow: {{ seg.seconds }}; background: {{ seg.color }}; color: {{ seg.ink }};"
+                                 title="{{ seg.label }}: {{ seg.minutes }} ({{ seg.pct }}%)">
+                                {% if seg.show_label %}<span>{{ seg.label }}</span>{% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+                {% for key, value in group.rows.items() %}
+                <tr>
+                    <td class="summary-indent">
+                        {% if group.swatches and key in group.swatches %}<span class="time-swatch" style="background: {{ group.swatches[key] }};"></span>{% endif %}
+                        {{ key }}
+                    </td>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
                 {% endfor %}
             </table>
         </div>
@@ -378,7 +450,8 @@
         <header class="group-head">
             <span class="group-badge">Σ Aggregate</span>
             <h2>Combined results</h2>
-            <p class="group-note">Read counts summed over all classification tools{{ ' and sub-runs' if units | selectattr('run_wide') | first }}.</p>
+            <p class="group-note">Read counts summed over all classification tools{{ ' and sub-runs' if units |
+                selectattr('run_wide') | first }}.</p>
         </header>
         <div class="plot-grid">
             {% for item in aggregates %}
@@ -400,7 +473,8 @@
         {% set unit_plots = details | selectattr('subrun', 'equalto', unit.id) | list %}
         {% if unit_plots %}
         <div id="plots-{{ unit.id }}" class="unit-block {{ 'tone-run' if unit.run_wide else 'tone-' ~ unit.tone }}">
-            <h3 class="unit-head">{{ unit_label(unit) }} <span class="unit-count">{{ unit_plots | length }} plot{{ 's' if unit_plots | length != 1 }}</span></h3>
+            <h3 class="unit-head">{{ unit_label(unit) }} <span class="unit-count">{{ unit_plots | length }} plot{{ 's'
+                    if unit_plots | length != 1 }}</span></h3>
             <div class="plot-grid">
                 {% for item in unit_plots %}
                 {{ plot_card(item, unit) }}
@@ -426,24 +500,18 @@
         {% for table in tables %}
         <div class="section">
             <h3>Source: {{ table.filename }}</h3>
-            {% if table.error %}
-            <p>Error loading file: {{ table.error }}</p>
-            {% elif not table.rows %}
+            {% for error in table.errors %}
+            <p>Error loading {{ error }}</p>
+            {% endfor %}
+            {% if not table.row_count %}
             <div class="no-data">NO DATA</div>
             {% else %}
-            <table id="{{ table.table_id }}" class="display compact data-table">
+            <p class="table-count">{{ table.row_count }} hit{{ 's' if table.row_count != 1 }}</p>
+            {# rows are fetched as JSON by initTables(); rendering them here made the page tens of MB #}
+            <table id="{{ table.table_id }}" class="display compact data-table" data-url="{{ table.url }}">
                 <thead>
                     <tr>{% for column in table.columns %}<th>{{ column }}</th>{% endfor %}</tr>
                 </thead>
-                <tbody>
-                    {% for row in table.rows %}
-                    <tr>
-                        {% for cell in row %}
-                        <td>{% for line in cell %}{{ line }}{{ "<br>" | safe if not loop.last }}{% endfor %}</td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
             </table>
             {% endif %}
         </div>
@@ -452,7 +520,7 @@
     {% endif %}
     {% endfor %}
     {% if not csv_data %}
-    <p>No CSV files found matching the pattern.</p>
+    <p>No AMR results found.</p>
     {% endif %}
 </div>
 
@@ -470,8 +538,34 @@
     const STATUS_URL = "{{ url_for('api_check_status', runid=runid) }}";
     const PANELS = ["SummaryTab", "PathogenTab", "CSVTab", "LogTab"];
 
+    const RUNID = {{ runid | tojson }};
+
     let status = {{ status | tojson }};
     let revision = {{ revision | tojson }};
+
+    const isDone = (s) => s === "finished" || s === "killed" || s === "interrupted";
+
+    // animate this run's banner while it runs; freeze it once the run ends
+    function showBannerStatus() {
+        const banner = [...document.querySelectorAll(".run-banner")]
+            .find(b => b.dataset.runid === RUNID);
+        if (!banner) return;
+
+        const done = isDone(status);
+        banner.classList.toggle("live", !done);
+        if (!done) return;
+
+        const [cls, emoji, text] = {
+            finished: ["is-finished", "\u{1F3C1}", "has finished"],
+            killed: ["is-killed", "\u{1F534}", "was killed"],
+            interrupted: ["is-interrupted", "⏸️", "was interrupted"],
+        }[status];
+        const icon = banner.querySelector(".run-icon");
+        banner.classList.add(cls);
+        icon.classList.add("done");
+        icon.textContent = emoji;
+        banner.querySelector(".run-text").textContent = `Experiment ${RUNID} ${text}.`;
+    }
 
     function openTab(evt, tabName) {
         for (const panel of document.getElementsByClassName("tabcontent")) {
@@ -482,6 +576,7 @@
         }
 
         document.getElementById(tabName).style.display = "block";
+        fitTimeLabels();
         evt.currentTarget.classList.add("active");
 
         if (tabName === 'CSVTab') {
@@ -489,33 +584,101 @@
         }
     }
 
-    function initTables() {
-        $('.data-table').DataTable({ pageLength: 25, order: [], scrollX: true });
+    // summary sections the user collapsed, by header; kept across live refreshes
+    const collapsedSections = new Set();
+
+    function applyCollapsed() {
+        for (const section of document.querySelectorAll(".summary-section")) {
+            const collapsed = collapsedSections.has(section.dataset.key);
+            const toggle = section.querySelector(".summary-toggle");
+            section.classList.toggle("collapsed", collapsed);
+            toggle.textContent = collapsed ? "Show" : "Hide";
+            toggle.setAttribute("aria-expanded", String(!collapsed));
+        }
+        fitTimeLabels();
     }
+
+    // a run-time label is shown only when it fits inside its bar segment;
+    // hidden bars measure 0, so only the visible ones are fitted
+    function fitTimeLabels() {
+        for (const label of document.querySelectorAll(".time-seg span")) {
+            const seg = label.parentElement;
+            if (!seg.offsetParent) continue;
+            label.classList.remove("no-fit");
+            label.classList.toggle("no-fit", label.offsetWidth > seg.clientWidth);
+        }
+    }
+    window.addEventListener("resize", fitTimeLabels);
+    window.addEventListener("beforeprint", fitTimeLabels);
+
+    // delegated, because refresh() replaces the panel's HTML
+    document.addEventListener("click", (event) => {
+        const toggle = event.target.closest(".summary-toggle");
+        if (!toggle) return;
+        const key = toggle.closest(".summary-section").dataset.key;
+        if (!collapsedSections.delete(key)) collapsedSections.add(key);
+        applyCollapsed();
+    });
+
+    const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    }[ch]));
+
+    // AMR cells come as lists of lines: shown one per line, sorted and searched as text
+    function renderCell(cell, type) {
+        return type === "display" ? cell.map(escapeHtml).join("<br>") : cell.join(" ");
+    }
+
+    function initTables(scope = document) {
+        $(scope).find('.data-table').each(function () {
+            $(this).DataTable({
+                ajax: this.dataset.url,
+                // only the rows on screen get DOM nodes; MGE results can be ~40k rows
+                deferRender: true,
+                columnDefs: [{ targets: "_all", render: renderCell }],
+                pageLength: 25,
+                order: [],
+                scrollX: true,
+            });
+        });
+    }
+
+    // each panel's HTML as last received, so a refresh only touches panels that changed
+    // (and the AMR rows are not refetched while their files stay the same)
+    const panelHtml = {};
 
     async function refresh() {
         const doc = new DOMParser().parseFromString(
             await (await fetch(location.href)).text(), "text/html");
 
-        $('.data-table').each(function () {
-            if ($.fn.DataTable.isDataTable(this)) $(this).DataTable().destroy();
-        });
-
         for (const id of PANELS) {
-            document.getElementById(id).innerHTML = doc.getElementById(id).innerHTML;
+            const html = doc.getElementById(id).innerHTML;
+            if (html === panelHtml[id]) continue;
+
+            const panel = document.getElementById(id);
+            $(panel).find('.data-table').each(function () {
+                if ($.fn.DataTable.isDataTable(this)) $(this).DataTable().destroy();
+            });
+            panel.innerHTML = html;
+            panelHtml[id] = html;
+            initTables(panel);
         }
 
-        initTables();
+        applyCollapsed();
         if ($('#CSVTab').is(':visible')) {
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
         }
     }
 
     $(document).ready(function () {
+        for (const id of PANELS) {
+            panelHtml[id] = document.getElementById(id).innerHTML;
+        }
         initTables();
         document.getElementById("defaultOpen").click();
+        showBannerStatus();
 
-        if (status === "finished" || status === "killed") return;
+        if (isDone(status)) return;
 
         const poll = setInterval(async () => {
             const data = await (await fetch(STATUS_URL)).json();
@@ -523,10 +686,11 @@
             if (data.is_running !== status || data.revision !== revision) {
                 status = data.is_running;
                 revision = data.revision;
+                showBannerStatus();
                 await refresh();
             }
 
-            if (status === "finished" || status === "killed") clearInterval(poll);
+            if (isDone(status)) clearInterval(poll);
         }, 5000);
     });
 </script>

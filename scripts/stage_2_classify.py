@@ -219,3 +219,10 @@ if __name__ == "__main__":
             
             fix_names(tsv,nr)
             merge_repeats(tsv)
+
+    
+    if sys.argv[1] == "fix_name":
+        nr=NameResolver(f"{RICA_S_HOME}/scripts/misc/spp.tar.gz")
+
+        fix_names(sys.argv[2],nr)
+        merge_repeats(sys.argv[2])

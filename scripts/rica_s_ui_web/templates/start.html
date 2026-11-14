@@ -100,61 +100,65 @@
 {% endif %}
 
 <form id="run_params" action="/submitted" method="post">
-
-    <div class="form-group">
-        <label for="tb_readpath">Read Path</label>
-        <div class="input-row">
-            <input type="text" id="tb_readpath" name="tb_readpath"
-                value="{{ readpath or rica_s_home ~ '/input/pod5/_1h' }}" />
-            <button type="button" id="btn_browse">Browse...</button>
-        </div>
-
-        <label for="tb_runid">Run ID</label>
-        <div class="input-row">
-            <input type="text" id="tb_runid" name="tb_runid" value="{{ runid or '' }}" />
-        </div>
-    </div>
-
-    <details class="advanced" {% if error %}open{% endif %}>
-        <summary>Advanced options</summary>
-
-        <input type="hidden" name="tools_submitted" value="1">
-
-        {% if not docker_ok %}
-        <p class="tool-note">Docker status unavailable: every tool is listed as available.</p>
+    <fieldset class="form-lock" {% if running_runs %}disabled{% endif %}>
+        {% if running_runs %}
+        <p class="tool-note">New runs can be submitted once the running experiment has finished.</p>
         {% endif %}
 
-        {% for group in tool_groups %}
-        <fieldset class="tool-group">
-            <legend>{{ group.title }}</legend>
-            {% if group.tools %}
-            <ul class="tool-list">
-                {% for tool in group.tools %}
-                <li class="tool-item{% if not tool.available %} is-off{% endif %}">
-                    <label for="tool_{{ tool.name }}">
-                        <input type="checkbox" id="tool_{{ tool.name }}" name="tools"
-                            value="{{ tool.name }}"
-                            {% if tool.available %}checked{% else %}disabled{% endif %}>
-                        <span class="tool-name">{{ tool.display }}</span>
-                        {% if not tool.available %}
-                        <span class="tool-state">{{ tool.state }}</span>
-                        {% endif %}
-                    </label>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p class="tool-note">No containers found.</p>
+        <div class="form-group">
+            <label for="tb_readpath">Read Path</label>
+            <div class="input-row">
+                <input type="text" id="tb_readpath" name="tb_readpath"
+                    value="{{ readpath or rica_s_home ~ '/input/pod5/_1h' }}" />
+                <button type="button" id="btn_browse">Browse...</button>
+            </div>
+
+            <label for="tb_runid">Run ID</label>
+            <div class="input-row">
+                <input type="text" id="tb_runid" name="tb_runid" value="{{ runid or '' }}" />
+            </div>
+        </div>
+
+        <details class="advanced" {% if error %}open{% endif %}>
+            <summary>Advanced options</summary>
+
+            <input type="hidden" name="tools_submitted" value="1">
+
+            {% if not docker_ok %}
+            <p class="tool-note">Docker status unavailable: every tool is listed as available.</p>
             {% endif %}
-        </fieldset>
-        {% endfor %}
 
-        <p class="tool-note">
-            Basecalling and human-DNA filtering always run and cannot be disabled.
-        </p>
-    </details>
+            {% for group in tool_groups %}
+            <fieldset class="tool-group">
+                <legend>{{ group.title }}</legend>
+                {% if group.tools %}
+                <ul class="tool-list">
+                    {% for tool in group.tools %}
+                    <li class="tool-item{% if not tool.available %} is-off{% endif %}">
+                        <label for="tool_{{ tool.name }}">
+                            <input type="checkbox" id="tool_{{ tool.name }}" name="tools" value="{{ tool.name }}"
+                                {% if tool.name == 'rica_s_id_clark' %}disabled{% elif tool.available %}checked{% else %}disabled{% endif %}>
+                            <span class="tool-name">{{ tool.display }}</span>
+                            {% if not tool.available %}
+                            <span class="tool-state">{{ tool.state }}</span>
+                            {% endif %}
+                        </label>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="tool-note">No containers found.</p>
+                {% endif %}
+            </fieldset>
+            {% endfor %}
 
-    <input type="submit" name="submit" id="submit" value="Submit Run" />
+            <p class="tool-note">
+                Basecalling and human-DNA filtering always run and cannot be disabled.
+            </p>
+        </details>
+
+        <input type="submit" name="submit" id="submit" value="Submit Run" />
+    </fieldset>
 </form>
 {% endblock %}
 

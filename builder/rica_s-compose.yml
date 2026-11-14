@@ -9,6 +9,16 @@ networks:
                 - subnet: 172.20.0.0/24 # Define the subnet for your network
 
 services:
+    rica_s_16s_krakenuniq:
+        extends:
+            file: 16s/rica_s_16s_krakenuniq-compose.yml
+            service: rica_s_16s_krakenuniq
+    
+    rica_s_16s_dummy1:
+        extends:
+            file: 16s/rica_s_16s_dummy1-compose.yml
+            service: rica_s_16s_dummy1
+    
     rica_s_id_dummy1:
         extends:
             file: id/rica_s_id_dummy1-compose.yml

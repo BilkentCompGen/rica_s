@@ -4,10 +4,14 @@ from flask import abort, send_from_directory, url_for
 from pathlib import Path
 import os
 import logging
+import zlib
 # from ..config import c
 
 from scripts.config import c, run_outdir, subrun_dirs, parse_run_info
 from scripts.tool_registry import tool_groups, all_tools, display_name, DISPLAY_NAMES, KIND_PREFIX
+from scripts.rica_s_ui_web.amr_results import AMR_COLUMNS, amr_sources, amr_counts
+from scripts.rica_s_ui_web.run_times import parse_run_log, time_section
+from scripts import run_state
 
 
 logger = logging.getLogger(__name__)
@@ -17,6 +21,20 @@ app = Flask(__name__)
 @app.context_processor
 def inject_rica_s_home():
     return {"rica_s_home": c["RICA_S_HOME"]}
+
+
+@app.context_processor
+def inject_running_runs():
+    # checked on every page render so the banner in base.html is always current
+    return {"running_runs": running_runs()}
+
+
+def running_runs():
+    out = Path(c["OUT_DIR"])
+    if not out.is_dir():
+        return []
+    return sorted(entry.name for entry in os.scandir(out)
+                  if entry.is_dir() and run_status(entry.name) == "started")
 
 
 def parse_summary_file(filepath: Path):
@@ -109,17 +127,28 @@ def run_status(runid: str):
     if not base.is_dir():
         return "no run ID"
 
+    # "started" on disk but not being processed: the process running it died.
+    # Runs with only an .info file are queued, not interrupted.
+    own = read_status(base, runid)
+    if own == "interrupted":
+        return "interrupted"
+    if own == "started" and run_state.listener_active:
+        # the run-level status is authoritative while the pipeline is in this process;
+        # it also covers the post-run merge, after every sub-run has finished
+        return "started" if runid in run_state.active_runs else "interrupted"
+
     subs = subrun_dirs(runid)
     if not subs:
-        return read_status(base, runid) or (
+        return own or (
             "started" if (base / f"{runid}.info").exists() else "no run ID")
 
-    statuses = [s for s in (read_status(Path(path), name)
-                            for _index, name, path in subs) if s]
-    if not statuses:
+    # a sub-run without a status file is still being processed
+    statuses = [read_status(Path(path), name) for _index, name, path in subs]
+    if not any(statuses):
         return "started"
-    if "killed" in statuses:
-        return "killed"
+    for stopped in ("killed", "interrupted"):
+        if stopped in statuses:
+            return stopped
 
     info = base / f"{runid}.info"
     try:
@@ -133,45 +162,84 @@ def run_status(runid: str):
     return "started"
 
 
-AMR_COLUMNS = [
-    'GENE', '%COVERAGE', '%IDENTITY', 'PRODUCT',
-    'RESISTANCE', 'DATABASE', 'ACCESSION', '#FILE', 'SEQUENCE'
-]
-
 AMR_SEPARATORS = {'RESISTANCE': ';', 'PRODUCT': ':'}
 
+AMR_TABLE_COLUMNS = ['TOOL'] + AMR_COLUMNS
 
-def process_csv_data(output_dir: Path, id_prefix: str = "csvDataTable", label: str = None):
-    tables = []
 
-    for index, file_path in enumerate(sorted(output_dir.glob("*.abricate.csv"))):
-        table = {
-            'filename': f"{label} / {file_path.name}" if label else file_path.name,
-            'subrun': label,
-            'table_id': f"{id_prefix}_{index}",
-            'columns': AMR_COLUMNS,
-        }
+# parsed AMR results per unit dir, reused until one of its result files changes.
+# L-EasyARG MGE output can hold tens of thousands of hits, so parsing it on every
+# report load (and every live refresh) is too slow.
+AMR_CACHE = {}
+AMR_CACHE_SIZE = 8
 
+
+def amr_signature(output_dir: Path, sources):
+    signature = []
+    for _tool, name, _load in sources:
         try:
-            with open(file_path, newline='', encoding='utf-8') as handle:
-                reader = csv.DictReader(handle, delimiter='\t')
+            st = (output_dir / name).stat()
+            signature.append((name, st.st_mtime_ns, st.st_size))
+        except OSError:
+            signature.append((name, None, None))
+    return tuple(signature)
 
-                missing = [c for c in AMR_COLUMNS
-                           if c not in (reader.fieldnames or [])]
-                if missing:
-                    raise KeyError("missing columns: " + ", ".join(missing))
 
-                table['rows'] = [
-                    [split_cell(row.get(column) or "", AMR_SEPARATORS.get(column))
-                     for column in AMR_COLUMNS]
-                    for row in reader
-                ]
+def load_amr(output_dir: Path):
+    """{tagged: [(tool, row)], files: [(tool, name)], errors, version} of one unit dir."""
+    sources = amr_sources(output_dir)
+    key = str(output_dir)
+    signature = amr_signature(output_dir, sources)
+    cached = AMR_CACHE.get(key)
+    if cached and cached[0] == signature:
+        return cached[1]
+
+    tagged, files, errors = [], [], []
+    for tool, name, load in sources:
+        files.append((tool, name))
+        try:
+            tagged += [(tool, row) for row in load()]
         except Exception as e:
-            table['error'] = str(e)
+            errors.append(f"{name}: {e}")
 
-        tables.append(table)
+    amr = {
+        'tagged': tagged,
+        'files': files,
+        'errors': errors,
+        # changes with the files, so the rows URL changes and the browser refetches
+        'version': f"{zlib.crc32(repr(signature).encode()):08x}",
+    }
+    AMR_CACHE.pop(key, None)
+    AMR_CACHE[key] = (signature, amr)
+    while len(AMR_CACHE) > AMR_CACHE_SIZE:
+        AMR_CACHE.pop(next(iter(AMR_CACHE)))
+    return amr
 
-    return tables
+
+def amr_table_rows(amr):
+    # every cell is a list of lines; the page shows them one per line
+    return [[[tool]] + [split_cell(value, AMR_SEPARATORS.get(column))
+                        for column, value in zip(AMR_COLUMNS, row)]
+            for tool, row in amr['tagged']]
+
+
+def process_csv_data(amr, runid: str, unit_id: str,
+                     id_prefix: str = "csvDataTable", label: str = None):
+    # one table per unit, mixing every AMR tool's rows; TOOL says which docker found it.
+    # The rows are not in the page: DataTables fetches them from get_amr_rows.
+    if not amr['files']:
+        return []
+
+    files = ", ".join(name for _tool, name in amr['files'])
+    return [{
+        'filename': f"{label} / {files}" if label else files,
+        'subrun': label,
+        'table_id': f"{id_prefix}_0",
+        'columns': AMR_TABLE_COLUMNS,
+        'row_count': len(amr['tagged']),
+        'url': url_for('get_amr_rows', runid=runid, unit_id=unit_id, v=amr['version']),
+        'errors': amr['errors'],
+    }]
 
 
 def split_cell(value: str, separator: str = None):
@@ -315,14 +383,37 @@ def generate_report(runid):
     pathogen_data = []
     log_parts = []
 
+    status = run_status(runid)
+    timings = parse_run_log(Path(run_outdir(runid)) / f"{runid}.log",
+                            [unit_id for unit_id, _dir in units],
+                            running=status == "started")
+    amr_by_unit = {unit_id: load_amr(run_dir) for unit_id, run_dir in units}
+
     for index, (unit_id, run_dir) in enumerate(units):
+        run_wide = has_subruns and unit_id == runid
         for section in parse_summary_file(run_dir / f"{unit_id}.summary"):
             section['header'] = f"[{unit_id}] {section['header']}"
             section['subrun'] = unit_id
             summary_data.append(section)
 
+        # the whole run counts every sub-run's hits together
+        amr_units = [u for u, _dir in units if u != runid] if run_wide else [unit_id]
+        amr_files = [f for u in amr_units for f in amr_by_unit[u]['files']]
+        if amr_files:
+            summary_data.append({
+                'header': f"[{unit_id}] AMR / mobile elements",
+                'subrun': unit_id,
+                'rows': amr_counts([r for u in amr_units for r in amr_by_unit[u]['tagged']],
+                                   amr_files),
+            })
+
+        timing = timings.get("__run__" if run_wide else unit_id)
+        if timing:
+            summary_data.append(time_section(unit_id, timing, run_wide=run_wide))
+
         csv_data += process_csv_data(
-            run_dir, id_prefix=f"csvDataTable_u{index}", label=unit_id)
+            amr_by_unit[unit_id], runid, unit_id,
+            id_prefix=f"csvDataTable_u{index}", label=unit_id)
 
         pathogen_data += process_pathogen_plots(
             runid, unit_id, run_dir, run_wide=has_subruns and unit_id == runid)
@@ -334,7 +425,7 @@ def generate_report(runid):
     return render_template(
         'report.html',
         runid=runid,
-        status=run_status(runid),
+        status=status,
         revision=run_revision(runid),
         subruns=[unit_id for unit_id, _dir in units],
         units=unit_info,
@@ -357,6 +448,20 @@ def get_run_plot(runid, unit_id, filename):
         abort(404)
 
     return send_from_directory(run_dir, filename)
+
+
+@app.route('/report/<runid>/amr/<unit_id>')
+def get_amr_rows(runid, unit_id):
+    run_dir = find_unit_dir(runid, unit_id)
+    if run_dir is None:
+        abort(404)
+
+    response = jsonify({"data": amr_table_rows(load_amr(run_dir))})
+    # the URL carries the files' version (?v=), so a changed result gets a new URL
+    if request.args.get('v'):
+        response.cache_control.private = True
+        response.cache_control.max_age = 3600
+    return response
 
 
 ################

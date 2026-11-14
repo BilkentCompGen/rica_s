@@ -32,7 +32,7 @@
         },
         {
             "name": "PyMod",
-            "sudo": true,
+            // "sudo": true,
             "type": "python",
             "request": "launch",
             "module": "scripts.run_listener",
