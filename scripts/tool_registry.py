@@ -1,6 +1,6 @@
 import os
 
-from scripts.config import PROJECT_HOME
+from scripts.config import RICA_S_HOME
 
 KIND_PREFIX = {"id": "rica_s_id_", "pr": "rica_s_pr_"}
 KIND_TITLE = {"id": "Identifiers", "pr": "AMR gene detectors"}
@@ -32,12 +32,12 @@ def container_states():
 
 
 def script_dirs():
-    scripts_dir = f"{PROJECT_HOME}/scripts"
+    scripts_dir = f"{RICA_S_HOME}/scripts"
     return [name for name in os.listdir(scripts_dir) if os.path.isdir(f"{scripts_dir}/{name}")]
 
 
 def has_script(kind, name):
-    return os.path.isfile(f"{PROJECT_HOME}/scripts/{name}/{KIND_SCRIPT[kind]}")
+    return os.path.isfile(f"{RICA_S_HOME}/scripts/{name}/{KIND_SCRIPT[kind]}")
 
 
 def discover_tools(kind, states=None):

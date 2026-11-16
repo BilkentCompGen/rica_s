@@ -25,7 +25,7 @@ services:
     tty: true
 
     volumes:
-      - /opt/rica_s:/opt/rica_s
+      - ${RICA_S_HOME:?run via builder/docker_control.sh or set RICA_S_HOME}:${RICA_S_HOME}
 
     deploy:
       resources:

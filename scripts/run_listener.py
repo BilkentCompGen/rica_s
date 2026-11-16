@@ -6,7 +6,9 @@ import os
 import sys
 import threading
 import waitress
+from pathlib import Path
 from scripts.config import c
+from scripts import run_state
 import scripts.main_run as mr
 import scripts.rica_s_ui_web.web_ui as ui
 import subprocess
@@ -33,7 +35,29 @@ class NewFileHandler(FileSystemEventHandler):
             print(f"[i]> Run ended at {event.src_path} ===")
 
 
+def mark_interrupted_runs(out_dir):
+    """Nothing runs yet, so every unfinished run left on disk belongs to a dead process."""
+    for run_dir in Path(out_dir).iterdir():
+        runid = run_dir.name
+        if not (run_dir / f"{runid}.info").is_file():
+            continue
+
+        status = run_dir / f"{runid}.status"
+        state = status.read_text().strip() if status.exists() else None
+        # no status file: it was queued and the watchdog will never pick it up again
+        if state in ("started", None):
+            status.write_text("interrupted\n")
+            print(f"[i]> marked {runid} as interrupted (was {state or 'queued'})")
+
+        for sub_status in run_dir.glob(f"{runid}_*/{runid}_*.status"):
+            if (sub_status.stem == sub_status.parent.name
+                    and sub_status.read_text().strip() == "started"):
+                sub_status.write_text("interrupted\n")
+
+
 def start_services(path_to_watch=c["OUT_DIR"]):
+    mark_interrupted_runs(path_to_watch)
+    run_state.listener_active = True
 
     event_handler = NewFileHandler()
     observer = Observer()

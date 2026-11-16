@@ -11,6 +11,13 @@
 
 <body class="{% block body_class %}{% endblock %}">
     <div class="container {% block container_class %}{% endblock %}">
+        {% for r in running_runs %}
+        <div class="run-banner" data-runid="{{ r }}">
+            <span class="run-icon" aria-hidden="true"></span>
+            <span class="run-text">An experiment is running:
+                <a href="{{ url_for('generate_report', runid=r) }}">{{ r }}</a></span>
+        </div>
+        {% endfor %}
         {% block content %}{% endblock %}
     </div>
     {% block scripts %}{% endblock %}

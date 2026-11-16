@@ -3,8 +3,11 @@ import os
 import sys
 import datetime
 import time
-from scripts.config import (PROJECT_HOME, run_outdir, parse_run_info,
-                            read_run_info, run_info_tuple, run_info_tools, c)
+from scripts.config import (RICA_S_HOME, run_outdir, parse_run_info,
+                            read_run_info, run_info_tuple, run_info_tools, c,
+                            subrun_dirs)
+from scripts.rica_s_ui_web.amr_results import AMR_COLUMNS, amr_sources
+from scripts import run_state
 from scripts.stage_0_basecall import all_basecall
 from scripts.stage_1_filter import all_filter
 from scripts.stage_2_classify import all_classify
@@ -13,7 +16,6 @@ from scripts.stage_4_plot import all_plot
 from scripts.stage_5_report import all_report
 import pod5 as p5
 import statistics
-from Bio import SeqIO
 import os
 import glob
 import csv
@@ -36,51 +38,46 @@ logger = logging.getLogger(__name__)
 
 ############################
 
-def merge_abricate_tsvs(run_id, target_dir):
-    target_path = Path(target_dir)
+def merge_and_plot_amr_subruns(run_id, output_prefix):
+    """Merge ABRicate and L-EasyARG hits of every sub-run and plot the top genes."""
+    rows = []
+    for _, subrun, path in subrun_dirs(run_id):
+        for tool, name, load in amr_sources(Path(path)):
+            try:
+                rows += [[subrun, tool, name] + row for row in load()]
+            except Exception:
+                logger.exception(f"Failed to read AMR results: {subrun}/{name}")
 
-    # 1. Find all abricate TSVs recursively in the subdirectories (runid_0, runid_1, etc.)
-    tsv_files = list(target_path.rglob("*abricate.csv"))
-
-    if not tsv_files:
-        logger.warning(
-            f"No abricate CSV files found in {target_dir} or its subdirectories.")
+    if not rows:
+        logger.warning(f"No AMR results found for run ID: {run_id}")
         return None
 
-    logger.info(f"Found {len(tsv_files)} abricate CSV. Merging now...")
+    merged_df = pd.DataFrame(
+        rows, columns=["SUBRUN", "TOOL", "SOURCE_FILE"] + AMR_COLUMNS)
+    output_file = f"{output_prefix}_merged_amr.tsv"
+    merged_df.to_csv(output_file, sep="\t", index=False)
+    logger.info(f"Merged {len(merged_df)} AMR hits into {output_file}")
 
-    # 2. Load them into a list of DataFrames
-    df_list = []
-    for file in tsv_files:
-        try:
-            df = pd.read_csv(file)
-            # Optional: Add a column to track exactly which subrun file it came from
-            df['source_file'] = file.name
-            df_list.append(df)
-        except Exception as e:
-            logger.exception(f"Failed to read CSV file: {file.name}")
+    try:
+        # distinct reads per (tool, gene), top 50
+        counts = (merged_df.drop_duplicates(["TOOL", "GENE", "SEQUENCE"])
+                  .groupby(["TOOL", "GENE"]).size().nlargest(50).sort_values())
+        labels = [f"{gene} [{tool}] ({n})" for (tool, gene), n in counts.items()]
+        # ~0.28 in per bar so 11 pt labels never overlap
+        fig = barh_figure(labels, counts.values, cmap=RICA_CMAP,
+                          figsize=(8, max(3, 0.28 * len(counts))), dpi=300,
+                          ytick_size=11, xlabel="Number of Reads with Hit")
+        save_image(fig, f"{output_prefix}_amr.png")
+        logger.info(f"AMR plot saved to: {output_prefix}_amr.png")
+    except Exception:
+        logger.exception("An error occurred while plotting the AMR hits.")
 
-    if not df_list:
-        return None
-
-    merged_df = pd.concat(df_list, ignore_index=True)
-    output_file = target_path / f"{run_id}_merged_abricate.csv"
-
-    merged_df.to_csv(output_file, sep='\t', index=False)
-    logger.info(
-        f"Successfully merged {len(merged_df)} rows and saved to {output_file}")
-
-    # with open(f"{target_dir}/{run_id}.merged_pr_.csv", "w") as f:
-    #     f.write(merged_df.to_string(max_rows=None, max_cols=None))
-
-    # return merged_df
+    return merged_df
 
 
 def merge_and_plot_subruns(run_id, target_dir, output_image_path):
     target_path = Path(target_dir)
 
-    # 1. Find all TSV files matching the run_id (e.g., subrun_01_run123.tsv)
-    # The '*' acts as a wildcard before and after the ID
     tsv_files = list(target_path.rglob(f"*{run_id}*_aggregate.tsv"))
 
     if not tsv_files:
@@ -90,7 +87,6 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
 
     logger.info(f"Found {len(tsv_files)} TSV files. Starting merge...")
 
-    # 2. Load all TSVs into a list of DataFrames
     df_list = []
     for file in tsv_files:
         try:
@@ -103,20 +99,15 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
     if not df_list:
         return None
 
-    # 3. Concatenate all DataFrames into one massive DataFrame
-    # ignore_index=True resets the row numbers so they go from 0 to total_rows
     merged_df = pd.concat(df_list, ignore_index=True)
 
-    # Extract the names of the columns at index 1 and 2
     col_to_group = merged_df.columns[0]
     col_to_sum = merged_df.columns[1]
 
-    # Group and sum using those dynamic names
     merged_df = merged_df.groupby(col_to_group, as_index=False)[
         col_to_sum].sum()
 
     logger.info(f"Successfully merged {len(merged_df)} total rows.")
-# 4. Generate the plot
     try:
         col_name = merged_df.columns[0]
         col_count = merged_df.columns[1]
@@ -127,7 +118,6 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
                 species_label(name, count) for name, count
                 in zip(merged_df[col_name], merged_df[col_count])]
 
-            # 2. Sort the DataFrame so the largest values appear at the top
             merged_df = merged_df.sort_values(by=col_count, ascending=True)
 
             fig = barh_figure(
@@ -140,8 +130,7 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
             )
 
             # Save the figure to disk
-            # save_image(fig, output_image_path)
-
+            save_image(fig, output_image_path)
             logger.info(f"Plot saved successfully to: {output_image_path}")
 
         else:
@@ -152,7 +141,7 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
         logger.exception("An error occurred while plotting the data.")
 
     from scripts.misc.histogram import plot_df
-    # hist_script = f"{c['PROJECT_HOME']}/scripts/misc/histogram.py"
+    # hist_script = f"{c['RICA_S_HOME']}/scripts/misc/histogram.py"
     # subprocess.run(["python3", hist_script, file])
     plot_df(merged_df, output_image_path)
 
@@ -161,522 +150,297 @@ def merge_and_plot_subruns(run_id, target_dir, output_image_path):
 
 
 
-def write_runinfo(readpath, runid, run_dir, info_path):
-
-    tools_line = "tools\trica_s_id_blast,rica_s_id_bwa,rica_s_id_clark,rica_s_id_cuclark,rica_s_id_kraken2,rica_s_id_minimap2,rica_s_id_ngmlr,rica_s_pr_abricate\n"
-
-    try:
-        run_dir.mkdir(parents=True, exist_ok=True)
-        pod5_filenames = sorted(p.name for p in Path(readpath).glob("*.pod5"))
-        logger.info(f"searching pod5s in {readpath}")
-        logger.info(f"Found {len(pod5_filenames)} POD5 files: {pod5_filenames}")
-        info_path.write_text(
-            f"runid\t{runid}\n"
-            f"readpath\t{readpath}\n"
-            f"pod5\t{','.join(pod5_filenames)}\n"
-            + tools_line
-        )
-        logger.info(f"Success: wrote {info_path}")
-
-    except Exception:
-        logger.info(f"CRITICAL ERROR: {e}.")
-    
-    return
 
 
 
 
 
+LOG_FORMAT = "%(asctime)s - [%(name)s:%(lineno)d] - %(message)s"
 
 
+def _attach_run_log(log_path):
+    # basicConfig only works once per process, so batch runs would all log
+    # to the first run's file; attach (and later remove) a handler per run
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    formatter = logging.Formatter(LOG_FORMAT)
+    if not any(type(h) is logging.StreamHandler for h in root.handlers):
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        root.addHandler(stream_handler)
+    file_handler = logging.FileHandler(log_path)
+    file_handler.setFormatter(formatter)
+    root.addHandler(file_handler)
+    return file_handler
 
 
+def _detach_run_log(file_handler):
+    logging.getLogger().removeHandler(file_handler)
+    file_handler.close()
 
 
+def _restart_containers():
+    logger.info("[i]> === Starting containers")
+    process = subprocess.Popen(
+        [f"{c['RICA_S_HOME']}/builder/docker_control.sh", "restart"],
+        cwd=f"{c['RICA_S_HOME']}/builder/",
+        env={**os.environ, "RICA_S_HOME": c['RICA_S_HOME']},
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1
+    )
+    logger.info(process.stdout.read())
+    process.wait()
+    logger.info("[i]> Containers started ===")
 
 
+def _n50(lengths):
+    total_yield = sum(lengths)
+    running_sum = 0
+    for length in sorted(lengths, reverse=True):
+        running_sum += length
+        if running_sum >= total_yield / 2:
+            return length
+    return 0
 
 
+def _ont_header_ids(header, channels, run_ids):
+    # header: the record's header line without its '@' / '>' marker
+    for item in header.split()[1:]:
+        if item.startswith("ch="):
+            channels.add(item.split("=")[1])
+        elif item.startswith("runid="):
+            run_ids.add(item.split("=")[1])
 
 
+def _append_summary(summaryfile, header, metrics):
+    with open(summaryfile, "a") as f:
+        f.write(f"\n--- {header}\n")
+        for key, value in metrics.items():
+            f.write(f"{key}: {value}\n")
 
 
+def pod5_metadata(inputfile, summaryfile):
+    with p5.Reader(inputfile) as reader:
+        try:
+            # the run info of the very first read describes the whole file
+            first_read = next(reader.reads())
+            info = first_read.run_info
+            metrics = {
+                "Sample Rate": info.sample_rate,
+                "Sequencing Kit": info.sequencing_kit,
+                "Experiment Name": info.experiment_name,
+                # pore_type is stored in a separate Pore object on the read
+                "Pore Type": first_read.pore.pore_type,
+            }
+        except StopIteration:
+            metrics = {"Error": "No reads found in this POD5 file."}
+    _append_summary(summaryfile, inputfile + " ", metrics)
 
 
+def _fastq_records(fastq):
+    """(header, sequence length, mean Phred) per read of a 4-line FASTQ.
+
+    Reads raw bytes instead of Biopython records: ~30x faster on ONT output, and the
+    mean Phred is computed in C (sum of the quality bytes).
+    """
+    with open(fastq, "rb") as handle:
+        for header in handle:
+            if not header.strip():
+                continue
+            seq = handle.readline().rstrip(b"\r\n")
+            handle.readline()
+            qual = handle.readline().rstrip(b"\r\n")
+            mean_q = sum(qual) / len(qual) - 33 if qual else None
+            yield header[1:].decode(errors="replace"), len(seq), mean_q
 
 
+def _fasta_records(fasta):
+    """(header, sequence length) per record; sequences may span several lines."""
+    header, length = None, 0
+    with open(fasta, "rb") as handle:
+        for line in handle:
+            if line.startswith(b">"):
+                if header is not None:
+                    yield header, length
+                header, length = line[1:].decode(errors="replace"), 0
+            else:
+                length += len(line.strip())
+    if header is not None:
+        yield header, length
 
 
+def fastq_metadata(fastq, summaryfile):
+    lengths, q_scores = [], []
+    channels, run_ids = set(), set()
+    for header, length, mean_q in _fastq_records(fastq):
+        lengths.append(length)
+        if mean_q is not None:
+            q_scores.append(mean_q)
+        _ont_header_ids(header, channels, run_ids)
+
+    _append_summary(summaryfile, fastq, {
+        "Total Reads": len(lengths),
+        "Total Yield (bp)": sum(lengths),
+        "Max Read Length (bp)": max(lengths) if lengths else 0,
+        "Read Length N50 (bp)": _n50(lengths),
+        "Overall Mean Q-Score": round(statistics.mean(q_scores), 2) if q_scores else 0,
+        "Active MinION Channels": len(channels),
+        "Run IDs Detected": list(run_ids),
+    })
 
 
+def fasta_metadata(fasta, summaryfile):
+    lengths = []
+    channels, run_ids = set(), set()
+    for header, length in _fasta_records(fasta):
+        lengths.append(length)
+        # only present if the FASTA kept the ONT headers of the FASTQ
+        _ont_header_ids(header, channels, run_ids)
 
+    metrics = {
+        "Total Sequences": len(lengths),
+        "Total Yield (bp)": sum(lengths),
+        "Max Sequence Length (bp)": max(lengths) if lengths else 0,
+        "Sequence Length N50 (bp)": _n50(lengths),
+    }
+    if channels:
+        metrics["Active MinION Channels"] = len(channels)
+    if run_ids:
+        metrics["Run IDs Detected"] = list(run_ids)
+    _append_summary(summaryfile, fasta, metrics)
+
+
+def tsv_metadata(outdir, summaryfile):
+    tsv_files = glob.glob(f"{outdir}/*.tsv")
+    if not tsv_files:
+        logger.info(f"No .tsv files found in directory: {outdir}")
+        return
+
+    summarydata = {}
+    for filepath in tsv_files:
+        try:
+            with open(filepath, mode='r', encoding='utf-8') as f:
+                for row in csv.reader(f, delimiter='\t'):
+                    summarydata[row[0]] = summarydata.get(row[0], 0) + int(row[1])
+        except Exception as e:
+            logger.error(f"Error reading {os.path.basename(filepath)}: {e}")
+
+    _append_summary(summaryfile, "tsv", {
+        "Tools used": len(tsv_files),
+        "Pathogens detected": len(summarydata),
+    })
+
+
+def _log_metadata_error(future):
+    # metadata is informative only, so a failure is logged, not fatal
+    if future.exception():
+        logger.error(f"[!]> metadata job failed: {future.exception()!r}")
 
 
 def start_run(run_info):
-    logger.info("=======")
-    with open(run_info, "r") as f:
-        logger.info(f.read())
-    logger.info("=======")
-    
-    fields = read_run_info(run_info)
-    runid, inputfile_path, inputfile_names = run_info_tuple(fields)
-    tools = run_info_tools(fields)
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - [%(name)s:%(lineno)d] - %(message)s",
-        handlers=[
-            logging.FileHandler(f"{c["OUT_DIR"]}/{runid}/{runid}.log"),
-            logging.StreamHandler()
-        ]
-    )
-
-
+    # give whoever is writing the .info file a moment to finish
     time.sleep(1)
-    if not runid or not inputfile_names:
+    fields = read_run_info(run_info)
+    runid, input_dir, input_names = run_info_tuple(fields)
+    tools = run_info_tools(fields)
+    if not runid or not input_names:
         logger.error(
-            f"[!]> unusable run info {run_info}: runid={runid!r}, files={inputfile_names}")
+            f"[!]> unusable run info {run_info}: runid={runid!r}, files={input_names}")
         return
 
-    statusfile = f"{c["OUT_DIR"]}/{runid}/{runid}.status"
-    os.system("echo started > "+statusfile)
+    run_dir = Path(c["OUT_DIR"]) / runid
+    log_handler = _attach_run_log(run_dir / f"{runid}.log")
+    status = run_dir / f"{runid}.status"
+    sub_status = None
+    # one worker keeps the metadata jobs from interleaving in the summary
+    metadata_pool = ThreadPoolExecutor(max_workers=1)
 
+    def metadata(fn, *args):
+        metadata_pool.submit(fn, *args).add_done_callback(_log_metadata_error)
 
-
-
-
-
-    print(f"[i]> === Starting containers")
-    try:
-
-        command = [
-            f"{c['PROJECT_HOME']}/builder/docker_control.sh", "restart"
-        ]
-
-        process = subprocess.Popen(
-            command,
-            cwd=f"{c['PROJECT_HOME']}/builder/",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1
-        )
-        print(process.stdout.read())
-        process.wait()
-    except Exception as e:
-        print(f"An exception ocurred while starting the containers: {e}")
-        exit(-1)
-
-    print(f"[i]> Containers started ===")
-
-
-    logger.info("[i]> Begin of sepsis detection")
-    logger.info(datetime.datetime.now())
-
-    for i, f in enumerate(inputfile_names):
-        all_run(f"{runid}_{i}", f"{inputfile_path}/{f}", parent=runid,
-                tools=tools)
-
-    # load tsv of subruns of _id_ and merge in a pandas df
-    # add them in one df
-    # generate plot
-    merge_and_plot_subruns(runid, c["OUT_DIR"]+"/"+runid, c["OUT_DIR"]+"/"+runid+"/_bigfile.png")
-
-    # load tsv of subruns of _pr_
-    # add them in 1
-    # display
-
-    # Example usage:
-    merge_abricate_tsvs(runid, c["OUT_DIR"]+"/"+runid)
-    
-    
-    logger.info(datetime.datetime.now())
-    logger.info("[i]> End of sepsis detection")
-
-
-
-
-
-
-
-
-
-def all_run(runid, inputfile_raw, parent=None, tools=None):
+    # registered before the status file says "started", so the web UI never sees
+    # a started run that is not active
+    run_state.active_runs.add(runid)
+    status.write_text("started\n")
+    logger.info(f"=======\n{Path(run_info).read_text()}\n=======")
 
     try:
-
-
-
-        inputfile = os.path.realpath(inputfile_raw)
-        outdir = run_outdir(runid, parent)
-        statusfile = outdir + "/" + runid + ".status"
-        summaryfile = outdir + "/" + runid + ".summary"
-
-        os.makedirs(outdir, exist_ok=True)
-
-        # os.system("echo started > "+statusfile)
-        # os.system("touch "+summaryfile)
-        os.system("echo RICA_S > "+outdir+"/"+runid+".log")
-
-        logger.info("-" * 30)
-        logger.info(f"run ID: {runid}")
-        logger.info(f"input file: {inputfile}")
-        logger.info(f"output dir: {outdir}")
-        logger.info("-" * 30)
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-##############################################################################
-##############################################################################
-##############################################################################
-
-
-    try:
-        logger.info(f"[i]> getting metadata for {inputfile}")
-
-        def get_pod5_metadata():
-            # pod5 data
-            with p5.Reader(inputfile) as reader:
-                with open(summaryfile, "a") as sf:
-                    sf.write("\n--- " + inputfile + " \n")
-
-                    try:
-                        # Grab the very first read in the file
-                        first_read = next(reader.reads())
-
-                        # Extract the RunInfo object
-                        info = first_read.run_info
-
-                        sf.write(f"Sample Rate: {info.sample_rate}\n")
-                        sf.write(f"Sequencing Kit: {info.sequencing_kit}\n")
-                        sf.write(f"Experiment Name: {info.experiment_name}\n")
-
-                        # pore_type is stored in a separate Pore object on the read
-                        sf.write(f"Pore Type: {first_read.pore.pore_type}\n")
-
-                    except StopIteration:
-                        # Failsafe in case the pod5 file is completely empty
-                        sf.write("Error: No reads found in this POD5 file.\n")
-        executor = ThreadPoolExecutor(max_workers=1)
-        executor.submit(get_pod5_metadata)
-
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-
-# ##############################################################################
-# ##############################################################################
-# ##############################################################################
-    try:
-        # 0. Basecall
-        logger.info(f"AllBasecall {runid} {inputfile}")
-        all_basecall(runid, inputfile, parent)
-        inputfile_bc = f"{outdir}/{os.path.basename(inputfile)}.fastq"
-        # input("Continue? Press Enter.")
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-
-
-# ##############################################################################
-# ##############################################################################
-# ##############################################################################
-
-
-
-    try:
-        logger.info("[i]> fetching fastqs metadata")
-
-
-        def get_fastq_metadata():
-            # fastq data
-            lengths = []
-            q_scores = []
-            channels = set()
-            run_ids = set()
-
-            # Iterate through the FASTQ file exactly once
-            for record in SeqIO.parse(inputfile_bc, "fastq"):
-
-                seq_len = len(record.seq)
-                lengths.append(seq_len)
-
-                read_phreds = record.letter_annotations["phred_quality"]
-                if read_phreds:
-                    q_scores.append(statistics.mean(read_phreds))
-
-                parts = record.description.split()
-                for item in parts[1:]:
-                    if item.startswith("ch="):
-                        channels.add(item.split("=")[1])
-                    elif item.startswith("runid="):
-                        run_ids.add(item.split("=")[1])
-
-            # Calculate N50
-            lengths.sort(reverse=True)
-            total_yield = sum(lengths)
-            n50 = 0
-            running_sum = 0
-
-            for length in lengths:
-                running_sum += length
-                if running_sum >= total_yield / 2:
-                    n50 = length
-                    break
-
-            # Compile the final statistics dictionary
-            metrics = {
-                "Total Reads": len(lengths),
-                "Total Yield (bp)": total_yield,
-                "Max Read Length (bp)": max(lengths) if lengths else 0,
-                "Read Length N50 (bp)": n50,
-                "Overall Mean Q-Score": round(statistics.mean(q_scores), 2) if q_scores else 0,
-                "Active MinION Channels": len(channels),
-                "Run IDs Detected": list(run_ids)
-            }
-            # Using "a" to append. Change to "w" if you want to overwrite the file each time.
-            with open(summaryfile, "a") as f:
-                f.write("\n--- "+inputfile_bc+"\n")
-                for key, value in metrics.items():
-                    f.write(f"{key}: {value}\n")
-        
-        
-        executor = ThreadPoolExecutor(max_workers=1)
-        executor.submit(get_fastq_metadata)
-
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-
-
-# ##############################################################################
-# ##############################################################################
-# ##############################################################################
-
-    try:
-        # 1. Filter
-        logger.info(f"AllFilter {runid} {inputfile_bc}")
-        all_filter(runid, inputfile_bc, parent)
-        inputfile_cleaned = f"{outdir}/{os.path.basename(inputfile_bc)}.cleaned.fasta"
-        # input("Continue? Press Enter.")
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-
-
-# ##############################################################################
-# ##############################################################################
-# ##############################################################################
-
-
-    try:
-        logger.info("[i]> fetching fasta metadata")
-
-        def get_fasta_metadata():
-                
-            lengths = []
-            channels = set()
-            run_ids = set()
-
-            # Iterate through the FASTA file exactly once
-            for record in SeqIO.parse(inputfile_cleaned, "fasta"):
-
-                # 1. Sequence & Length Metrics
-                seq_len = len(record.seq)
-                lengths.append(seq_len)
-
-                # 2. Hardware & Run Metadata
-                # (Only applies if the FASTA retained ONT headers from a FASTQ conversion)
-                parts = record.description.split()
-                for item in parts[1:]:
-                    if item.startswith("ch="):
-                        channels.add(item.split("=")[1])
-                    elif item.startswith("runid="):
-                        run_ids.add(item.split("=")[1])
-
-            # Calculate N50
-            lengths.sort(reverse=True)
-            total_yield = sum(lengths)
-            n50 = 0
-            running_sum = 0
-
-            for length in lengths:
-                running_sum += length
-                if running_sum >= total_yield / 2:
-                    n50 = length
-                    break
-
-            # Compile the final statistics dictionary
-            metrics = {
-                "Total Sequences": len(lengths),
-                "Total Yield (bp)": total_yield,
-                "Max Sequence Length (bp)": max(lengths) if lengths else 0,
-                "Sequence Length N50 (bp)": n50,
-            }
-
-            # Only add hardware metrics if they were actually found in the FASTA header
-            if channels:
-                metrics["Active MinION Channels"] = len(channels)
-            if run_ids:
-                metrics["Run IDs Detected"] = list(run_ids)
-
-            # Using "a" to append. Change to "w" if you want to overwrite.
-            with open(summaryfile, "a") as f:
-                f.write("\n--- "+inputfile_cleaned+"\n")
-                for key, value in metrics.items():
-                    f.write(f"{key}: {value}\n")
-
-
-        executor = ThreadPoolExecutor(max_workers=1)
-        executor.submit(get_fasta_metadata)
-
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-
-
-##############################################################################
-##############################################################################
-##############################################################################
-
-    if "dummy.pod5" in inputfile_raw:
-        inputfile_cleaned = os.path.dirname(inputfile_raw) + "/" + runid[0:-2] + ".fasta"
-    
-    try:
-        # Uncomment the following when ready to execute full pipeline end-to-end:
-        logger.info(f"AllClassify {runid} {inputfile_cleaned}")
-        all_classify(runid, inputfile_cleaned, parent, tools=tools)
-        # input("Continue? Press Enter.")
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-##############################################################################
-##############################################################################
-##############################################################################
-
-
-
-    try:
-        logger.info("[i]> fetching tsv metadata")
-
-        def get_tsv_metadata():
-                
-            # Initialize the main dictionary
-            summarydata = {}
-
-            # Locate all TSV files in the target directory
-            search_pattern = f"{outdir}/*.tsv"
-            tsv_files = glob.glob(search_pattern)
-
-            if not tsv_files:
-                logger.info(f"No .tsv files found in directory: {outdir}")
-            else:
-                # Process each file
-                for filepath in tsv_files:
-                    filename = os.path.basename(filepath)
-
-                    try:
-                        with open(filepath, mode='r', encoding='utf-8') as f:
-                            # DictReader automatically uses the first row as dictionary keys
-                            reader = csv.reader(f, delimiter='\t')
-                            for row in reader:
-                                if row[0] in summarydata.keys():
-                                    summarydata[row[0]] += int(row[1])
-                                else:
-                                    summarydata[row[0]] = int(row[1])
-                    except Exception as e:
-                        logger.error(f"Error reading {filename}: {e}")
-
-                # Dump the accumulated dictionary to a JSON file
-                with open(summaryfile, "a") as f:
-                    f.write("\n--- tsv\n")
-                    f.write("Tools used: " + str(len(tsv_files))+"\n")
-                    f.write("Pathogens detected: "+str(len(summarydata))+"\n")
-
-
-        executor = ThreadPoolExecutor(max_workers=1)
-        executor.submit(get_tsv_metadata)
-
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-
-
-##############################################################################
-##############################################################################
-##############################################################################
-
-
-
-    try:
-        logger.info(f"AllProfile {runid} {inputfile_cleaned}")
-        all_profile(runid, inputfile_cleaned, parent, tools=tools)
-        # input("Continue? Press Enter.")
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-
-
-##############################################################################
-##############################################################################
-##############################################################################
-
-
-
-    try:
-        logger.info(f"AllPlot {runid}")
-        all_plot(runid, parent)
-        # input("Continue? Press Enter.")
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-
-
-##############################################################################
-##############################################################################
-##############################################################################
-
-
-    try:
-        logger.info(f"AllReport {runid}")
-        all_report(runid, parent)
-        # input("Continue? Press Enter.")
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-        exit(-1)
-
-
-##############################################################################
-##############################################################################
-##############################################################################
-    try:
-
-        os.system("echo finished > "+statusfile)
-    except Exception as e:
-        os.system("echo killed > "+statusfile)
-        logger.error(f"An unexpected error occurred: {e}")
-
-###################
+        _restart_containers()
+        logger.info("[i]> Begin of sepsis detection")
+
+        for i, name in enumerate(input_names):
+            sub_id = f"{runid}_{i}"
+            inputfile = os.path.realpath(f"{input_dir}/{name}")
+            outdir = run_outdir(sub_id, runid)
+            os.makedirs(outdir, exist_ok=True)
+            summaryfile = f"{outdir}/{sub_id}.summary"
+            fastq = f"{outdir}/{os.path.basename(inputfile)}.fastq"
+            fasta = f"{outdir}/{os.path.basename(fastq)}.cleaned.fasta"
+            sub_status = Path(outdir) / f"{sub_id}.status"
+            Path(outdir, f"{sub_id}.log").write_text("RICA_S\n")
+
+            logger.info("-" * 30)
+            logger.info(f"run ID: {sub_id}")
+            logger.info(f"input file: {inputfile}")
+            logger.info(f"output dir: {outdir}")
+            logger.info("-" * 30)
+
+            metadata(pod5_metadata, inputfile, summaryfile)
+
+            logger.info(f"AllBasecall {sub_id} {inputfile}")
+            all_basecall(sub_id, inputfile, runid)
+            metadata(fastq_metadata, fastq, summaryfile)
+
+            logger.info(f"AllFilter {sub_id} {fastq}")
+            all_filter(sub_id, fastq, runid)
+            metadata(fasta_metadata, fasta, summaryfile)
+
+            # dummy runs skip basecall/filter and use the prepared fasta
+            if "dummy.pod5" in name:
+                fasta = f"{os.path.dirname(f'{input_dir}/{name}')}/{runid}.fasta"
+
+            logger.info(f"AllClassify {sub_id} {fasta}")
+            all_classify(sub_id, fasta, runid, tools=tools)
+            metadata(tsv_metadata, outdir, summaryfile)
+
+            logger.info(f"AllProfile {sub_id} {fasta}")
+            all_profile(sub_id, fasta, runid, tools=tools)
+
+            logger.info(f"AllPlot {sub_id}")
+            all_plot(sub_id, runid)
+
+            logger.info(f"AllReport {sub_id}")
+            all_report(sub_id, runid)
+
+            sub_status.write_text("finished\n")
+            sub_status = None
+
+        # merge the tsvs of all sub-runs into one df and plot it
+        merge_and_plot_subruns(runid, f"{run_dir}", f"{run_dir}/_bigfile.png")
+        # merge the AMR hits (ABRicate + L-EasyARG) of all sub-runs and plot them
+        merge_and_plot_amr_subruns(runid, f"{run_dir}/{runid}")
+
+        # summaries must be complete before the run is reported as finished
+        logger.info("[i]> waiting for metadata jobs to finish")
+        metadata_pool.shutdown(wait=True)
+        logger.info("[i]> metadata jobs done")
+        status.write_text("finished\n")
+        logger.info("[i]> End of sepsis detection")
+    except BaseException as e:
+        for s in (status, sub_status):
+            if s is not None:
+                s.write_text("killed\n")
+        logger.exception(f"[!]> run {runid} killed: {e!r}")
+        # Ctrl+C and friends still stop the process; pipeline errors do not,
+        # so the listener and the batch loop carry on with the next run
+        if not isinstance(e, Exception):
+            raise
+    finally:
+        metadata_pool.shutdown(wait=False)
+        _detach_run_log(log_handler)
+        run_state.active_runs.discard(runid)
 
 
 
@@ -733,36 +497,36 @@ if __name__ == "__main__":
         # basepath=Path(sys.argv[2])
         # run_infos = list(basepath.rglob("*.info"))
         infos = [
-            "/opt/rica_s/output/expr2_05B_0.100A_4H_1G/expr2_05B_0.100A_4H_1G.info",
-            "/opt/rica_s/output/expr2_05B_0.100A_4H_3G/expr2_05B_0.100A_4H_3G.info",
-            "/opt/rica_s/output/expr2_10B_0.100A_4H_1G/expr2_10B_0.100A_4H_1G.info",
-            "/opt/rica_s/output/expr2_10B_0.100A_4H_3G/expr2_10B_0.100A_4H_3G.info",
-            "/opt/rica_s/output/expr2_15B_0.100A_4H_1G/expr2_15B_0.100A_4H_1G.info",
-            "/opt/rica_s/output/expr2_15B_0.100A_4H_3G/expr2_15B_0.100A_4H_3G.info"
+            f"{c['OUT_DIR']}/expr2_05B_0.100A_4H_1G/expr2_05B_0.100A_4H_1G.info",
+            f"{c['OUT_DIR']}/expr2_05B_0.100A_4H_3G/expr2_05B_0.100A_4H_3G.info",
+            f"{c['OUT_DIR']}/expr2_10B_0.100A_4H_1G/expr2_10B_0.100A_4H_1G.info",
+            f"{c['OUT_DIR']}/expr2_10B_0.100A_4H_3G/expr2_10B_0.100A_4H_3G.info",
+            f"{c['OUT_DIR']}/expr2_15B_0.100A_4H_1G/expr2_15B_0.100A_4H_1G.info",
+            f"{c['OUT_DIR']}/expr2_15B_0.100A_4H_3G/expr2_15B_0.100A_4H_3G.info"
         ]
 
 
         l1 = [
-            # "/opt/rica_s/output/05B_0.001A_1H/05B_0.001A_1H.info",
-            # "/opt/rica_s/output/05B_0.010A_1H/05B_0.010A_1H.info",
-            # "/opt/rica_s/output/05B_0.100A_1H/05B_0.100A_1H.info", 
-            # "/opt/rica_s/output/10B_0.001A_1H/10B_0.001A_1H.info",
-            # "/opt/rica_s/output/10B_0.010A_1H/10B_0.010A_1H.info",
-            # "/opt/rica_s/output/10B_0.100A_1H/10B_0.100A_1H.info",
-            # "/opt/rica_s/output/15B_0.001A_1H/15B_0.001A_1H.info",
-            # "/opt/rica_s/output/15B_0.010A_1H/15B_0.010A_1H.info",
-            # "/opt/rica_s/output/15B_0.100A_1H/15B_0.100A_1H.info",
+            # f"{c['OUT_DIR']}/05B_0.001A_1H/05B_0.001A_1H.info",
+            # f"{c['OUT_DIR']}/05B_0.010A_1H/05B_0.010A_1H.info",
+            # f"{c['OUT_DIR']}/05B_0.100A_1H/05B_0.100A_1H.info", 
+            # f"{c['OUT_DIR']}/10B_0.001A_1H/10B_0.001A_1H.info",
+            # f"{c['OUT_DIR']}/10B_0.010A_1H/10B_0.010A_1H.info",
+            # f"{c['OUT_DIR']}/10B_0.100A_1H/10B_0.100A_1H.info",
+            # f"{c['OUT_DIR']}/15B_0.001A_1H/15B_0.001A_1H.info",
+            # f"{c['OUT_DIR']}/15B_0.010A_1H/15B_0.010A_1H.info",
+            # f"{c['OUT_DIR']}/15B_0.100A_1H/15B_0.100A_1H.info",
             
 
-            "/opt/rica_s/output/05B_0.001A_2H/05B_0.001A_2H.info",
-            "/opt/rica_s/output/05B_0.010A_2H/05B_0.010A_2H.info",
-            "/opt/rica_s/output/05B_0.100A_2H/05B_0.100A_2H.info", 
-            "/opt/rica_s/output/10B_0.001A_2H/10B_0.001A_2H.info",
-            "/opt/rica_s/output/10B_0.010A_2H/10B_0.010A_2H.info",
-            "/opt/rica_s/output/10B_0.100A_2H/10B_0.100A_2H.info",
-            "/opt/rica_s/output/15B_0.001A_2H/15B_0.001A_2H.info",
-            "/opt/rica_s/output/15B_0.010A_2H/15B_0.010A_2H.info",
-            "/opt/rica_s/output/15B_0.100A_2H/15B_0.100A_2H.info"
+            f"{c['OUT_DIR']}/05B_0.001A_2H/05B_0.001A_2H.info",
+            f"{c['OUT_DIR']}/05B_0.010A_2H/05B_0.010A_2H.info",
+            f"{c['OUT_DIR']}/05B_0.100A_2H/05B_0.100A_2H.info", 
+            f"{c['OUT_DIR']}/10B_0.001A_2H/10B_0.001A_2H.info",
+            f"{c['OUT_DIR']}/10B_0.010A_2H/10B_0.010A_2H.info",
+            f"{c['OUT_DIR']}/10B_0.100A_2H/10B_0.100A_2H.info",
+            f"{c['OUT_DIR']}/15B_0.001A_2H/15B_0.001A_2H.info",
+            f"{c['OUT_DIR']}/15B_0.010A_2H/15B_0.010A_2H.info",
+            f"{c['OUT_DIR']}/15B_0.100A_2H/15B_0.100A_2H.info"
         ]
 
 

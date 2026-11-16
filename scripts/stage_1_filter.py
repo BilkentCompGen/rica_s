@@ -1,7 +1,7 @@
 import os
 import datetime
 import docker
-from scripts.config import PROJECT_HOME, run_outdir
+from scripts.config import RICA_S_HOME, run_outdir
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ def all_filter(runid, inputfile, parent=None):
     os.makedirs(outdir, exist_ok=True)
     logfile = f"{outdir}/{runid}.log"
     
-    script_path = f"{PROJECT_HOME}/scripts/rica_s_id_minimap2/filterHumanDna.sh"
+    script_path = f"{RICA_S_HOME}/scripts/rica_s_id_minimap2/filterHumanDna.sh"
     
     client = docker.from_env()
     
@@ -25,6 +25,7 @@ def all_filter(runid, inputfile, parent=None):
 
         exit_code, output_stream = container.exec_run(
             cmd=[script_path, inputfile, outdir],
+            environment={"RICA_S_HOME": RICA_S_HOME},
             tty=True,
             stream=True
         )

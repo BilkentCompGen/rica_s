@@ -4,14 +4,15 @@ inputfile="$1"
 outputfile=$(basename $inputfile)
 outdir="$2"
 
-cuclarkdb=/opt/rica_s/tools/rica_s_id_cuclark/
+# project root: passed in by the stage driver (config.py), else derived from this script's location
+RICA_S_HOME="${RICA_S_HOME:-$(cd "$(dirname "$0")/../.." && pwd)}"
+cuclarkdb=$RICA_S_HOME/tools/rica_s_id_cuclark/
 
 
 
 set_targets.sh $cuclarkdb custom
 #/rica_s/output/test_3/rica_s_fl_minimap2/nonhuman_unmapped_sequence.fasta 
-/usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" classify_metagenome.sh  -n 8 -O $inputfile -R $outdir/$outputfile.cuclark.csv
-# tail -n +2 $outdir/$outputfile.cuclark.csv.csv | cut -d',' -f1,4 | tr ',' '\t' > $outdir/$outputfile.cuclark.csv.tsv
+/usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" classify_metagenome.sh  -n `nproc` -O $inputfile -R $outdir/$outputfile.cuclark.csv
 
 awk -F',' '
 NR>1 {

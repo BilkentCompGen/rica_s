@@ -3,7 +3,7 @@ import subprocess
 import glob
 import datetime
 from collections import defaultdict
-from scripts.config import PROJECT_HOME, run_outdir
+from scripts.config import RICA_S_HOME, run_outdir
 import logging
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ def all_plot(runid, parent=None):
     logger.info("[i]> done.")
     
     logger.info("[i]> generating plots...")
-    hist_script = f"{PROJECT_HOME}/scripts/misc/histogram.py"
+    hist_script = f"{RICA_S_HOME}/scripts/misc/histogram.py"
     
     for file in glob.glob(f"{outdir}/*.tsv"):
         subprocess.run(["python3", hist_script, file])
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         logger.info("[i]> done.")
         
         logger.info("[i]> generating plots...")
-        hist_script = f"{PROJECT_HOME}/scripts/misc/histogram.py"
+        hist_script = f"{RICA_S_HOME}/scripts/misc/histogram.py"
         
         for file in glob.glob(f"{sys.argv[2]}/*.tsv"):
             subprocess.run(["python3", hist_script, file])

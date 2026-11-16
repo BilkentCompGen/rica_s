@@ -1,13 +1,14 @@
 import os
 import re
 
-PROJECT_HOME ="/opt/rica_s"
-OUTPUT_ROOT = f"{PROJECT_HOME}/output"
+# project root, derived from this file's location (scripts/config.py)
+RICA_S_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUTPUT_ROOT = f"{RICA_S_HOME}/output"
 
 c = {
-    "PROJECT_HOME": PROJECT_HOME,
-    "DL_DIR": PROJECT_HOME,
-    "OUT_DIR": OUTPUT_ROOT,
+    "RICA_S_HOME": RICA_S_HOME,
+    "DL_DIR": RICA_S_HOME,
+    "OUT_DIR": f"{RICA_S_HOME}/output",
     "BASE_URL": "http://donut.cs.bilkent.edu.tr/rica_s",
     "FLASK_PORT":5000,
     "DOCKER_HOST_IP":"172.20.0.1",
@@ -18,8 +19,8 @@ c = {
 
 def run_outdir(runid, parent=None):
     if parent and parent != runid:
-        return f"{OUTPUT_ROOT}/{parent}/{runid}"
-    return f"{OUTPUT_ROOT}/{runid}"
+        return f"{c["OUT_DIR"]}/{parent}/{runid}"
+    return f"{c["OUT_DIR"]}/{runid}"
 
 
 def subrun_dirs(runid):

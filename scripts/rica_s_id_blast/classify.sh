@@ -5,7 +5,9 @@ inputfile="$1"
 outputfile=$(basename $inputfile).blastout.tab
 outdir="$2"
 
-blastdbfile="/opt/rica_s/tools/rica_s_id_blast/pathogen_references.fasta.blastdb"
+# project root: passed in by the stage driver (config.py), else derived from this script's location
+RICA_S_HOME="${RICA_S_HOME:-$(cd "$(dirname "$0")/../.." && pwd)}"
+blastdbfile="$RICA_S_HOME/tools/rica_s_id_blast/pathogen_references.fasta.blastdb"
 
 
 # blastn -query "$1" -db "$blastdbfile" -num_threads `nproc` -outfmt 0 > "$outdir/$outputfile"

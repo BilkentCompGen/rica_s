@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# Project root (parent of this script's directory); the compose files mount it into every container
+export RICA_S_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # Path to the Docker Compose configuration file
-COMPOSE_FILE="/opt/rica_s/builder/rica_s-compose.yml"
+COMPOSE_FILE="$RICA_S_HOME/builder/rica_s-compose.yml"
 
 # Ensure the compose file exists before running commands
 if [ ! -f "$COMPOSE_FILE" ]; then

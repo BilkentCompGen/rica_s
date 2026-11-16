@@ -1,4 +1,4 @@
-"""Usage (from /opt/rica_s):
+"""Usage (from the project root):
   python3 -m scripts.evaluate_resources [DIR ...]
 """
 
@@ -14,10 +14,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from scripts.config import PROJECT_HOME, OUTPUT_ROOT
+from scripts.config import RICA_S_HOME, OUTPUT_ROOT
 from scripts.tool_registry import display_name
 
-EVAL_ROOT = f"{PROJECT_HOME}/evaluation"
+EVAL_ROOT = f"{RICA_S_HOME}/evaluation"
 OVERVIEW_DIR = f"{EVAL_ROOT}/resources_overview"
 
 STAGES = ["Basecalling", "Filtering", "Classification", "Profiling", "Plotting", "Reporting"]
@@ -403,10 +403,10 @@ def write_report(name, outdir, logs, runs, run, stages, tools, dbs, plots, other
     if not logs:
         L.append("- none: this directory contains no .log files")
     for p in logs:
-        L.append(f"- `{os.path.relpath(p, PROJECT_HOME)}` ({os.path.getsize(p):,} bytes)")
+        L.append(f"- `{os.path.relpath(p, RICA_S_HOME)}` ({os.path.getsize(p):,} bytes)")
     if other_files:
         L.append(f"- runs of this directory were also found in: "
-                 + ", ".join(f"`{os.path.relpath(p, PROJECT_HOME)}`" for p in other_files))
+                 + ", ".join(f"`{os.path.relpath(p, RICA_S_HOME)}`" for p in other_files))
     L.append("")
 
     if run is None and tools.empty:

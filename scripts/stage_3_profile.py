@@ -1,7 +1,7 @@
 import os
 import datetime
 import docker
-from scripts.config import PROJECT_HOME, run_outdir
+from scripts.config import RICA_S_HOME, run_outdir
 from scripts.tool_registry import selected_tools
 import logging
 
@@ -22,12 +22,13 @@ def all_profile(runid, inputfile, parent=None, tools=None):
     client = docker.from_env()
 
     for container_name in containers:
-        script_path = f"{PROJECT_HOME}/scripts/{container_name}/profile.sh"
+        script_path = f"{RICA_S_HOME}/scripts/{container_name}/profile.sh"
         try:
             container = client.containers.get(container_name)
             logger.info(f"[i]> {container.name} ===")
 
             exit_code, output_stream = container.exec_run(cmd=[script_path, inputfile, outdir],
+                                                          environment={"RICA_S_HOME": RICA_S_HOME},
                                                           tty=True,
                                                           stream=True
                                                           )
