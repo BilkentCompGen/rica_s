@@ -11,6 +11,7 @@ blastdbfile="$RICA_S_HOME/tools/rica_s_id_blast/pathogen_references.fasta.blastd
 
 
 # blastn -query "$1" -db "$blastdbfile" -num_threads `nproc` -outfmt 0 > "$outdir/$outputfile"
+echo "[cmd]> blastn -num_threads $(nproc) -query $inputfile -db $blastdbfile -outfmt 6 > $outdir/$outputfile.6"
 /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" blastn -num_threads `nproc` -query $inputfile -db $blastdbfile -outfmt 6 > $outdir/$outputfile.6 
 
 

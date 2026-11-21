@@ -10,6 +10,7 @@ echo "outdir: " $outdir
 
 # project root: passed in by the stage driver (config.py), else derived from this script's location
 RICA_S_HOME="${RICA_S_HOME:-$(cd "$(dirname "$0")/../.." && pwd)}"
+echo "[cmd]> /bin/bash -ic \"cd $outdir && conda activate && easyARG.sh --rawdata $inputdir --database '$RICA_S_HOME/tools/rica_s_pr-l-easyarg/database/' --threads $(nproc)\""
 /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" /bin/bash -ic "cd $outdir && conda activate && easyARG.sh --rawdata $inputdir --database '$RICA_S_HOME/tools/rica_s_pr-l-easyarg/database/' --threads `nproc`"
 
 

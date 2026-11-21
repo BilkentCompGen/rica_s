@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}RICA-S Experiments{% endblock %}
+
+{% block head %}
+<style>
+    .experiments-table th {
+        text-align: left;
+        padding: 10px 15px;
+        background: var(--line-soft);
+        border-bottom: 1px solid var(--line);
+    }
+
+    .experiments-table td:first-child {
+        width: auto;
+    }
+
+    .run-status {
+        font-weight: 600;
+    }
+
+    .run-status.status-finished {
+        color: #0f5132;
+    }
+
+    .run-status.status-started {
+        color: var(--accent);
+    }
+
+    .run-status.status-killed,
+    .run-status.status-interrupted {
+        color: #842029;
+    }
+
+    .button-link {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 5px;
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .button-link:hover {
+        background: var(--accent-dark);
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <h1>Experiments</h1>
+    <a class="button-link" href="{{ url_for('new_run') }}">+ New experiment</a>
+</div>
+
+{% if experiments %}
+<table class="summary-table experiments-table">
+    <thead>
+        <tr>
+            <th>Run ID</th>
+            <th>Status</th>
+            <th>Last modified</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in experiments %}
+        <tr>
+            <td><a href="{{ url_for('generate_report', runid=e.id) }}">{{ e.id }}</a></td>
+            <td class="run-status status-{{ e.status | replace(' ', '-') }}">{{ e.status }}</td>
+            <td>{{ e.modified | datetime }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No experiments found in the output folder yet.</p>
+{% endif %}
+{% endblock %}

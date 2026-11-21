@@ -10,6 +10,7 @@ RICA_S_HOME="${RICA_S_HOME:-$(cd "$(dirname "$0")/../.." && pwd)}"
 index=$RICA_S_HOME/tools/rica_s_id_bwa/all_pathogens.fasta
 
 
+echo "[cmd]> bwa mem -t $(nproc) -x ont2d $index $inputfile > $outdir/$outputfile.bwa.sam"
 /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" bwa mem -t `nproc` -x ont2d $index $inputfile > $outdir/$outputfile.bwa.sam
 # /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" bwa mem -t `nproc` -x ont2d $RICA_S_HOME/tools/rica_s_id_bwa/all_pathogens.fasta $RICA_S_HOME/datasets/_1/amr_EreA.fasta > ./outputfile.bwa.sam
 

@@ -17,6 +17,7 @@ evaluation/
 _4later/
 _analysis/
 _evaluation/
+_doc/
 flask_server.log
 docs/
 

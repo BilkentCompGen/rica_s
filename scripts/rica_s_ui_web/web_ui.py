@@ -2,6 +2,7 @@ import csv
 from flask import Flask, render_template, request, jsonify
 from flask import abort, send_from_directory, url_for
 from pathlib import Path
+from datetime import datetime
 import os
 import logging
 import zlib
@@ -204,6 +205,7 @@ def load_amr(output_dir: Path):
 
     amr = {
         'tagged': tagged,
+        'best': best_hits(tagged),
         'files': files,
         'errors': errors,
         # changes with the files, so the rows URL changes and the browser refetches
@@ -216,11 +218,58 @@ def load_amr(output_dir: Path):
     return amr
 
 
+# the AMR table only shows hits at or above this %IDENTITY and %COVERAGE
+MIN_IDENTITY = 80.0
+MIN_COVERAGE = 80.0
+
+
+def hit_value(row, column):
+    try:
+        return float(row[AMR_COLUMNS.index(column)])
+    except ValueError:
+        return 0.0
+
+
+def hit_score(row):
+    return hit_value(row, '%IDENTITY') * hit_value(row, '%COVERAGE')
+
+
+def passes_cutoff(row):
+    return (hit_value(row, '%IDENTITY') >= MIN_IDENTITY
+            and hit_value(row, '%COVERAGE') >= MIN_COVERAGE)
+
+
+def best_hits(tagged):
+    """(tool, row, hits) per gene and tool: row is the hit with the highest identity x coverage.
+
+    Only hits with %IDENTITY >= MIN_IDENTITY and %COVERAGE >= MIN_COVERAGE count; a gene
+    with none of them is left out. A gene with more than one such hit in a tool gets a "*"
+    after its name, and hits holds all of them, best first (empty for a gene found once).
+    Sorted by gene.
+    """
+    gene_i = AMR_COLUMNS.index('GENE')
+    groups = {}
+    for tool, row in filter(lambda t: passes_cutoff(t[1]), tagged):
+        groups.setdefault((tool, row[gene_i]), []).append(row)
+
+    rows = []
+    for (tool, gene), hits in groups.items():
+        hits = sorted(hits, key=hit_score, reverse=True)
+        row = list(hits[0])
+        if len(hits) > 1:
+            row[gene_i] = gene + "*"
+        rows.append((tool, row, hits if len(hits) > 1 else []))
+    return sorted(rows, key=lambda r: (r[1][gene_i].lower(), r[0]))
+
+
 def amr_table_rows(amr):
-    # every cell is a list of lines; the page shows them one per line
+    # every cell is a list of lines; the page shows them one per line.
+    # The last item is not a column: the hits behind a starred gene, each as
+    # [identity x coverage / 100] + AMR_COLUMNS, for the page's popup.
     return [[[tool]] + [split_cell(value, AMR_SEPARATORS.get(column))
                         for column, value in zip(AMR_COLUMNS, row)]
-            for tool, row in amr['tagged']]
+            + [[[f"{hit_score(hit) / 100:.2f}"] + hit for hit in hits]]
+            for tool, row, hits in amr['best']]
 
 
 def process_csv_data(amr, runid: str, unit_id: str,
@@ -236,7 +285,11 @@ def process_csv_data(amr, runid: str, unit_id: str,
         'subrun': label,
         'table_id': f"{id_prefix}_0",
         'columns': AMR_TABLE_COLUMNS,
-        'row_count': len(amr['tagged']),
+        'row_count': len(amr['best']),
+        'hit_count': len(amr['tagged']),
+        'kept_count': sum(len(hits) or 1 for _tool, _row, hits in amr['best']),
+        'min_identity': f"{MIN_IDENTITY:g}",
+        'min_coverage': f"{MIN_COVERAGE:g}",
         'url': url_for('get_amr_rows', runid=runid, unit_id=unit_id, v=amr['version']),
         'errors': amr['errors'],
     }]
@@ -335,8 +388,38 @@ def get_folders():
 
 # Routes
 
+@app.template_filter('datetime')
+def format_datetime(timestamp):
+    return datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M')
+
+
+def list_experiments():
+    # an experiment is a folder in OUT_DIR holding <runid>.info directly (depth 1 only)
+    out = Path(c["OUT_DIR"])
+    if not out.is_dir():
+        return []
+    experiments = []
+    for entry in os.scandir(out):
+        if not entry.is_dir():
+            continue
+        if not (Path(entry.path) / f"{entry.name}.info").is_file():
+            continue
+        experiments.append({
+            'id': entry.name,
+            'status': run_status(entry.name),
+            'modified': entry.stat().st_mtime,
+        })
+    experiments.sort(key=lambda e: e['modified'], reverse=True)
+    return experiments
+
+
 @app.route('/')
 def root():
+    return render_template('experiments.html', experiments=list_experiments())
+
+
+@app.route('/new')
+def new_run():
     groups, docker_ok = tool_groups()
     return render_template('start.html', tool_groups=groups, docker_ok=docker_ok)
 

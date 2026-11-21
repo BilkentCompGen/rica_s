@@ -1,5 +1,6 @@
 import os
 import re
+import shlex
 
 # project root, derived from this file's location (scripts/config.py)
 RICA_S_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,6 +16,12 @@ c = {
     "DOCKER_HOST_PORT":"667",
     "HOST_ROOT":"/"
 }
+
+
+def docker_exec_str(container, cmd, env):
+    """Shell-equivalent `docker exec` line for a docker-py exec_run call (for logging)."""
+    env_args = [a for k, v in env.items() for a in ("-e", f"{k}={v}")]
+    return shlex.join(["docker", "exec", "-t", *env_args, container, *cmd])
 
 
 def run_outdir(runid, parent=None):

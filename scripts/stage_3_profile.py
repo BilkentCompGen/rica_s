@@ -1,7 +1,7 @@
 import os
 import datetime
 import docker
-from scripts.config import RICA_S_HOME, run_outdir
+from scripts.config import RICA_S_HOME, run_outdir, docker_exec_str
 from scripts.tool_registry import selected_tools
 import logging
 
@@ -27,8 +27,11 @@ def all_profile(runid, inputfile, parent=None, tools=None):
             container = client.containers.get(container_name)
             logger.info(f"[i]> {container.name} ===")
 
-            exit_code, output_stream = container.exec_run(cmd=[script_path, inputfile, outdir],
-                                                          environment={"RICA_S_HOME": RICA_S_HOME},
+            cmd = [script_path, inputfile, outdir]
+            env_vars = {"RICA_S_HOME": RICA_S_HOME}
+            logger.info(f"[cmd]> {docker_exec_str(container.name, cmd, env_vars)}")
+            exit_code, output_stream = container.exec_run(cmd=cmd,
+                                                          environment=env_vars,
                                                           tty=True,
                                                           stream=True
                                                           )

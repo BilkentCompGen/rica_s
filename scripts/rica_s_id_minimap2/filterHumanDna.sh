@@ -12,6 +12,7 @@ filename=$(basename "$inputfile")
 clean_id="${filename%.*}"
 
 
+echo "[cmd]> minimap2 -a -R \"@RG\tID:$filename\tSM:$clean_id\" $indexfile $inputfile > $outdir/$filename.filterHumanDna.sam"
 /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" minimap2 -a -R "@RG\tID:$filename\tSM:$clean_id" "$indexfile" "$inputfile" > $outdir/$filename.filterHumanDna.sam
 
 # mkdir -p $outdir/rica_s_fl_minimap2/
@@ -22,4 +23,5 @@ fix_mapq() {
 fix_mapq "$outdir/$filename".filterHumanDna.sam | samtools view -F 4 - | awk '{print $1}' | sort -u > "$outdir/$filename".human_mapped_sequence_names.txt
 fix_mapq "$outdir/$filename".filterHumanDna.sam | samtools view -f 4 - | awk '{print $1}' | sort -u > "$outdir/$filename".nonhuman_unmapped_sequence_names.txt
 
+echo "[cmd]> seqtk subseq $inputfile $outdir/$filename.nonhuman_unmapped_sequence_names.txt | seqtk seq -A > $outdir/$filename.cleaned.fasta"
 seqtk subseq $inputfile $outdir/$filename.nonhuman_unmapped_sequence_names.txt | seqtk seq -A > $outdir/$filename.cleaned.fasta

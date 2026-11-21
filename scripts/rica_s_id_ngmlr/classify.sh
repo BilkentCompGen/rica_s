@@ -9,6 +9,7 @@ referencefile="$RICA_S_HOME/tools/rica_s_id_ngmlr/all_pathogen.fasta"
 # queries=$(find $2 -type f -name "*."$3)
 # refs=$(find /rica_s/data/pathogen_reference/ -type f -name "*.fasta")
 
+echo "[cmd]> ngmlr -t $(nproc) -r $referencefile -q $inputfile -o $outdir/$outputfile.ngmlr.sam"
 /usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" ngmlr -t `nproc` -r $referencefile -q $inputfile -o $outdir/$outputfile.ngmlr.sam # 1> $outdir/$outputfile.ngmlr.log 2> $outdir/$outputfile.ngmlr.err
 
 fix_mapq() {

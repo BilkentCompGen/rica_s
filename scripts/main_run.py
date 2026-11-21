@@ -494,45 +494,46 @@ if __name__ == "__main__":
     
 
     if sys.argv[1] == "do_main_run":
-        # basepath=Path(sys.argv[2])
-        # run_infos = list(basepath.rglob("*.info"))
-        infos = [
-            f"{c['OUT_DIR']}/expr2_05B_0.100A_4H_1G/expr2_05B_0.100A_4H_1G.info",
-            f"{c['OUT_DIR']}/expr2_05B_0.100A_4H_3G/expr2_05B_0.100A_4H_3G.info",
-            f"{c['OUT_DIR']}/expr2_10B_0.100A_4H_1G/expr2_10B_0.100A_4H_1G.info",
-            f"{c['OUT_DIR']}/expr2_10B_0.100A_4H_3G/expr2_10B_0.100A_4H_3G.info",
-            f"{c['OUT_DIR']}/expr2_15B_0.100A_4H_1G/expr2_15B_0.100A_4H_1G.info",
-            f"{c['OUT_DIR']}/expr2_15B_0.100A_4H_3G/expr2_15B_0.100A_4H_3G.info"
-        ]
+        
 
 
         l1 = [
-            # f"{c['OUT_DIR']}/05B_0.001A_1H/05B_0.001A_1H.info",
-            # f"{c['OUT_DIR']}/05B_0.010A_1H/05B_0.010A_1H.info",
-            # f"{c['OUT_DIR']}/05B_0.100A_1H/05B_0.100A_1H.info", 
-            # f"{c['OUT_DIR']}/10B_0.001A_1H/10B_0.001A_1H.info",
-            # f"{c['OUT_DIR']}/10B_0.010A_1H/10B_0.010A_1H.info",
-            # f"{c['OUT_DIR']}/10B_0.100A_1H/10B_0.100A_1H.info",
-            # f"{c['OUT_DIR']}/15B_0.001A_1H/15B_0.001A_1H.info",
-            # f"{c['OUT_DIR']}/15B_0.010A_1H/15B_0.010A_1H.info",
-            # f"{c['OUT_DIR']}/15B_0.100A_1H/15B_0.100A_1H.info",
+            # "/opt/rica_s/output/05B_0.001A_1H/05B_0.001A_1H.info",
+            # "/opt/rica_s/output/05B_0.010A_1H/05B_0.010A_1H.info",
+            # "/opt/rica_s/output/05B_0.100A_1H/05B_0.100A_1H.info", 
+            # "/opt/rica_s/output/10B_0.001A_1H/10B_0.001A_1H.info",
+            # "/opt/rica_s/output/10B_0.010A_1H/10B_0.010A_1H.info",
+            # "/opt/rica_s/output/10B_0.100A_1H/10B_0.100A_1H.info",
+            # "/opt/rica_s/output/15B_0.001A_1H/15B_0.001A_1H.info",
+            # "/opt/rica_s/output/15B_0.010A_1H/15B_0.010A_1H.info",
+            # "/opt/rica_s/output/15B_0.100A_1H/15B_0.100A_1H.info",
             
-
-            f"{c['OUT_DIR']}/05B_0.001A_2H/05B_0.001A_2H.info",
-            f"{c['OUT_DIR']}/05B_0.010A_2H/05B_0.010A_2H.info",
-            f"{c['OUT_DIR']}/05B_0.100A_2H/05B_0.100A_2H.info", 
-            f"{c['OUT_DIR']}/10B_0.001A_2H/10B_0.001A_2H.info",
-            f"{c['OUT_DIR']}/10B_0.010A_2H/10B_0.010A_2H.info",
-            f"{c['OUT_DIR']}/10B_0.100A_2H/10B_0.100A_2H.info",
-            f"{c['OUT_DIR']}/15B_0.001A_2H/15B_0.001A_2H.info",
-            f"{c['OUT_DIR']}/15B_0.010A_2H/15B_0.010A_2H.info",
-            f"{c['OUT_DIR']}/15B_0.100A_2H/15B_0.100A_2H.info"
+            # "/opt/rica_s/output/05B_0.001A_2H/05B_0.001A_2H.info",
+            # "/opt/rica_s/output/05B_0.010A_2H/05B_0.010A_2H.info",
+            # "/opt/rica_s/output/05B_0.100A_2H/05B_0.100A_2H.info", 
+            # "/opt/rica_s/output/10B_0.001A_2H/10B_0.001A_2H.info",
+            # "/opt/rica_s/output/10B_0.010A_2H/10B_0.010A_2H.info",
+            # "/opt/rica_s/output/10B_0.100A_2H/10B_0.100A_2H.info",
+            # "/opt/rica_s/output/15B_0.001A_2H/15B_0.001A_2H.info",
+            # "/opt/rica_s/output/15B_0.010A_2H/15B_0.010A_2H.info",
+            # "/opt/rica_s/output/15B_0.100A_2H/15B_0.100A_2H.info",
+            
+            "/opt/rica_s/output/05B_0.001A_4H/05B_0.001A_4H.info",
+            "/opt/rica_s/output/05B_0.010A_4H/05B_0.010A_4H.info", # RUN AGAIN
+            # "/opt/rica_s/output/05B_0.100A_4H/05B_0.100A_4H.info", 
+            # "/opt/rica_s/output/10B_0.001A_4H/10B_0.001A_4H.info",
+            # "/opt/rica_s/output/10B_0.010A_4H/10B_0.010A_4H.info",
+            # "/opt/rica_s/output/10B_0.100A_4H/10B_0.100A_4H.info",
+            # "/opt/rica_s/output/15B_0.001A_4H/15B_0.001A_4H.info",
+            # "/opt/rica_s/output/15B_0.010A_4H/15B_0.010A_4H.info",
+            # "/opt/rica_s/output/15B_0.100A_4H/15B_0.100A_4H.info",
+            
         ]
-
 
         print("starting batch runs")
         print(l1)
         for info in l1:
+            os.system("mkdir -p /opt/rica_s/output/05B_0.001A_1H/")
             start_run(info)
         print("finished batch runs")
 

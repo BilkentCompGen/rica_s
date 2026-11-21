@@ -331,6 +331,69 @@
             print-color-adjust: exact;
         }
     }
+
+    .hits-link {
+        font-size: 1.35em;
+        line-height: 1;
+        text-decoration: none;
+        padding: 0 4px;
+        vertical-align: middle;
+    }
+
+    .hits-link:hover {
+        filter: drop-shadow(0 0 2px var(--accent));
+    }
+
+    #hits_dialog {
+        max-width: min(1100px, 92vw);
+        max-height: 80vh;
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+    }
+
+    #hits_dialog::backdrop {
+        background: rgba(15, 23, 42, 0.45);
+    }
+
+    #hits_dialog header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line-soft);
+        position: sticky;
+        top: 0;
+        background: #fff;
+    }
+
+    #hits_dialog h3 {
+        margin: 0;
+    }
+
+    #hits_dialog .hits-body {
+        padding: 12px 16px;
+        overflow: auto;
+    }
+
+    #hits_dialog table {
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    #hits_dialog th,
+    #hits_dialog td {
+        border: 1px solid var(--line-soft);
+        padding: 4px 8px;
+        text-align: left;
+        vertical-align: top;
+        white-space: nowrap;
+    }
+
+    #hits_dialog tbody tr:first-child {
+        background: #eef3ff;
+    }
 </style>
 {% endblock %}
 
@@ -503,10 +566,16 @@
             {% for error in table.errors %}
             <p>Error loading {{ error }}</p>
             {% endfor %}
-            {% if not table.row_count %}
+            {% if not table.hit_count %}
             <div class="no-data">NO DATA</div>
+            {% elif not table.row_count %}
+            <div class="no-data">NO HITS WITH IDENTITY &ge; {{ table.min_identity }}% AND COVERAGE &ge; {{
+                table.min_coverage }}% ({{ table.hit_count }} hit{{ 's' if table.hit_count != 1 }} below)</div>
             {% else %}
-            <p class="table-count">{{ table.row_count }} hit{{ 's' if table.row_count != 1 }}</p>
+            <p class="table-count">{{ table.row_count }} gene{{ 's' if table.row_count != 1 }} per tool, best hit of each
+                (only hits with identity &ge; {{ table.min_identity }}% and coverage &ge; {{ table.min_coverage }}%:
+                {{ table.kept_count }} of {{ table.hit_count }} hit{{ 's' if table.hit_count != 1 }};
+                🔍 = gene hit more than once, click for all its hits)</p>
             {# rows are fetched as JSON by initTables(); rendering them here made the page tens of MB #}
             <table id="{{ table.table_id }}" class="display compact data-table" data-url="{{ table.url }}">
                 <thead>
@@ -523,6 +592,14 @@
     <p>No AMR results found.</p>
     {% endif %}
 </div>
+
+<dialog id="hits_dialog">
+    <header>
+        <h3></h3>
+        <button type="button" class="hits-close">Close</button>
+    </header>
+    <div class="hits-body"></div>
+</dialog>
 
 <div id="LogTab" class="tabcontent">
     {% if log_text %}
@@ -629,13 +706,65 @@
         return type === "display" ? cell.map(escapeHtml).join("<br>") : cell.join(" ");
     }
 
+    // the item after the last column: every hit of a starred gene, best first
+    const rowHits = (row) => row[row.length - 1];
+
+    // a starred gene shows a magnifying glass in place of its "*", which opens the
+    // popup with all of its hits (sorting and search still see the "*")
+    function renderGene(cell, type, row) {
+        if (type !== "display" || !rowHits(row).length) return renderCell(cell, type);
+        const lines = cell.map(escapeHtml);
+        lines[lines.length - 1] = lines[lines.length - 1].replace(/\*$/, "") +
+            `<a href="#" class="hits-link" title="${rowHits(row).length} hits: show all"` +
+            ` aria-label="Show all ${rowHits(row).length} hits">🔍</a>`;
+        return lines.join("<br>");
+    }
+
+    function showHits(link) {
+        const table = $(link).closest("table").DataTable();
+        const row = table.row($(link).closest("tr")).data();
+        const headers = table.columns().header().toArray().map((th) => th.textContent);
+        // hits hold AMR_COLUMNS, which are the table's columns after TOOL
+        const columns = ["ID x COV / 100"].concat(headers.slice(1));
+        const hits = rowHits(row);
+
+        const dialog = document.getElementById("hits_dialog");
+        dialog.querySelector("h3").textContent =
+            `${row[headers.indexOf("GENE")].join(" ").replace(/\*$/, "")} ` +
+            `(${row[0].join(" ")}): ${hits.length} hits, best first`;
+        dialog.querySelector(".hits-body").innerHTML =
+            "<table><thead><tr>" + columns.map((c) => `<th>${escapeHtml(c)}</th>`).join("") +
+            "</tr></thead><tbody>" +
+            hits.map((hit) => "<tr>" + hit.map((v) => `<td>${escapeHtml(v)}</td>`).join("") +
+                "</tr>").join("") +
+            "</tbody></table>";
+        dialog.showModal();
+    }
+
+    document.addEventListener("click", (event) => {
+        const link = event.target.closest(".hits-link");
+        if (link) {
+            event.preventDefault();
+            showHits(link);
+            return;
+        }
+        const dialog = document.getElementById("hits_dialog");
+        // a click on the close button or on the backdrop around the dialog
+        if (event.target.closest(".hits-close") || event.target === dialog) dialog.close();
+    });
+
     function initTables(scope = document) {
         $(scope).find('.data-table').each(function () {
+            const geneColumn = $(this).find("thead th").toArray()
+                .findIndex((th) => th.textContent === "GENE");
             $(this).DataTable({
                 ajax: this.dataset.url,
                 // only the rows on screen get DOM nodes; MGE results can be ~40k rows
                 deferRender: true,
-                columnDefs: [{ targets: "_all", render: renderCell }],
+                columnDefs: [
+                    { targets: geneColumn, render: renderGene },
+                    { targets: "_all", render: renderCell },
+                ],
                 pageLength: 25,
                 order: [],
                 scrollX: true,

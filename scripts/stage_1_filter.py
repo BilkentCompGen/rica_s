@@ -1,7 +1,7 @@
 import os
 import datetime
 import docker
-from scripts.config import RICA_S_HOME, run_outdir
+from scripts.config import RICA_S_HOME, run_outdir, docker_exec_str
 import logging
 
 logger = logging.getLogger(__name__)
@@ -23,9 +23,12 @@ def all_filter(runid, inputfile, parent=None):
         container = client.containers.get("rica_s_id_minimap2")
         logger.info(f"[i]> {container.name} ===")
 
+        cmd = [script_path, inputfile, outdir]
+        env_vars = {"RICA_S_HOME": RICA_S_HOME}
+        logger.info(f"[cmd]> {docker_exec_str(container.name, cmd, env_vars)}")
         exit_code, output_stream = container.exec_run(
-            cmd=[script_path, inputfile, outdir],
-            environment={"RICA_S_HOME": RICA_S_HOME},
+            cmd=cmd,
+            environment=env_vars,
             tty=True,
             stream=True
         )

@@ -4,7 +4,7 @@ import subprocess
 import datetime
 import docker
 import pandas as pd
-from scripts.config import RICA_S_HOME, run_outdir, c
+from scripts.config import RICA_S_HOME, run_outdir, c, docker_exec_str
 from scripts.misc.name_resolver import NameResolver
 from scripts.tool_registry import selected_tools
 import logging
@@ -168,8 +168,10 @@ def all_classify(runid, inputfile, parent=None, tools=None):
             }
             logger.info(f"[i]> {container.name} ===")
 
+            cmd = [script_path, inputfile, outdir]
+            logger.info(f"[cmd]> {docker_exec_str(container.name, cmd, env_vars)}")
             exit_code, output_stream = container.exec_run(
-                cmd=[script_path, inputfile, outdir],
+                cmd=cmd,
                 environment=env_vars,
                 tty=True,
                 stream=True
