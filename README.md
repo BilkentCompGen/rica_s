@@ -3,9 +3,9 @@
 
 # RICA_S
 
-**A container-base, modular workflow for rapid pathogen identification and antimicrobial‑resistance (AMR) profiling from long‑read sequencing data, geared toward sepsis diagnostics.**
+**A container-based, modular workflow for rapid pathogen identification and antimicrobial‑resistance (AMR) profiling from long‑read sequencing data, geared toward sepsis diagnostics.**
 
-`RICA_S` takes raw sequencing reads (e.g. Oxford Nanopore FASTA/FASTQ), filters out human DNA, classifies the remaining reads against a curated pathogen database using several independent classifiers in ensemble, profiles the sample for antimicrobial‑resistance and virulence genes, and (optionally) surfaces results through a small web UI. Every stage runs inside its own Docker container so tools with conflicting dependencies coexist cleanly and the pipeline is reproducible across machines.
+`RICA_S` takes Oxford Nanopore signal (`.pod5`), basecalls it with Dorado, filters out human reads, classifies the remaining reads against a curated collection of 299 pathogen genomes with seven independent classifiers, screens the reads for acquired resistance genes, and surfaces the results through a small web UI. The per-species read counts of all classifiers are reported side by side, together with their sum; `RICA_S` applies no read-count cutoff or other decision rule, and the interpretation is left to the user. Every stage runs inside its own Docker container so tools with conflicting dependencies coexist cleanly and the pipeline is reproducible across machines.
 <!--
 ---
 
@@ -110,6 +110,25 @@ Each stage appends its stdout/stderr to a per‑sub‑run log at `output/<runid>
 - NVIDIA Container Toolkit.
 - The prebuilt images are published under the Docker Hub org **`alkanlab/`** (e.g. `alkanlab/rica_s_id_kraken2:v1.1`). Docker will pull them automatically on first `up`.
 -->
+## Tools and settings
+
+Each tool runs in its own container (`rica_s_<stage>_<tool>`). The versions are those reported by each tool inside its image.
+
+| Stage | Tool | Version | Image | Command and key settings |
+|-------|------|---------|-------|--------------------------|
+| Basecalling | Dorado | 0.9.0 (HAC model `dna_r10.4.1_e8.2_400bps_hac@v4.1.0`) | `alkanlab/rica_s_bc_dorado:0.9.0-cuda12.2.0` | `dorado basecaller -x cuda:all --batchsize 0` |
+| Human filter | minimap2 | 2.30-r1287 (with samtools 1.13, seqtk 1.3-r106) | `alkanlab/rica_s_id_minimap2:v1.3` | `minimap2 -a` (map-ont defaults) against GRCh38; unmapped reads are kept |
+| Classification | BLAST | 2.17.0+ | `alkanlab/rica_s_id_blast:v1.3` | `blastn -outfmt 6` (megablast, E-value 10); best hit per read |
+| | BWA | 0.7.19-r1273 | `alkanlab/rica_s_id_bwa:v1.3` | `bwa mem -x ont2d`; primary alignment per read |
+| | minimap2 | 2.30-r1287 | `alkanlab/rica_s_id_minimap2:v1.3` | `minimap2 -c -x map-ont`; highest mapping quality per read |
+| | NGMLR | 0.2.7 | `alkanlab/rica_s_id_ngmlr:v1.3` | `ngmlr` (defaults); primary alignment per read |
+| | Kraken2 | 2.17.1 | `alkanlab/rica_s_id_kraken2:v1.3` | `k2 classify` (confidence 0); species-level report counts |
+| | CLARK | 1.4.5.0-a | `alkanlab/rica_s_id_clark:v1.3` | `classify_metagenome.sh -n 8 -m 0 --long` (full mode, k = 31) |
+| | cuCLARK (GPU) | 1.1 | `alkanlab/rica_s_id_cuclark:v1.3` | `classify_metagenome.sh -n 8` |
+| Profiling | ABRicate | 1.4.0 (with BLAST 2.17.0) | `alkanlab/rica_s_pr_abricate:v1.4` | `abricate --db <db> --minid 80 --mincov 80`, once per database: ResFinder, ARG-ANNOT, MegaRes, PlasmidFinder, CARD, NCBI |
+
+ABRicate runs at its default minimum identity and coverage of 80%. Release v0.41, which was used for the evaluation in the RICA_S manuscript, ran it at 95% (`--minid 95 --mincov 95`); on simulated R10 reads of about 88% identity, no resistance gene passed that threshold.
+
 ## Installation
 
 1. **Clone the repository** (any directory works; `/opt/rica_s` is used as the example). 
@@ -294,18 +313,18 @@ output/<runid>/
 │   ├── <runid>_0.log                                # combined stage log
 │   ├── <runid>_0.status                             # started | finished | killed
 │   ├── <runid>_0.summary                            # per-stage read/yield metrics
-│   ├── <inputfile>.fastq                            # basecalling stage
+│   ├── <inputfile>.bam, <inputfile>.fastq           # basecalling stage
 │   ├── <inputfile>.human_mapped_sequence_names.txt  # filtering stage
 │   ├── <inputfile>.nonhuman_unmapped_sequence_names.txt
 │   ├── <inputfile>.cleaned.fasta                    # → input for classification
-│   ├── <inputfile>.minimap2.[ paf|tsv|pdf|eps ]
-│   ├── <inputfile>.kraken2.[ report|tsv|pdf|eps ]
-│   ├── <inputfile>.blastout.tab.[ 6|tsv|pdf|eps ]
-│   ├── <inputfile>.bwa.[ sam|tsv|pdf|eps ]
-│   ├── <inputfile>.ngmlr.[ sam|tsv|pdf|eps ]
-│   ├── <inputfile>.[ clark|cuclark ].csv.[ csv|tsv|pdf|eps ]
+│   ├── <inputfile>.minimap2.paf[ .tsv|.html|.png|.svg ]
+│   ├── <inputfile>.kraken2.report[ .tsv|.html|.png|.svg ]
+│   ├── <inputfile>.blastout.tab.6, <inputfile>.blastout.tab[ .tsv|.html|.png|.svg ]
+│   ├── <inputfile>.bwa.sam[ .tsv|.html|.png|.svg ]
+│   ├── <inputfile>.ngmlr.sam[ .tsv|.html|.png|.svg ]
+│   ├── <inputfile>.[ clark|cuclark ].csv.csv[ .tsv|.html|.png|.svg ]
 │   ├── <inputfile>.abricate.csv                     # profiling stage
-│   ├── <runid>_0.tsv                                # merged normalized hits
+│   ├── <runid>_0_aggregate[ .tsv|.html|.png|.svg ]  # summed counts of all classifiers
 │   └── <runid>_0_final_report.html                  # standalone report
 └── <runid>_1/                                       # sub-run for the 2nd pod5 file
     └── ...
@@ -333,7 +352,7 @@ It reads a two‑column TSV, keeps the top 20 subjects by hit count, and renders
 - **Compose structure.** `builder/rica_s-compose.yml` doesn't define services inline — it `extends` each per‑service file under `builder/<stage>/`. Images are pulled from `alkanlab/*` on Docker Hub; the `build.dockerfile_inline` blocks add common CLI tools (`samtools`, `seqtk`, `seqkit`, …) on top.
 - **Git‑ignored data.** `tools/`, `input/`, `output/`, `evaluation/`, `datasets/`, `reference_genomes/` and the downloaded test data are excluded from version control (see `.gitignore`). They're populated by the download step, pipeline runs, and evaluation.
 - **Reproducibility.** Every classifier wraps its main command in `/usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB"`, so per‑run resource usage (wall time, peak memory) is captured in the log for benchmarking.
-- **Not for clinical use.** This is a research pipeline. Identifications and treatment mappings are for investigation and benchmarking, not diagnosis.
+- **Not for clinical use.** This is a research pipeline. Identifications and resistance-gene hits are for investigation and benchmarking, not diagnosis.
 <!-- 
 ## Troubleshooting
 

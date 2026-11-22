@@ -13,8 +13,8 @@ cuclarkdb=$RICA_S_HOME/tools/rica_s_id_cuclark/
 echo "[cmd]> set_targets.sh $cuclarkdb custom"
 set_targets.sh $cuclarkdb custom
 #/rica_s/output/test_3/rica_s_fl_minimap2/nonhuman_unmapped_sequence.fasta 
-echo "[cmd]> classify_metagenome.sh -n $(nproc) -O $inputfile -R $outdir/$outputfile.cuclark.csv"
-/usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" classify_metagenome.sh  -n `nproc` -O $inputfile -R $outdir/$outputfile.cuclark.csv
+echo "[cmd]> classify_metagenome.sh -n 8 -O $inputfile -R $outdir/$outputfile.cuclark.csv"
+/usr/bin/time -f "\n\tT> %E [h:]m:s.s\n\tM> %M KB" classify_metagenome.sh -n 8 -O $inputfile -R $outdir/$outputfile.cuclark.csv
 
 awk -F',' '
 NR>1 {
